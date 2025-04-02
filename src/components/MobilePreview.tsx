@@ -157,6 +157,21 @@ interface MobilePreviewProps {
 
 const MobilePreview: React.FC<MobilePreviewProps> = ({ components }) => {
   const renderComponent = (component: Component) => {
+    const getOptions = (options: any): string[] => {
+      if (Array.isArray(options)) {
+        return options;
+      }
+      if (typeof options === 'string') {
+        try {
+          const parsed = JSON.parse(options);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          return [];
+        }
+      }
+      return [];
+    };
+
     switch (component.type) {
       case 'text-heading':
         return (
@@ -217,7 +232,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components }) => {
               required={component.properties?.required === 'true'}
             >
               <option value="">{component.properties?.placeholder || 'Select an option'}</option>
-              {JSON.parse(component.properties?.options || '[]').map((option: string) => (
+              {getOptions(component.properties?.options).map((option: string) => (
                 <option key={option} value={option}>{option}</option>
               ))}
             </Select>
@@ -229,7 +244,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components }) => {
           <FormControl key={component.id}>
             <Label>{component.properties?.label || 'Options'}</Label>
             <RadioGroup>
-              {JSON.parse(component.properties?.options || '[]').map((option: string) => (
+              {getOptions(component.properties?.options).map((option: string) => (
                 <CheckboxGroup key={option}>
                   <input type="radio" name={component.id} value={option} />
                   <Label>{option}</Label>
@@ -243,7 +258,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components }) => {
         return (
           <FormControl key={component.id}>
             <Label>{component.properties?.label || 'Options'}</Label>
-            {JSON.parse(component.properties?.options || '[]').map((option: string) => (
+            {getOptions(component.properties?.options).map((option: string) => (
               <CheckboxGroup key={option}>
                 <input type="checkbox" value={option} />
                 <Label>{option}</Label>

@@ -1,51 +1,96 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import Sidebar from './components/Sidebar';
 import Builder from './components/Builder';
 import MobilePreview from './components/MobilePreview';
 import { Component } from './types';
 
-const AppContainer = styled.div`
-  display: flex;
-  height: 100vh;
-  background: #f8f9fa;
-  overflow: hidden;
-`;
+const AppContainer = styled('div')({
+  display: 'flex',
+  height: '100vh',
+  overflow: 'hidden',
+  backgroundColor: '#f5f5f5',
+});
 
-const MainContent = styled.div`
-  flex: 1;
-  display: flex;
-  overflow: hidden;
-`;
+const SidebarContainer = styled('div')({
+  position: 'fixed',
+  left: 0,
+  top: 0,
+  bottom: 0,
+  width: '300px',
+  backgroundColor: '#fff',
+  borderRight: '1px solid #e0e0e0',
+  overflowY: 'auto',
+  zIndex: 100,
+});
 
-const BuilderContainer = styled.div`
-  flex: 1;
-  border-right: 1px solid #eee;
-  background: white;
-  overflow-y: auto;
-  padding: 20px;
-`;
+const BuilderContainer = styled('div')({
+  position: 'fixed',
+  left: '300px',
+  top: 0,
+  bottom: 0,
+  width: 'calc(100% - 300px - 375px - 300px)',
+  backgroundColor: '#fff',
+  padding: '20px',
+  overflowY: 'auto',
+  borderRight: '1px solid #e0e0e0',
+  zIndex: 90,
+});
 
-const PreviewContainer = styled.div`
-  width: 375px;
-  background: #f8f9fa;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
+const PreviewContainer = styled('div')({
+  position: 'fixed',
+  right: '300px',
+  top: 0,
+  bottom: 0,
+  width: '375px',
+  backgroundColor: '#f8f9fa',
+  padding: '20px',
+  overflowY: 'auto',
+  zIndex: 80,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+});
+
+const JsonEditorContainer = styled('div')({
+  position: 'fixed',
+  right: 0,
+  top: 0,
+  bottom: 0,
+  width: '300px',
+  backgroundColor: '#1e1e1e',
+  padding: '20px',
+  overflowY: 'auto',
+  zIndex: 70,
+  color: '#fff',
+});
 
 const App: React.FC = () => {
   const [components, setComponents] = useState<Component[]>([]);
-  const [selectedComponent, setSelectedComponent] = useState<number | null>(null);
+  const [selectedComponent, setSelectedComponent] = useState<Component | null>(null);
+  const [jsonInput, setJsonInput] = useState<string>('[]');
 
   const handleDragEnd = (result: DropResult) => {
-    const { source, destination } = result;
+    if (!result.destination) return;
 
-    if (!destination) return;
+    const { source, destination, draggableId } = result;
 
-    if (source.droppableId === 'builder' && destination.droppableId === 'builder') {
+    if (source.droppableId === 'sidebar' && destination.droppableId === 'builder') {
+      // Add new component from sidebar
+      const newComponent: Component = {
+        id: `component-${Date.now()}`,
+        type: draggableId,
+        name: draggableId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        properties: {}
+      };
+
+      const newComponents = Array.from(components);
+      newComponents.splice(destination.index, 0, newComponent);
+      setComponents(newComponents);
+      setSelectedComponent(newComponent);
+    } else if (source.droppableId === 'builder' && destination.droppableId === 'builder') {
+      // Reorder components in builder
       const newComponents = Array.from(components);
       const [removed] = newComponents.splice(source.index, 1);
       newComponents.splice(destination.index, 0, removed);
@@ -53,154 +98,108 @@ const App: React.FC = () => {
     }
   };
 
-  const handleAddComponent = (componentType: string) => {
+  const handleAddComponent = (type: string) => {
     const newComponent: Component = {
-      id: `${componentType}-${Date.now()}`,
-      type: componentType,
-      name: getComponentName(componentType),
-      properties: getDefaultProperties(componentType)
+      id: `component-${Date.now()}`,
+      type,
+      name: type.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      properties: {}
     };
-
     setComponents(prev => [...prev, newComponent]);
-    setSelectedComponent(components.length); // Select the newly added component
+    setSelectedComponent(newComponent);
   };
 
-  const getComponentName = (type: string): string => {
-    switch (type) {
-      case 'text-heading':
-        return 'Text Heading';
-      case 'sub-heading':
-        return 'Sub Heading';
-      case 'text-body':
-        return 'Text Body';
-      case 'text-caption':
-        return 'Text Caption';
-      case 'rich-text':
-        return 'Rich Text';
-      case 'text-input':
-        return 'Text Input';
-      case 'text-area':
-        return 'Text Area';
-      case 'radio-button':
-        return 'Radio Button';
-      case 'check-box':
-        return 'Check Box';
-      case 'drop-down':
-        return 'Drop Down';
-      case 'footer-button':
-        return 'Footer Button';
-      case 'embedded-link':
-        return 'Embedded Link';
-      case 'opt-in':
-        return 'Opt In';
-      case 'photo':
-        return 'Photo';
-      case 'document':
-        return 'Document';
-      default:
-        return 'Unknown Component';
+  const handlePropertyChange = (componentId: string, property: string, value: any) => {
+    setComponents(prevComponents =>
+      prevComponents.map(comp =>
+        comp.id === componentId
+          ? {
+              ...comp,
+              properties: {
+                ...comp.properties,
+                [property]: value
+              }
+            }
+          : comp
+      )
+    );
+
+    // Update selected component to reflect changes immediately
+    if (selectedComponent && selectedComponent.id === componentId) {
+      setSelectedComponent(prev => prev ? {
+        ...prev,
+        properties: {
+          ...prev.properties,
+          [property]: value
+        }
+      } : null);
     }
   };
 
-  const getDefaultProperties = (type: string): Record<string, string> => {
-    switch (type) {
-      case 'text-heading':
-      case 'sub-heading':
-      case 'text-body':
-      case 'text-caption':
-      case 'rich-text':
-        return {
-          text: 'Enter your text here',
-          label: getComponentName(type)
-        };
-      case 'text-input':
-      case 'text-area':
-        return {
-          label: 'Input Label',
-          placeholder: 'Enter text...',
-          outputVariable: '',
-          required: 'false',
-          inputType: 'text',
-          visible: 'true'
-        };
-      case 'radio-button':
-      case 'check-box':
-        return {
-          label: 'Select Option',
-          outputVariable: '',
-          required: 'false',
-          options: '[]',
-          visible: 'true'
-        };
-      case 'drop-down':
-        return {
-          label: 'Select from dropdown',
-          outputVariable: '',
-          required: 'false',
-          options: '[]',
-          placeholder: 'Select an option',
-          visible: 'true'
-        };
-      case 'footer-button':
-      case 'embedded-link':
-        return {
-          buttonText: 'Submit',
-          variant: 'contained',
-          action: 'submit'
-        };
-      case 'opt-in':
-        return {
-          label: 'I agree to the terms',
-          outputVariable: '',
-          required: 'false'
-        };
-      case 'photo':
-      case 'document':
-        return {
-          label: 'Upload File',
-          outputVariable: '',
-          accept: type === 'photo' ? 'image/*' : 'application/pdf',
-          maxSize: '5',
-          required: 'false'
-        };
-      default:
-        return {};
+  const handleComponentSelect = (component: Component | null) => {
+    setSelectedComponent(component);
+  };
+
+  const handleDeleteComponent = (componentId: string) => {
+    setComponents(prevComponents => prevComponents.filter(comp => comp.id !== componentId));
+    if (selectedComponent?.id === componentId) {
+      setSelectedComponent(null);
     }
   };
 
-  const handleComponentSelect = (index: number) => {
-    setSelectedComponent(index);
-  };
-
-  const handlePropertyChange = (index: number, field: string, value: string) => {
-    setComponents(prev => {
-      const newComponents = [...prev];
-      if (!newComponents[index].properties) {
-        newComponents[index].properties = {};
+  const handleJsonChange = (newJson: string) => {
+    try {
+      const parsed = JSON.parse(newJson);
+      if (Array.isArray(parsed)) {
+        setComponents(parsed);
+        setJsonInput(newJson);
       }
-      newComponents[index].properties![field] = value;
-      return newComponents;
-    });
+    } catch (e) {
+      console.error('Invalid JSON');
+    }
   };
+
+  // Update JSON when components change
+  useEffect(() => {
+    setJsonInput(JSON.stringify(components, null, 2));
+  }, [components]);
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <AppContainer>
-        <Sidebar onAddComponent={handleAddComponent} />
-        <MainContent>
-          <BuilderContainer>
-            <Builder 
-              components={components} 
-              setComponents={setComponents}
-              selectedComponent={selectedComponent}
-              onComponentSelect={handleComponentSelect}
-              onPropertyChange={handlePropertyChange}
-            />
-          </BuilderContainer>
-          <PreviewContainer>
-            <MobilePreview components={components} />
-          </PreviewContainer>
-        </MainContent>
+        <SidebarContainer>
+          <Sidebar onAddComponent={handleAddComponent} />
+        </SidebarContainer>
+        <BuilderContainer>
+          <Builder
+            components={components}
+            selectedComponent={selectedComponent}
+            onComponentSelect={handleComponentSelect}
+            onPropertyChange={handlePropertyChange}
+            onDeleteComponent={handleDeleteComponent}
+          />
+        </BuilderContainer>
+        <PreviewContainer>
+          <MobilePreview components={components} />
+        </PreviewContainer>
+        <JsonEditorContainer>
+          <h3 style={{ color: '#fff', marginBottom: '16px' }}>JSON Editor</h3>
+          <textarea
+            value={jsonInput}
+            onChange={(e) => handleJsonChange(e.target.value)}
+            style={{
+              width: '100%',
+              height: 'calc(100% - 40px)',
+              backgroundColor: '#2d2d2d',
+              color: '#fff',
+              border: '1px solid #444',
+              padding: '8px',
+              fontFamily: 'monospace',
+              fontSize: '14px',
+              resize: 'none'
+            }}
+          />
+        </JsonEditorContainer>
       </AppContainer>
     </DragDropContext>
   );

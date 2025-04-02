@@ -61,31 +61,37 @@ const OptionItem = styled(ListItem)(({ theme }) => ({
 
 interface PropertiesFormProps {
   component: Component;
-  index: number;
-  onPropertyChange: (index: number, field: string, value: string) => void;
+  onPropertyChange: (property: string, value: any) => void;
   onClose: () => void;
 }
 
 const PropertiesForm: React.FC<PropertiesFormProps> = ({
   component,
-  index,
   onPropertyChange,
   onClose
 }) => {
+  const handleChange = (property: string, value: any) => {
+    onPropertyChange(property, value);
+  };
+
   const handleOptionAdd = (field: string) => {
-    const currentOptions = JSON.parse(component.properties?.[field] || '[]');
+    const currentOptions = Array.isArray(component.properties?.[field]) 
+      ? component.properties[field] 
+      : [];
     const newOption = component.properties?.['newOption'] || '';
     if (newOption) {
       const updatedOptions = [...currentOptions, newOption];
-      onPropertyChange(index, field, JSON.stringify(updatedOptions));
-      onPropertyChange(index, 'newOption', '');
+      handleChange(field, updatedOptions);
+      handleChange('newOption', '');
     }
   };
 
   const handleOptionDelete = (field: string, optionToDelete: string) => {
-    const currentOptions = JSON.parse(component.properties?.[field] || '[]');
+    const currentOptions = Array.isArray(component.properties?.[field])
+      ? component.properties[field]
+      : [];
     const updatedOptions = currentOptions.filter((option: string) => option !== optionToDelete);
-    onPropertyChange(index, field, JSON.stringify(updatedOptions));
+    handleChange(field, updatedOptions);
   };
 
   const renderTextFields = () => (
@@ -95,14 +101,14 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         required
         fullWidth
         value={component.properties?.text || ''}
-        onChange={(e) => onPropertyChange(index, 'text', e.target.value)}
+        onChange={(e) => handleChange('text', e.target.value)}
         size="small"
       />
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>
         <Select
           value={component.properties?.visible || 'true'}
-          onChange={(e) => onPropertyChange(index, 'visible', e.target.value)}
+          onChange={(e) => handleChange('visible', e.target.value)}
           label="Visible (Optional)"
         >
           <MenuItem value="true">True</MenuItem>
@@ -113,7 +119,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         <InputLabel>Font Weight (Optional)</InputLabel>
         <Select
           value={component.properties?.fontWeight || 'normal'}
-          onChange={(e) => onPropertyChange(index, 'fontWeight', e.target.value)}
+          onChange={(e) => handleChange('fontWeight', e.target.value)}
           label="Font Weight (Optional)"
         >
           <MenuItem value="normal">Normal</MenuItem>
@@ -124,7 +130,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         <InputLabel>Strike Through (Optional)</InputLabel>
         <Select
           value={component.properties?.strikeThrough || 'false'}
-          onChange={(e) => onPropertyChange(index, 'strikeThrough', e.target.value)}
+          onChange={(e) => handleChange('strikeThrough', e.target.value)}
           label="Strike Through (Optional)"
         >
           <MenuItem value="false">False</MenuItem>
@@ -135,7 +141,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         <InputLabel>Markdown (Optional)</InputLabel>
         <Select
           value={component.properties?.markdown || 'false'}
-          onChange={(e) => onPropertyChange(index, 'markdown', e.target.value)}
+          onChange={(e) => handleChange('markdown', e.target.value)}
           label="Markdown (Optional)"
         >
           <MenuItem value="false">False</MenuItem>
@@ -152,7 +158,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         required
         fullWidth
         value={component.properties?.label || ''}
-        onChange={(e) => onPropertyChange(index, 'label', e.target.value)}
+        onChange={(e) => handleChange('label', e.target.value)}
         size="small"
       />
       <TextField
@@ -160,21 +166,21 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         required
         fullWidth
         value={component.properties?.outputVariable || ''}
-        onChange={(e) => onPropertyChange(index, 'outputVariable', e.target.value)}
+        onChange={(e) => handleChange('outputVariable', e.target.value)}
         size="small"
       />
       <TextField
         label="Init Value (Optional)"
         fullWidth
         value={component.properties?.initValue || ''}
-        onChange={(e) => onPropertyChange(index, 'initValue', e.target.value)}
+        onChange={(e) => handleChange('initValue', e.target.value)}
         size="small"
       />
       <FormControl fullWidth size="small">
         <InputLabel>Required (Optional)</InputLabel>
         <Select
           value={component.properties?.required || 'false'}
-          onChange={(e) => onPropertyChange(index, 'required', e.target.value)}
+          onChange={(e) => handleChange('required', e.target.value)}
           label="Required (Optional)"
         >
           <MenuItem value="false">False</MenuItem>
@@ -186,7 +192,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           <InputLabel>Input Type (Optional)</InputLabel>
           <Select
             value={component.properties?.inputType || 'text'}
-            onChange={(e) => onPropertyChange(index, 'inputType', e.target.value)}
+            onChange={(e) => handleChange('inputType', e.target.value)}
             label="Input Type (Optional)"
           >
             <MenuItem value="text">Text</MenuItem>
@@ -203,7 +209,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             type="number"
             fullWidth
             value={component.properties?.minChars || ''}
-            onChange={(e) => onPropertyChange(index, 'minChars', e.target.value)}
+            onChange={(e) => handleChange('minChars', e.target.value)}
             size="small"
           />
           <TextField
@@ -211,7 +217,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             type="number"
             fullWidth
             value={component.properties?.maxChars || ''}
-            onChange={(e) => onPropertyChange(index, 'maxChars', e.target.value)}
+            onChange={(e) => handleChange('maxChars', e.target.value)}
             size="small"
           />
         </>
@@ -221,7 +227,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           type="number"
           fullWidth
           value={component.properties?.maxLength || ''}
-          onChange={(e) => onPropertyChange(index, 'maxLength', e.target.value)}
+          onChange={(e) => handleChange('maxLength', e.target.value)}
           size="small"
         />
       )}
@@ -229,7 +235,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         label="Helper Text (Optional)"
         fullWidth
         value={component.properties?.helperText || ''}
-        onChange={(e) => onPropertyChange(index, 'helperText', e.target.value)}
+        onChange={(e) => handleChange('helperText', e.target.value)}
         size="small"
       />
     </Stack>
@@ -242,14 +248,14 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         required
         fullWidth
         value={component.properties?.label || ''}
-        onChange={(e) => onPropertyChange(index, 'label', e.target.value)}
+        onChange={(e) => handleChange('label', e.target.value)}
         size="small"
       />
       <TextField
         label="Description (Optional)"
         fullWidth
         value={component.properties?.description || ''}
-        onChange={(e) => onPropertyChange(index, 'description', e.target.value)}
+        onChange={(e) => handleChange('description', e.target.value)}
         size="small"
       />
       <TextField
@@ -257,14 +263,14 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         required
         fullWidth
         value={component.properties?.outputVariable || ''}
-        onChange={(e) => onPropertyChange(index, 'outputVariable', e.target.value)}
+        onChange={(e) => handleChange('outputVariable', e.target.value)}
         size="small"
       />
       <FormControl fullWidth size="small">
         <InputLabel>Property (Optional)</InputLabel>
         <Select
           value={component.properties?.property || ''}
-          onChange={(e) => onPropertyChange(index, 'property', e.target.value)}
+          onChange={(e) => handleChange('property', e.target.value)}
           label="Property (Optional)"
         >
           <MenuItem value="">Select property</MenuItem>
@@ -281,7 +287,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             size="small"
             fullWidth
             value={component.properties?.newOption || ''}
-            onChange={(e) => onPropertyChange(index, 'newOption', e.target.value)}
+            onChange={(e) => handleChange('newOption', e.target.value)}
             placeholder="Add new option"
           />
           <Button
@@ -293,7 +299,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           </Button>
         </Stack>
         <List>
-          {JSON.parse(component.properties?.options || '[]').map((option: string) => (
+          {Array.isArray(component.properties?.options) && component.properties.options.map((option: string) => (
             <OptionItem key={option}>
               <ListItemText primary={option} />
               <ListItemSecondaryAction>
@@ -313,11 +319,11 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         <InputLabel>Init Value (Optional)</InputLabel>
         <Select
           value={component.properties?.initValue || ''}
-          onChange={(e) => onPropertyChange(index, 'initValue', e.target.value)}
+          onChange={(e) => handleChange('initValue', e.target.value)}
           label="Init Value (Optional)"
         >
           <MenuItem value="">Select value</MenuItem>
-          {JSON.parse(component.properties?.options || '[]').map((option: string) => (
+          {Array.isArray(component.properties?.options) && component.properties.options.map((option: string) => (
             <MenuItem key={option} value={option}>{option}</MenuItem>
           ))}
         </Select>
@@ -326,7 +332,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         <InputLabel>Required (Optional)</InputLabel>
         <Select
           value={component.properties?.required || 'false'}
-          onChange={(e) => onPropertyChange(index, 'required', e.target.value)}
+          onChange={(e) => handleChange('required', e.target.value)}
           label="Required (Optional)"
         >
           <MenuItem value="false">False</MenuItem>
@@ -340,7 +346,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             type="number"
             fullWidth
             value={component.properties?.minSelectedItems || ''}
-            onChange={(e) => onPropertyChange(index, 'minSelectedItems', e.target.value)}
+            onChange={(e) => handleChange('minSelectedItems', e.target.value)}
             size="small"
           />
           <TextField
@@ -348,7 +354,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             type="number"
             fullWidth
             value={component.properties?.maxSelectedItems || ''}
-            onChange={(e) => onPropertyChange(index, 'maxSelectedItems', e.target.value)}
+            onChange={(e) => handleChange('maxSelectedItems', e.target.value)}
             size="small"
           />
         </>
@@ -363,7 +369,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         required
         fullWidth
         value={component.properties?.label || ''}
-        onChange={(e) => onPropertyChange(index, 'label', e.target.value)}
+        onChange={(e) => handleChange('label', e.target.value)}
         size="small"
       />
       {component.type === 'footer-button' && (
@@ -372,21 +378,21 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             label="Left-Caption (Optional)"
             fullWidth
             value={component.properties?.leftCaption || ''}
-            onChange={(e) => onPropertyChange(index, 'leftCaption', e.target.value)}
+            onChange={(e) => handleChange('leftCaption', e.target.value)}
             size="small"
           />
           <TextField
             label="Center-Caption (Optional)"
             fullWidth
             value={component.properties?.centerCaption || ''}
-            onChange={(e) => onPropertyChange(index, 'centerCaption', e.target.value)}
+            onChange={(e) => handleChange('centerCaption', e.target.value)}
             size="small"
           />
           <TextField
             label="Right-Caption (Optional)"
             fullWidth
             value={component.properties?.rightCaption || ''}
-            onChange={(e) => onPropertyChange(index, 'rightCaption', e.target.value)}
+            onChange={(e) => handleChange('rightCaption', e.target.value)}
             size="small"
           />
         </>
@@ -398,14 +404,14 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             required
             fullWidth
             value={component.properties?.text || ''}
-            onChange={(e) => onPropertyChange(index, 'text', e.target.value)}
+            onChange={(e) => handleChange('text', e.target.value)}
             size="small"
           />
           <FormControl fullWidth size="small">
             <InputLabel>Visible (Optional)</InputLabel>
             <Select
               value={component.properties?.visible || 'true'}
-              onChange={(e) => onPropertyChange(index, 'visible', e.target.value)}
+              onChange={(e) => handleChange('visible', e.target.value)}
               label="Visible (Optional)"
             >
               <MenuItem value="true">True</MenuItem>
@@ -418,7 +424,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         <InputLabel>On Click Action</InputLabel>
         <Select
           value={component.properties?.onClickAction || ''}
-          onChange={(e) => onPropertyChange(index, 'onClickAction', e.target.value)}
+          onChange={(e) => handleChange('onClickAction', e.target.value)}
           label="On Click Action"
         >
           <MenuItem value="">Select action</MenuItem>
@@ -437,14 +443,14 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         required
         fullWidth
         value={component.properties?.label || ''}
-        onChange={(e) => onPropertyChange(index, 'label', e.target.value)}
+        onChange={(e) => handleChange('label', e.target.value)}
         size="small"
       />
       <TextField
         label="Description (Optional)"
         fullWidth
         value={component.properties?.description || ''}
-        onChange={(e) => onPropertyChange(index, 'description', e.target.value)}
+        onChange={(e) => handleChange('description', e.target.value)}
         size="small"
       />
       <TextField
@@ -452,14 +458,14 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         required
         fullWidth
         value={component.properties?.outputVariable || ''}
-        onChange={(e) => onPropertyChange(index, 'outputVariable', e.target.value)}
+        onChange={(e) => handleChange('outputVariable', e.target.value)}
         size="small"
       />
       <FormControl fullWidth size="small">
         <InputLabel>Photo Source (Optional)</InputLabel>
         <Select
           value={component.properties?.photoSource || 'camera'}
-          onChange={(e) => onPropertyChange(index, 'photoSource', e.target.value)}
+          onChange={(e) => handleChange('photoSource', e.target.value)}
           label="Photo Source (Optional)"
         >
           <MenuItem value="camera">Camera Gallery</MenuItem>
@@ -472,7 +478,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         type="number"
         fullWidth
         value={component.properties?.minPhotos || ''}
-        onChange={(e) => onPropertyChange(index, 'minPhotos', e.target.value)}
+        onChange={(e) => handleChange('minPhotos', e.target.value)}
         size="small"
       />
       <TextField
@@ -481,7 +487,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         type="number"
         fullWidth
         value={component.properties?.maxPhotos || ''}
-        onChange={(e) => onPropertyChange(index, 'maxPhotos', e.target.value)}
+        onChange={(e) => handleChange('maxPhotos', e.target.value)}
         size="small"
       />
       <TextField
@@ -489,14 +495,14 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         type="number"
         fullWidth
         value={component.properties?.maxFileSize || '25'}
-        onChange={(e) => onPropertyChange(index, 'maxFileSize', e.target.value)}
+        onChange={(e) => handleChange('maxFileSize', e.target.value)}
         size="small"
       />
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>
         <Select
           value={component.properties?.visible || 'true'}
-          onChange={(e) => onPropertyChange(index, 'visible', e.target.value)}
+          onChange={(e) => handleChange('visible', e.target.value)}
           label="Visible (Optional)"
         >
           <MenuItem value="true">True</MenuItem>
@@ -507,7 +513,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         <InputLabel>Enabled (Optional)</InputLabel>
         <Select
           value={component.properties?.enabled || 'true'}
-          onChange={(e) => onPropertyChange(index, 'enabled', e.target.value)}
+          onChange={(e) => handleChange('enabled', e.target.value)}
           label="Enabled (Optional)"
         >
           <MenuItem value="true">True</MenuItem>
@@ -552,7 +558,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           control={
             <Switch
               checked={component.properties?.isDynamic === 'true'}
-              onChange={(e) => onPropertyChange(index, 'isDynamic', e.target.checked.toString())}
+              onChange={(e) => handleChange('isDynamic', e.target.checked.toString())}
               color="primary"
             />
           }

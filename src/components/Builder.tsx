@@ -25,9 +25,14 @@ const ComponentsList = styled.div`
   min-height: 100%;
 `;
 
-const DroppedComponent = styled.div<{ isSelected: boolean; type: string }>`
+interface DroppedComponentProps {
+  $isSelected: boolean;
+  $type: string;
+}
+
+const DroppedComponent = styled.div<DroppedComponentProps>`
   background: white;
-  border: 2px solid ${props => props.isSelected ? '#2196f3' : '#e0e0e0'};
+  border: 2px solid ${props => props.$isSelected ? '#2196f3' : '#e0e0e0'};
   border-radius: 4px;
   padding: 10px;
   cursor: pointer;
@@ -64,26 +69,19 @@ const ComponentContent = styled.div`
 
 interface BuilderProps {
   components: Component[];
-  setComponents: React.Dispatch<React.SetStateAction<Component[]>>;
-  selectedComponent: number | null;
-  onComponentSelect: (index: number) => void;
-  onPropertyChange: (index: number, field: string, value: string) => void;
+  selectedComponent: Component | null;
+  onComponentSelect: (component: Component | null) => void;
+  onPropertyChange: (componentId: string, property: string, value: any) => void;
+  onDeleteComponent: (componentId: string) => void;
 }
 
 const Builder: React.FC<BuilderProps> = ({
   components,
-  setComponents,
   selectedComponent,
   onComponentSelect,
-  onPropertyChange
+  onPropertyChange,
+  onDeleteComponent
 }) => {
-  const handleDeleteComponent = (index: number) => {
-    setComponents(prev => prev.filter((_, i) => i !== index));
-    if (selectedComponent === index) {
-      onComponentSelect(-1);
-    }
-  };
-
   const renderComponentContent = (component: Component) => {
     switch (component.type) {
       case 'text-body':
@@ -126,9 +124,9 @@ const Builder: React.FC<BuilderProps> = ({
                         ...provided.draggableProps.style,
                         opacity: snapshot.isDragging ? 0.5 : 1
                       }}
-                      isSelected={selectedComponent === index}
-                      type={component.type}
-                      onClick={() => onComponentSelect(index)}
+                      $isSelected={selectedComponent?.id === component.id}
+                      $type={component.type}
+                      onClick={() => onComponentSelect(component)}
                     >
                       <ComponentHeader>
                         <ComponentTitle>
@@ -142,7 +140,7 @@ const Builder: React.FC<BuilderProps> = ({
                             style={{ color: '#666', cursor: 'pointer' }}
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDeleteComponent(index);
+                              onDeleteComponent(component.id);
                             }}
                           />
                         </div>
@@ -158,12 +156,11 @@ const Builder: React.FC<BuilderProps> = ({
         </Droppable>
       </BuildArea>
       
-      {selectedComponent !== null && selectedComponent >= 0 && components[selectedComponent] && (
+      {selectedComponent && (
         <PropertiesForm
-          component={components[selectedComponent]}
-          index={selectedComponent}
-          onPropertyChange={onPropertyChange}
-          onClose={() => onComponentSelect(-1)}
+          component={selectedComponent}
+          onPropertyChange={(property, value) => onPropertyChange(selectedComponent.id, property, value)}
+          onClose={() => onComponentSelect(null)}
         />
       )}
     </BuilderContainer>
