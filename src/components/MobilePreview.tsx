@@ -56,7 +56,7 @@ const FormControl = styled.div`
 
 const Label = styled.label`
   font-size: 14px;
-  color: #666;
+  color: #333;
 `;
 
 const Input = styled.input`
@@ -64,6 +64,7 @@ const Input = styled.input`
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+  color: #333;
 
   &:focus {
     outline: none;
@@ -78,6 +79,7 @@ const TextArea = styled.textarea`
   font-size: 14px;
   min-height: 100px;
   resize: vertical;
+  color: #333;
 
   &:focus {
     outline: none;
@@ -91,6 +93,7 @@ const Select = styled.select`
   border-radius: 4px;
   font-size: 14px;
   background: white;
+  color: #333;
 
   &:focus {
     outline: none;
