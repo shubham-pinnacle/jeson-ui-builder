@@ -73,6 +73,8 @@ interface BuilderProps {
   onComponentSelect: (component: Component | null) => void;
   onPropertyChange: (componentId: string, property: string, value: any) => void;
   onDeleteComponent: (componentId: string) => void;
+  onDragEnd: (result: any) => void;
+  onAddComponent: (component: Component) => void;
 }
 
 const Builder: React.FC<BuilderProps> = ({
@@ -80,13 +82,21 @@ const Builder: React.FC<BuilderProps> = ({
   selectedComponent,
   onComponentSelect,
   onPropertyChange,
-  onDeleteComponent
+  onDeleteComponent,
+  onDragEnd,
+  onAddComponent
 }) => {
   const renderComponentContent = (component: Component) => {
     switch (component.type) {
-      case 'text-body':
+      case 'text-heading':
         return <ComponentContent>{component.properties?.text || 'No text content'}</ComponentContent>;
       case 'text-input':
+        return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
+      case 'text-area':
+        return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
+      case 'check-box':
+        return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
+      case 'radio-button':
         return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
       case 'footer-button':
         return <ComponentContent>{component.properties?.buttonText || 'Submit'}</ComponentContent>;
