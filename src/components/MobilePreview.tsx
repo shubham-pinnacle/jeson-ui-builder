@@ -2,16 +2,26 @@ import React from 'react';
 import styled from 'styled-components';
 import { Component } from '../types';
 
+const PreviewContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height for vertical centering */
+  background: #ffffff; /* Optional: background color for contrast */
+  margin-bottom: 15px;
+`;
+
 const PreviewFrame = styled.div`
   width: 320px;
-  height: 640px;
+  height: 70vh;
   background: white;
   border-radius: 32px;
   padding: 20px;
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
   position: relative;
   overflow-y: auto;
-  border: 12px solid #333;
+  border: 3px solid #333;
+  margin: auto;
 
   &:before {
     content: '';
@@ -345,15 +355,17 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components }) => {
   };
 
   return (
-    <PreviewFrame>
-      <PreviewHeader>
-        <PreviewTitle>Step One</PreviewTitle>
-      </PreviewHeader>
-      <PreviewContent>
-        {components.map(component => renderComponent(component))}
-      </PreviewContent>
-    </PreviewFrame>
+    <PreviewContainer>
+      <PreviewFrame>
+        <PreviewHeader>
+          <PreviewTitle>Screen Name</PreviewTitle>
+        </PreviewHeader>
+        <PreviewContent>
+          {components.map(component => renderComponent(component))}
+        </PreviewContent>
+      </PreviewFrame>
+    </PreviewContainer>
   );
 };
 
-export default MobilePreview; 
+export default MobilePreview;

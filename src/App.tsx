@@ -24,11 +24,16 @@ const AppContainer = styled('div')({
 const SidebarContainer = styled('div')({
   width: '300px',
   minWidth: '300px',
-  height: '100vh',
+  height: '97vh',
   backgroundColor: '#ffffff',
   borderRight: '1px solid #e0e0e0',
-  overflowY: 'auto',
+  overflowY: 'hidden',
+  overflowX: 'hidden',
   boxShadow: '2px 0 4px rgba(0,0,0,0.05)',
+  borderRadius: '15px',
+  marginTop: '13px',
+  marginRight: '10px',
+  marginBottom: '30px',
 });
 
 const MainContent = styled('div')({
@@ -41,13 +46,13 @@ const MainContent = styled('div')({
 const BuilderContainer = styled('div')<{ isPreviewVisible: boolean }>(({ isPreviewVisible }) => ({
   width: isPreviewVisible ? 'calc(100% - 875px)' : 'calc(100% - 500px)',
   minWidth: isPreviewVisible ? 'calc(100% - 875px)' : 'calc(100% - 500px)',
-  height: '100%',
+  height: '98vh',
   backgroundColor: '#ffffff',
   borderRight: '1px solid #e0e0e0',
   overflow: 'hidden',
-  display: 'flex',
   flexDirection: 'column',
   transition: 'all 0.3s ease',
+  borderRadius: '15px',
 }));
 
 const PreviewContainer = styled('div')<{ isVisible: boolean }>(({ isVisible }) => ({
@@ -65,11 +70,13 @@ const PreviewContainer = styled('div')<{ isVisible: boolean }>(({ isVisible }) =
 const JsonEditorContainer = styled('div')({
   width: '500px',
   minWidth: '500px',
-  height: '100%',
+  height: '98vh',
   backgroundColor: '#ffffff',
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
+  marginLeft: '10px',
+  borderRadius: '15px',
 });
 
 const ButtonGroupContainer = styled('div')({
@@ -435,8 +442,8 @@ function App() {
   };
 
   return (
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <AppContainer>
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <AppContainer>
         <SidebarContainer>
           <Sidebar onAddComponent={handleAddComponent} />
         </SidebarContainer>
@@ -445,6 +452,7 @@ function App() {
           <BuilderContainer isPreviewVisible={showPreview}>
             <ButtonGroupContainer>
               <StyledButton
+                style={{ marginLeft: 'auto' }}  // This pushes the button to the right
                 variant="outlined"
                 size="small"
                 onClick={() => setShowPreview(!showPreview)}
@@ -486,8 +494,8 @@ function App() {
             />
           </JsonEditorContainer>
         </MainContent>
-          </AppContainer>
-        </DragDropContext>
+      </AppContainer>
+    </DragDropContext>
   );
 }
 

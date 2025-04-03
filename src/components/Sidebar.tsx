@@ -14,7 +14,7 @@ const SidebarContainer = styled.div`
   height: 100vh;
   padding: 20px;
   border-right: 1px solid #eee;
-  overflow-y: auto;
+  overflow-y: hidden;
 `;
 
 const SectionTitle = styled.h2`
@@ -57,28 +57,28 @@ const ComponentName = styled.span`
 `;
 
 const components = {
-  basicText: [
+  BasicText: [
     { id: 'text-heading', name: 'Text Heading', icon: FaHeading },
     { id: 'sub-heading', name: 'Sub Heading', icon: FaFont },
     { id: 'text-body', name: 'Text Body', icon: FaAlignLeft },
     { id: 'text-caption', name: 'Text Caption', icon: FaParagraph },
     { id: 'rich-text', name: 'Rich Text', icon: FaFont },
   ],
-  textEntry: [
+  TextEntry: [
     { id: 'text-input', name: 'Text Input', icon: BsInputCursorText },
     { id: 'text-area', name: 'Text Area', icon: BsTextareaResize },
   ],
-  selectControls: [
+  SelectControls: [
     { id: 'radio-button', name: 'Radio Button', icon: MdRadioButtonChecked },
     { id: 'check-box', name: 'Check Box', icon: MdCheckBox },
     { id: 'drop-down', name: 'Drop Down', icon: IoMdArrowDropdown },
   ],
-  buttons: [
+  Buttons: [
     { id: 'footer-button', name: 'Footer Button', icon: AiOutlineLink },
     { id: 'embedded-link', name: 'Embedded Link', icon: AiOutlineLink },
     { id: 'opt-in', name: 'Opt In', icon: MdCheckBox },
   ],
-  mediaInput: [
+  MediaInput: [
     { id: 'photo', name: 'Photo', icon: BiImageAlt },
     { id: 'document', name: 'Document', icon: BiImageAlt },
   ],
