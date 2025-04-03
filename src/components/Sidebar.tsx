@@ -13,9 +13,21 @@ const SidebarContainer = styled.div`
   background: white;
   height: 100vh;
   padding: 20px;
-  border-right: 1px solid #eee;
-  overflow-y: hidden;
+  border-right: 0.5px solid #ffff;
+  overflow-y: scroll; /* Still allow scrolling */
+  
+  /* Hide scrollbar for Firefox */
+  scrollbar-width: none; 
+  
+  /* Hide scrollbar for IE, Edge */
+  -ms-overflow-style: none; 
+  
+  /* Hide scrollbar for Chrome, Safari, and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
+
 
 const SectionTitle = styled.h2`
   font-size: 16px;

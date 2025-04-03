@@ -31,7 +31,7 @@ const ComponentsList = styled.div`
 const ComponentWrapper = styled.div<DroppedComponentProps>`
   background: white;
   border: 2px solid ${props => props.$isSelected ? '#2196f3' : '#e0e0e0'};
-  border-radius: 4px;
+  border-radius: 13px;
   padding: 10px;
   cursor: pointer;
   transition: all 0.2s ease;

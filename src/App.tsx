@@ -59,7 +59,6 @@ const PreviewContainer = styled('div')<{ isVisible: boolean }>(({ isVisible }) =
   width: '375px',
   minWidth: '375px',
   height: '100%',
-  backgroundColor: '#ffffff',
   borderRight: '1px solid #e0e0e0',
   overflow: 'hidden',
   display: isVisible ? 'flex' : 'none',
@@ -452,7 +451,7 @@ function App() {
           <BuilderContainer isPreviewVisible={showPreview}>
             <ButtonGroupContainer>
               <StyledButton
-                style={{ marginLeft: 'auto' }}  // This pushes the button to the right
+                style={{ marginLeft: 'auto' }}  // Positions the button to the right
                 variant="outlined"
                 size="small"
                 onClick={() => setShowPreview(!showPreview)}
@@ -472,13 +471,10 @@ function App() {
             />
           </BuilderContainer>
 
-          <PreviewContainer isVisible={showPreview}>
-            <MobilePreview components={components} />
-          </PreviewContainer>
-
           <JsonEditorContainer>
             <ButtonGroupContainer>
               <StyledButton
+                style={{ marginLeft: 'auto' }}  // Moves the Copy JSON button to the right
                 variant="outlined"
                 size="small"
                 onClick={handleCopyJson}
@@ -493,6 +489,10 @@ function App() {
               onMetaGenerate={handleMetaGenerate}
             />
           </JsonEditorContainer>
+
+          <PreviewContainer isVisible={showPreview}>
+            <MobilePreview components={components} />
+          </PreviewContainer>
         </MainContent>
       </AppContainer>
     </DragDropContext>

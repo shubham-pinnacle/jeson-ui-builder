@@ -7,7 +7,7 @@ const PreviewContainer = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh; /* Full viewport height for vertical centering */
-  background: #ffffff; /* Optional: background color for contrast */
+  // background: #ffff; /* Optional: background color for contrast */
   margin-bottom: 15px;
 `;
 
