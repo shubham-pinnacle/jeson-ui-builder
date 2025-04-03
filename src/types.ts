@@ -18,9 +18,6 @@ export interface BuilderProps {
 }
 
 export interface SidebarProps {
-  components: Component[];
-  onComponentSelect: (component: Component | null) => void;
-  onDeleteComponent: (componentId: string) => void;
   onAddComponent: (type: string) => void;
 }
 
@@ -32,8 +29,6 @@ export interface MetaJsonGeneratorProps {
 
 export interface MobilePreviewProps {
   components: Component[];
-  selectedComponent: Component | null;
-  onComponentSelect: (component: Component | null) => void;
 }
 
 export interface DroppedComponentProps {
