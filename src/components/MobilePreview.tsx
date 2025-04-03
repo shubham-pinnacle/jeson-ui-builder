@@ -59,33 +59,41 @@ const Label = styled.label`
   color: #333;
 `;
 
-const Input = styled.input`
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #333;
-
-  &:focus {
-    outline: none;
-    border-color: #2196f3;
+const StyledInput = styled('input')({
+  width: '100%',
+  padding: '8px 12px',
+  border: '1px solid #333',
+  borderRadius: '4px',
+  fontSize: '16px',
+  backgroundColor: '#000',
+  color: '#fff',
+  '&:focus': {
+    outline: 'none',
+    borderColor: '#90caf9',
+  },
+  '&::placeholder': {
+    color: '#666',
   }
-`;
+});
 
-const TextArea = styled.textarea`
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  min-height: 100px;
-  resize: vertical;
-  color: #333;
-
-  &:focus {
-    outline: none;
-    border-color: #2196f3;
+const StyledTextArea = styled('textarea')({
+  width: '100%',
+  padding: '8px 12px',
+  border: '1px solid #333',
+  borderRadius: '4px',
+  fontSize: '16px',
+  minHeight: '100px',
+  resize: 'vertical',
+  backgroundColor: '#000',
+  color: '#fff',
+  '&:focus': {
+    outline: 'none',
+    borderColor: '#90caf9',
+  },
+  '&::placeholder': {
+    color: '#666',
   }
-`;
+});
 
 const Select = styled.select`
   padding: 8px 12px;
@@ -101,20 +109,23 @@ const Select = styled.select`
   }
 `;
 
-const Button = styled.button<{ variant?: string }>`
-  padding: 8px 16px;
-  background: ${props => props.variant === 'contained' ? '#2196f3' : 'transparent'};
-  color: ${props => props.variant === 'contained' ? 'white' : '#2196f3'};
-  border: ${props => props.variant === 'contained' ? 'none' : '1px solid #2196f3'};
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: ${props => props.variant === 'contained' ? '#1976d2' : 'rgba(33, 150, 243, 0.1)'};
+const StyledButton = styled('button')({
+  width: '100%',
+  padding: '12px',
+  backgroundColor: '#2196f3',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '4px',
+  fontSize: '16px',
+  cursor: 'pointer',
+  '&:hover': {
+    backgroundColor: '#1976d2',
+  },
+  '&:disabled': {
+    backgroundColor: '#666',
+    cursor: 'not-allowed',
   }
-`;
+});
 
 const Heading = styled.h2`
   font-size: 24px;
@@ -153,6 +164,32 @@ const RadioGroup = styled.div`
   flex-direction: column;
   gap: 8px;
 `;
+
+const StyledCheckbox = styled('input')({
+  marginRight: '8px',
+  width: '18px',
+  height: '18px',
+  cursor: 'pointer',
+  backgroundColor: '#000',
+  borderColor: '#333',
+  '&:checked': {
+    backgroundColor: '#90caf9',
+    borderColor: '#90caf9',
+  }
+});
+
+const StyledRadio = styled('input')({
+  marginRight: '8px',
+  width: '18px',
+  height: '18px',
+  cursor: 'pointer',
+  backgroundColor: '#000',
+  borderColor: '#333',
+  '&:checked': {
+    backgroundColor: '#90caf9',
+    borderColor: '#90caf9',
+  }
+});
 
 interface MobilePreviewProps {
   components: Component[];
@@ -208,7 +245,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components }) => {
         return (
           <FormControl key={component.id}>
             <Label>{component.properties?.label || 'Label'}</Label>
-            <Input 
+            <StyledInput 
               type={component.properties?.inputType || 'text'}
               placeholder={component.properties?.placeholder}
               required={component.properties?.required === 'true'}
@@ -220,7 +257,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components }) => {
         return (
           <FormControl key={component.id}>
             <Label>{component.properties?.label || 'Label'}</Label>
-            <TextArea 
+            <StyledTextArea 
               placeholder={component.properties?.placeholder}
               required={component.properties?.required === 'true'}
             />
@@ -249,7 +286,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components }) => {
             <RadioGroup>
               {getOptions(component.properties?.options).map((option: string) => (
                 <CheckboxGroup key={option}>
-                  <input type="radio" name={component.id} value={option} />
+                  <StyledRadio type="radio" name={component.id} value={option} />
                   <Label>{option}</Label>
                 </CheckboxGroup>
               ))}
@@ -263,7 +300,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components }) => {
             <Label>{component.properties?.label || 'Options'}</Label>
             {getOptions(component.properties?.options).map((option: string) => (
               <CheckboxGroup key={option}>
-                <input type="checkbox" value={option} />
+                <StyledCheckbox type="checkbox" value={option} />
                 <Label>{option}</Label>
               </CheckboxGroup>
             ))}
@@ -273,18 +310,18 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components }) => {
       case 'footer-button':
       case 'embedded-link':
         return (
-          <Button 
+          <StyledButton 
             key={component.id}
             variant={component.properties?.variant}
           >
             {component.properties?.buttonText || 'Submit'}
-          </Button>
+          </StyledButton>
         );
 
       case 'opt-in':
         return (
           <CheckboxGroup key={component.id}>
-            <input type="checkbox" required={component.properties?.required === 'true'} />
+            <StyledCheckbox type="checkbox" required={component.properties?.required === 'true'} />
             <Label>{component.properties?.label || 'I agree'}</Label>
           </CheckboxGroup>
         );
@@ -294,7 +331,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components }) => {
         return (
           <FormControl key={component.id}>
             <Label>{component.properties?.label || 'Upload File'}</Label>
-            <Input 
+            <StyledInput 
               type="file"
               accept={component.properties?.accept}
               required={component.properties?.required === 'true'}
