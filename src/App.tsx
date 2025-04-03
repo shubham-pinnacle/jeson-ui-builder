@@ -242,15 +242,18 @@ function App() {
     });
 
     setComponents(updatedComponents);
+    
+    // Update the selected component if it's the one being changed
     if (selectedComponent?.id === componentId) {
-      setSelectedComponent(prev => prev ? {
-        ...prev,
-        properties: {
-          ...prev.properties,
-          [property]: value
-        }
-      } : null);
+      const updatedSelectedComponent = updatedComponents.find(comp => comp.id === componentId);
+      if (updatedSelectedComponent) {
+        setSelectedComponent(updatedSelectedComponent);
+      }
     }
+    
+    // Update the JSON editor with the new components
+    const jsonString = JSON.stringify(generateJson(), null, 2);
+    setEditValue(jsonString);
   };
 
   const handleDeleteComponent = (componentId: string) => {
@@ -331,6 +334,18 @@ function App() {
           });
 
           setComponents(newComponents);
+          
+          // If there's a selected component, update it to match the new components
+          if (selectedComponent) {
+            const updatedSelectedComponent = newComponents.find(
+              (comp: Component) => comp.type === selectedComponent.type && 
+              comp.properties.label === selectedComponent.properties.label
+            );
+            
+            if (updatedSelectedComponent) {
+              setSelectedComponent(updatedSelectedComponent);
+            }
+          }
         }
       }
     } catch (error) {
@@ -420,8 +435,8 @@ function App() {
   };
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <AppContainer>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <AppContainer>
         <SidebarContainer>
           <Sidebar onAddComponent={handleAddComponent} />
         </SidebarContainer>
@@ -445,7 +460,7 @@ function App() {
               onPropertyChange={handlePropertyChange}
               onDeleteComponent={handleDeleteComponent}
               onDragEnd={handleDragEnd}
-              onAddComponent={handleAddComponent}
+              onAddComponent={(type: string) => handleAddComponent(type)}
             />
           </BuilderContainer>
 
@@ -471,8 +486,8 @@ function App() {
             />
           </JsonEditorContainer>
         </MainContent>
-      </AppContainer>
-    </DragDropContext>
+          </AppContainer>
+        </DragDropContext>
   );
 }
 

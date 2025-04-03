@@ -3,8 +3,11 @@ import styled from 'styled-components';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
-import { Component } from '../types';
+import { Component, BuilderProps, DroppedComponentProps } from '../types';
 import PropertiesForm from './PropertiesForm';
+import DroppedComponent from './DroppedComponent';
+import { Box, Typography, IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const BuilderContainer = styled.div`
   display: flex;
@@ -25,12 +28,7 @@ const ComponentsList = styled.div`
   min-height: 100%;
 `;
 
-interface DroppedComponentProps {
-  $isSelected: boolean;
-  $type: string;
-}
-
-const DroppedComponent = styled.div<DroppedComponentProps>`
+const ComponentWrapper = styled.div<DroppedComponentProps>`
   background: white;
   border: 2px solid ${props => props.$isSelected ? '#2196f3' : '#e0e0e0'};
   border-radius: 4px;
@@ -67,16 +65,6 @@ const ComponentContent = styled.div`
   color: #666;
 `;
 
-interface BuilderProps {
-  components: Component[];
-  selectedComponent: Component | null;
-  onComponentSelect: (component: Component | null) => void;
-  onPropertyChange: (componentId: string, property: string, value: any) => void;
-  onDeleteComponent: (componentId: string) => void;
-  onDragEnd: (result: any) => void;
-  onAddComponent: (component: Component) => void;
-}
-
 const Builder: React.FC<BuilderProps> = ({
   components,
   selectedComponent,
@@ -84,8 +72,22 @@ const Builder: React.FC<BuilderProps> = ({
   onPropertyChange,
   onDeleteComponent,
   onDragEnd,
-  onAddComponent
+  onAddComponent,
 }) => {
+  const handleComponentClick = (component: Component) => {
+    onComponentSelect(component);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, componentId: string) => {
+    e.stopPropagation();
+    onDeleteComponent(componentId);
+  };
+
+  // This function is needed to match the interface but won't be used
+  const handleAddComponentWrapper = (type: string) => {
+    onAddComponent(type);
+  };
+
   const renderComponentContent = (component: Component) => {
     switch (component.type) {
       case 'text-heading':
@@ -126,7 +128,7 @@ const Builder: React.FC<BuilderProps> = ({
                   index={index}
                 >
                   {(provided, snapshot) => (
-                    <DroppedComponent
+                    <ComponentWrapper
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
@@ -136,7 +138,7 @@ const Builder: React.FC<BuilderProps> = ({
                       }}
                       $isSelected={selectedComponent?.id === component.id}
                       $type={component.type}
-                      onClick={() => onComponentSelect(component)}
+                      onClick={() => handleComponentClick(component)}
                     >
                       <ComponentHeader>
                         <ComponentTitle>
@@ -156,7 +158,7 @@ const Builder: React.FC<BuilderProps> = ({
                         </div>
                       </ComponentHeader>
                       {renderComponentContent(component)}
-                    </DroppedComponent>
+                    </ComponentWrapper>
                   )}
                 </Draggable>
               ))}
