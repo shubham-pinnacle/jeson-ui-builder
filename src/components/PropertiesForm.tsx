@@ -151,6 +151,32 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
     </Stack>
   );
 
+
+  const renderTextHeading = () => (
+    <Stack spacing={2}>
+      <TextField
+        label='text-heading' 
+        required
+        fullWidth
+        value={component.properties?.text || ''}
+        onChange={(e) => handleChange('text', e.target.value)}
+        size="small"
+      />
+      <FormControl fullWidth size="small">
+        <InputLabel>Visible (Optional)</InputLabel>
+        <Select
+          value={component.properties?.visible || 'true'}
+          onChange={(e) => handleChange('visible', e.target.value)}
+          label="Visible (Optional)"
+        >
+          <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
+        </Select>
+      </FormControl>
+      
+    </Stack>
+  );
+
   const renderInputFields = () => (
     <Stack spacing={2}>
       <TextField
@@ -525,12 +551,19 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
 
   const renderFields = () => {
     switch (component.type) {
-      case 'text-heading':
-      case 'sub-heading':
+      
+      
       case 'text-body':
       case 'text-caption':
-      case 'rich-text':
+      
         return renderTextFields();
+
+      case 'text-heading':
+      case 'sub-heading':
+       return renderTextHeading();
+
+       case 'rich-text':
+        
       case 'text-input':
       case 'text-area':
         return renderInputFields();
