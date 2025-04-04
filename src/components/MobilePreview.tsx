@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Component } from '../types';
 import { TextField, FormControl, FormLabel, FormGroup, FormControlLabel, Radio, RadioGroup, Checkbox, Button, Select, MenuItem, InputLabel } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 const PreviewContainer = styled.div`
   display: flex;
@@ -41,7 +42,7 @@ const PreviewFrame = styled.div`
     left: 50%;
     transform: translateX(-50%);
     width: 150px;
-    height: 20px;
+    height: 13px;
     background: #333;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
@@ -50,8 +51,9 @@ const PreviewFrame = styled.div`
 
 const PreviewHeader = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  gap: 10px;
   padding: 10px 0;
   margin-bottom: 20px;
   border-bottom: 1px solid #eee;
@@ -61,6 +63,7 @@ const PreviewTitle = styled.h1`
   font-size: 18px;
   color: #333;
   margin: 0;
+  text-align: center;
 `;
 
 const PreviewContent = styled.div`

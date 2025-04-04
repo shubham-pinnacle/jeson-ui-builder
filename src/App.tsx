@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import { Button, Box, Tabs, Tab, Typography, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert } from '@mui/material';
+import { Button, Box, Tabs, Tab, Typography, IconButton, Tooltip, Menu, MenuItem, TextField } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -9,11 +9,15 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Close';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Sidebar from './components/Sidebar';
 import Builder from './components/Builder';
 import MobilePreview from './components/MobilePreview';
 import MetaJsonGenerator from './components/MetaJsonGenerator';
+import ScreenDialog from './components/ScreenDialog';
 import { Component } from './types';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
 
 const AppContainer = styled('div')({
   display: 'flex',
@@ -119,6 +123,22 @@ const ScreenTab = styled(Tab)({
   },
 });
 
+const ScreenTabContent = styled('div')({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+});
+
+const MoreOptionsSpan = styled('span')({
+  display: 'inline-flex',
+  alignItems: 'center',
+  marginLeft: '4px',
+  cursor: 'pointer',
+  '&:hover': {
+    opacity: 0.8,
+  },
+});
+
 const AddScreenButton = styled(IconButton)({
   marginLeft: '8px',
   color: '#1976d2',
@@ -185,6 +205,11 @@ function App() {
   const [newScreenId, setNewScreenId] = useState('');
   const [screenNameError, setScreenNameError] = useState('');
   const [screenIdError, setScreenIdError] = useState('');
+  const [isScreenDialogOpen, setIsScreenDialogOpen] = useState(false);
+  const [screenDialogMode, setScreenDialogMode] = useState<'create' | 'edit'>('create');
+  const [selectedScreenForEdit, setSelectedScreenForEdit] = useState<{ title: string; id: string } | null>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedScreenIndex, setSelectedScreenIndex] = useState<number | null>(null);
 
   // Update JSON editor when screens change
   useEffect(() => {
@@ -485,29 +510,6 @@ function App() {
     setSelectedComponent(null);
   };
 
-  const handleDeleteScreen = (index: number) => {
-    if (screens.length <= 1) return; // Don't delete the last screen
-    
-    const updatedScreens = screens.filter((_, i) => i !== index);
-    setScreens(updatedScreens);
-    
-    // Adjust active screen index if needed
-    if (activeScreenIndex >= updatedScreens.length) {
-      setActiveScreenIndex(updatedScreens.length - 1);
-    }
-    
-    // Clear selected component if it was in the deleted screen
-    if (selectedComponent) {
-      const componentExists = updatedScreens.some(screen => 
-        screen.components.some(comp => comp.id === selectedComponent.id)
-      );
-      
-      if (!componentExists) {
-        setSelectedComponent(null);
-      }
-    }
-  };
-
   const handleScreenChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveScreenIndex(newValue);
     setSelectedComponent(null);
@@ -670,6 +672,69 @@ function App() {
     setScreenIdError('');
   };
 
+  const handleScreenMenuOpen = (event: React.MouseEvent<HTMLElement>, index: number) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+    setSelectedScreenIndex(index);
+  };
+
+  const handleScreenMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedScreenIndex(null);
+  };
+
+  const handleEditScreen = () => {
+    if (selectedScreenIndex !== null) {
+      const screen = screens[selectedScreenIndex];
+      setSelectedScreenForEdit({ title: screen.title, id: screen.id });
+      setScreenDialogMode('edit');
+      setIsScreenDialogOpen(true);
+    }
+    handleScreenMenuClose();
+  };
+
+  const handleDeleteScreen = () => {
+    if (selectedScreenIndex !== null && screens.length > 1) {
+      const updatedScreens = screens.filter((_, index) => index !== selectedScreenIndex);
+      setScreens(updatedScreens);
+      if (activeScreenIndex >= updatedScreens.length) {
+        setActiveScreenIndex(updatedScreens.length - 1);
+      }
+    }
+    handleScreenMenuClose();
+  };
+
+  const handleOpenCreateDialog = () => {
+    setScreenDialogMode('create');
+    setSelectedScreenForEdit(null);
+    setIsScreenDialogOpen(true);
+  };
+
+  const handleScreenDialogClose = () => {
+    setIsScreenDialogOpen(false);
+    setSelectedScreenForEdit(null);
+  };
+
+  const handleScreenSubmit = (screenName: string, screenId: string) => {
+    if (screenDialogMode === 'create') {
+      const newScreen: Screen = {
+        id: screenId,
+        title: screenName,
+        components: [],
+      };
+      setScreens([...screens, newScreen]);
+      setActiveScreenIndex(screens.length);
+    } else if (screenDialogMode === 'edit' && selectedScreenIndex !== null) {
+      const updatedScreens = [...screens];
+      updatedScreens[selectedScreenIndex] = {
+        ...updatedScreens[selectedScreenIndex],
+        id: screenId,
+        title: screenName,
+      };
+      setScreens(updatedScreens);
+    }
+  };
+
   return (
         <DragDropContext onDragEnd={handleDragEnd}>
           <AppContainer>
@@ -701,25 +766,20 @@ function App() {
                   <ScreenTab 
                     key={screen.id} 
                     label={
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <ScreenTabContent>
                         <ScreenTitle>{screen.title}</ScreenTitle>
-                        {screens.length > 1 && (
-                          <DeleteScreenButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteScreen(index);
-                            }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </DeleteScreenButton>
-                        )}
-                      </Box>
+                        <MoreOptionsSpan onClick={(e) => {
+                          e.stopPropagation();
+                          handleScreenMenuOpen(e as React.MouseEvent<HTMLElement>, index);
+                        }}>
+                          <MoreVertIcon fontSize="small" />
+                        </MoreOptionsSpan>
+                      </ScreenTabContent>
                     }
                   />
                 ))}
               </Tabs>
-              <AddScreenButton onClick={handleOpenDialog} size="small">
+              <AddScreenButton onClick={handleOpenCreateDialog} size="small">
                 <AddIcon />
               </AddScreenButton>
             </ScreenTabsContainer>
@@ -734,8 +794,6 @@ function App() {
               onAddComponent={(type: string) => handleAddComponent(type)}
             />
           </BuilderContainer>
-
-         
 
           <JsonEditorContainer>
             <ButtonGroupContainer>
@@ -762,65 +820,28 @@ function App() {
           </PreviewContainer>
         </MainContent>
 
-        <CreateScreenDialog
-          open={isCreateDialogOpen}
-          onClose={handleCloseDialog}
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleScreenMenuClose}
         >
-          <DialogTitle>Create New Screen</DialogTitle>
-          <DialogContent>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                Instructions:
-              </Typography>
-              <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                <li>If the screen name meets the Screen ID rules, then the Screen ID is used as its screen name</li>
-                <li>Screen ID must be unique.</li>
-                <li>Screen ID allows only alphabets and underscores ("_").</li>
-                <li>Provide a separate screen ID, if the screen title includes special characters or doesn't meet screen ID rules.</li>
-              </ul>
-            </Box>
-            <DialogTextField
-              fullWidth
-              label="Enter screen name"
-              value={newScreenName}
-              onChange={(e) => {
-                setNewScreenName(e.target.value);
-                validateScreenName(e.target.value);
-              }}
-              error={!!screenNameError}
-              helperText={screenNameError}
-            />
-            <DialogTextField
-              fullWidth
-              label="Enter screen ID (Optional)"
-              value={newScreenId}
-              onChange={(e) => {
-                setNewScreenId(e.target.value);
-                validateScreenId(e.target.value);
-              }}
-              error={!!screenIdError}
-              helperText={screenIdError}
-            />
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="body2" color="primary">
-                Click here to import screen JSON file.
-              </Typography>
-              <Typography variant="caption" color="textSecondary">
-                (Only 1 file allowed)
-              </Typography>
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Close</Button>
-            <Button 
-              onClick={handleCreateScreen}
-              variant="contained" 
-              disabled={!newScreenName || !!screenNameError || !!screenIdError}
-            >
-              Create
-            </Button>
-          </DialogActions>
-        </CreateScreenDialog>
+          <MenuItem onClick={handleEditScreen}>Edit Screen</MenuItem>
+          <MenuItem 
+            onClick={handleDeleteScreen}
+            disabled={screens.length <= 1}
+          >
+            Delete Screen
+          </MenuItem>
+        </Menu>
+
+        <ScreenDialog
+          open={isScreenDialogOpen}
+          onClose={handleScreenDialogClose}
+          onSubmit={handleScreenSubmit}
+          mode={screenDialogMode}
+          initialData={selectedScreenForEdit || undefined}
+          existingScreenIds={screens.map(screen => screen.id)}
+        />
           </AppContainer>
         </DragDropContext>
   );
