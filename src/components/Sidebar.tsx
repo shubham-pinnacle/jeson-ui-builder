@@ -44,7 +44,8 @@ const ComponentsGrid = styled.div`
 
 const ComponentCard = styled.div`
   background: white;
-  border: 1px solid #eee;
+  border: 1px solid  #a7adb8
+;
   border-radius: 8px;
   padding: 15px;
   display: flex;
@@ -66,6 +67,7 @@ const ComponentName = styled.span`
   font-size: 12px;
   color: #666;
   text-align: center;
+  font-weight:bold;
 `;
 
 const components = {

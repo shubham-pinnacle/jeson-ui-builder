@@ -8,7 +8,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from '@mui/icons-material/Close';
 import Sidebar from './components/Sidebar';
 import Builder from './components/Builder';
 import MobilePreview from './components/MobilePreview';
@@ -86,6 +86,7 @@ const ButtonGroupContainer = styled('div')({
   padding: '16px',
   borderBottom: '1px solid #e0e0e0',
   backgroundColor: '#f8f9fa',
+  justifyContent: 'flex-end',
 });
 
 const StyledButton = styled(Button)({
@@ -98,6 +99,7 @@ const StyledButton = styled(Button)({
       backgroundColor: 'rgba(25, 118, 210, 0.04)',
     },
   },
+
 });
 
 const ScreenTabsContainer = styled(Box)({
@@ -106,6 +108,7 @@ const ScreenTabsContainer = styled(Box)({
   padding: '8px 16px',
   borderBottom: '1px solid #e0e0e0',
   backgroundColor: '#f8f9fa',
+  
 });
 
 const ScreenTab = styled(Tab)({
@@ -123,7 +126,8 @@ const AddScreenButton = styled(IconButton)({
 
 const DeleteScreenButton = styled(IconButton)({
   marginLeft: '4px',
-  color: '#d32f2f',
+  fontSize:'small',
+  color: '#000',
   '&:hover': {
     backgroundColor: 'rgba(211, 47, 47, 0.04)',
   },
@@ -131,9 +135,10 @@ const DeleteScreenButton = styled(IconButton)({
 
 const ScreenTitle = styled(Typography)({
   fontSize: '14px',
-  fontWeight: 500,
+  fontWeight: 800,
   color: '#333',
   marginRight: '8px',
+  
 });
 
 const CreateScreenDialog = styled(Dialog)({
