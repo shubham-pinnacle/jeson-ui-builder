@@ -175,8 +175,8 @@ interface Screen {
 function App() {
   const [screens, setScreens] = useState<Screen[]>([
     {
-      id: 'SCREEN_1',
-      title: 'Screen 1',
+      id: 'WELCOME',
+      title: 'WELCOME',
       components: [],
     }
   ]);
@@ -218,7 +218,7 @@ function App() {
       // Set default properties based on component type
       switch (draggableId) {
         case 'text-heading':
-          newComponent.properties = { text: 'Heading Text', color: '#333333' };
+          newComponent.properties = { text: ''};
           break;
         case 'sub-heading':
           newComponent.properties = { text: 'Sub Heading Text', color: '#666666' };
@@ -294,16 +294,16 @@ function App() {
     // Set default properties based on component type
     switch (type) {
       case 'text-heading':
-        newComponent.properties = { text: 'Heading Text', color: '#333333' };
+        newComponent.properties = { text: '' };
         break;
       case 'sub-heading':
-        newComponent.properties = { text: 'Sub Heading Text', color: '#666666' };
+        newComponent.properties = { text: '' };
         break;
       case 'text-body':
-        newComponent.properties = { text: 'Body Text Content', color: '#666666' };
+        newComponent.properties = { text: ''};
         break;
       case 'text-caption':
-        newComponent.properties = { text: 'Caption Text', color: '#999999' };
+        newComponent.properties = { text: '' };
         break;
       case 'text-input':
         newComponent.properties = { 
@@ -428,28 +428,28 @@ function App() {
                 case 'TextHeading':
                   type = 'text-heading';
                   properties = {
-                    text: child.text || 'Heading Text',
+                    text: child.text || '',
                     color: child.style?.color || '#333333'
                   };
                   break;
                 case 'SubHeading':
                   type = 'sub-heading';
                   properties = {
-                    text: child.text || 'Sub Heading Text',
+                    text: child.text || '',
                     color: child.style?.color || '#666666'
                   };
                   break;
                 case 'TextBody':
                   type = 'text-body';
                   properties = {
-                    text: child.text || 'Body Text Content',
+                    text: child.text || '',
                     color: child.style?.color || '#666666'
                   };
                   break;
                 case 'TextCaption':
                   type = 'text-caption';
                   properties = {
-                    text: child.text || 'Caption Text',
+                    text: child.text || '',
                     color: child.style?.color || '#999999'
                   };
                   break;
@@ -570,26 +570,26 @@ function App() {
                   case 'text-heading':
                     return {
                       type: "TextHeading",
-                      text: comp.properties?.text || 'Heading Text',
-                      style: { color: comp.properties?.color || '#333333' }
+                      text: comp.properties?.text || '',
+                      //style: { color: comp.properties?.color || '#333333' }
                     };
                   case 'sub-heading':
                     return {
-                      type: "SubHeading",
-                      text: comp.properties?.text || 'Sub Heading Text',
-                      style: { color: comp.properties?.color || '#666666' }
+                      type: "TextSubheading",
+                      text: comp.properties?.text || '',
+                      //style: { color: comp.properties?.color || '#666666' }
                     };
                   case 'text-body':
                     return {
                       type: "TextBody",
-                      text: comp.properties?.text || 'Body Text Content',
-                      style: { color: comp.properties?.color || '#666666' }
+                      text: comp.properties?.text || '',
+                      //style: { color: comp.properties?.color || '#666666' }
                     };
                   case 'text-caption':
                     return {
                       type: "TextCaption",
-                      text: comp.properties?.text || 'Caption Text',
-                      style: { color: comp.properties?.color || '#999999' }
+                      text: comp.properties?.text || '',
+                      //style: { color: comp.properties?.color || '#999999' }
                     };
                   case 'text-input':
                     return {
