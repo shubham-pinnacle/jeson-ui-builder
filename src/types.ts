@@ -47,7 +47,37 @@ export type ComponentProperties = {
 }
 
 export const componentProperties: { [key: string]: ComponentProperties } = {
+  'text-heading': {
+    text: {
+      label: 'Text Content',
+      type: 'text'
+    },
+    color: {
+      label: 'Text Color',
+      type: 'color'
+    }
+  },
+  'sub-heading': {
+    text: {
+      label: 'Text Content',
+      type: 'text'
+    },
+    color: {
+      label: 'Text Color',
+      type: 'color'
+    }
+  },
   'text-body': {
+    text: {
+      label: 'Text Content',
+      type: 'text'
+    },
+    color: {
+      label: 'Text Color',
+      type: 'color'
+    }
+  },
+  'text-caption': {
     text: {
       label: 'Text Content',
       type: 'text'

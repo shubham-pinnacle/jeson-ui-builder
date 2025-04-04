@@ -3,11 +3,16 @@ import styled from 'styled-components';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
-import { Component, BuilderProps, DroppedComponentProps } from '../types';
+import { Component, BuilderProps } from '../types';
 import PropertiesForm from './PropertiesForm';
 import DroppedComponent from './DroppedComponent';
 import { Box, Typography, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+
+interface StyledProps {
+  $isSelected?: boolean;
+  $type?: string;
+}
 
 const BuilderContainer = styled.div`
   display: flex;
@@ -44,7 +49,7 @@ const ComponentsList = styled.div`
   min-height: 100%;
 `;
 
-const ComponentWrapper = styled.div`
+const ComponentWrapper = styled.div<StyledProps>`
   background: white;
   border: 2px solid ${props => props.$isSelected ? '#2196f3' : '#e0e0e0'};
   border-radius: 4px;
@@ -73,12 +78,12 @@ const ComponentTitle = styled.div`
   color: #333;
 `;
 
-const ComponentContent = styled.div`
+const ComponentContent = styled.div<{ color?: string; fontSize?: string }>`
   padding: 10px;
   background: #f5f5f5;
   border-radius: 4px;
-  font-size: 14px;
-  color: #666;
+  font-size: ${props => props.fontSize || '14px'};
+  color: ${props => props.color || '#666'};
 `;
 
 const Builder: React.FC<BuilderProps> = ({
@@ -107,7 +112,29 @@ const Builder: React.FC<BuilderProps> = ({
   const renderComponentContent = (component: Component) => {
     switch (component.type) {
       case 'text-heading':
-        return <ComponentContent>{component.properties?.text || 'No text content'}</ComponentContent>;
+        return (
+          <ComponentContent fontSize="24px" color={component.properties?.color || '#333333'}>
+            {component.properties?.text || 'Heading Text'}
+          </ComponentContent>
+        );
+      case 'sub-heading':
+        return (
+          <ComponentContent fontSize="18px" color={component.properties?.color || '#666666'}>
+            {component.properties?.text || 'Sub Heading Text'}
+          </ComponentContent>
+        );
+      case 'text-body':
+        return (
+          <ComponentContent fontSize="14px" color={component.properties?.color || '#666666'}>
+            {component.properties?.text || 'Body Text Content'}
+          </ComponentContent>
+        );
+      case 'text-caption':
+        return (
+          <ComponentContent fontSize="12px" color={component.properties?.color || '#999999'}>
+            {component.properties?.text || 'Caption Text'}
+          </ComponentContent>
+        );
       case 'text-input':
         return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
       case 'text-area':
@@ -166,10 +193,7 @@ const Builder: React.FC<BuilderProps> = ({
                           <FaTrash
                             size={14}
                             style={{ color: '#666', cursor: 'pointer' }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onDeleteComponent(component.id);
-                            }}
+                            onClick={(e) => handleDeleteClick(e, component.id)}
                           />
                         </div>
                       </ComponentHeader>

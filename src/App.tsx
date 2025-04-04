@@ -123,22 +123,6 @@ const ScreenTab = styled(Tab)({
   },
 });
 
-const ScreenTabContent = styled('div')({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-});
-
-const MoreOptionsSpan = styled('span')({
-  display: 'inline-flex',
-  alignItems: 'center',
-  marginLeft: '4px',
-  cursor: 'pointer',
-  '&:hover': {
-    opacity: 0.8,
-  },
-});
-
 const AddScreenButton = styled(IconButton)({
   marginLeft: '8px',
   color: '#1976d2',
@@ -234,7 +218,16 @@ function App() {
       // Set default properties based on component type
       switch (draggableId) {
         case 'text-heading':
-          newComponent.properties = { text: '' };
+          newComponent.properties = { text: 'Heading Text', color: '#333333' };
+          break;
+        case 'sub-heading':
+          newComponent.properties = { text: 'Sub Heading Text', color: '#666666' };
+          break;
+        case 'text-body':
+          newComponent.properties = { text: 'Body Text Content', color: '#666666' };
+          break;
+        case 'text-caption':
+          newComponent.properties = { text: 'Caption Text', color: '#999999' };
           break;
         case 'text-input':
           newComponent.properties = { 
@@ -301,7 +294,16 @@ function App() {
     // Set default properties based on component type
     switch (type) {
       case 'text-heading':
-        newComponent.properties = { text: '' };
+        newComponent.properties = { text: 'Heading Text', color: '#333333' };
+        break;
+      case 'sub-heading':
+        newComponent.properties = { text: 'Sub Heading Text', color: '#666666' };
+        break;
+      case 'text-body':
+        newComponent.properties = { text: 'Body Text Content', color: '#666666' };
+        break;
+      case 'text-caption':
+        newComponent.properties = { text: 'Caption Text', color: '#999999' };
         break;
       case 'text-input':
         newComponent.properties = { 
@@ -425,7 +427,31 @@ function App() {
               switch (child.type) {
                 case 'TextHeading':
                   type = 'text-heading';
-                  properties = { text: child.text || '' };
+                  properties = {
+                    text: child.text || 'Heading Text',
+                    color: child.style?.color || '#333333'
+                  };
+                  break;
+                case 'SubHeading':
+                  type = 'sub-heading';
+                  properties = {
+                    text: child.text || 'Sub Heading Text',
+                    color: child.style?.color || '#666666'
+                  };
+                  break;
+                case 'TextBody':
+                  type = 'text-body';
+                  properties = {
+                    text: child.text || 'Body Text Content',
+                    color: child.style?.color || '#666666'
+                  };
+                  break;
+                case 'TextCaption':
+                  type = 'text-caption';
+                  properties = {
+                    text: child.text || 'Caption Text',
+                    color: child.style?.color || '#999999'
+                  };
                   break;
                 case 'TextInput':
                   type = 'text-input';
@@ -544,7 +570,26 @@ function App() {
                   case 'text-heading':
                     return {
                       type: "TextHeading",
-                      text: comp.properties.text || ""
+                      text: comp.properties?.text || 'Heading Text',
+                      style: { color: comp.properties?.color || '#333333' }
+                    };
+                  case 'sub-heading':
+                    return {
+                      type: "SubHeading",
+                      text: comp.properties?.text || 'Sub Heading Text',
+                      style: { color: comp.properties?.color || '#666666' }
+                    };
+                  case 'text-body':
+                    return {
+                      type: "TextBody",
+                      text: comp.properties?.text || 'Body Text Content',
+                      style: { color: comp.properties?.color || '#666666' }
+                    };
+                  case 'text-caption':
+                    return {
+                      type: "TextCaption",
+                      text: comp.properties?.text || 'Caption Text',
+                      style: { color: comp.properties?.color || '#999999' }
                     };
                   case 'text-input':
                     return {
@@ -766,15 +811,16 @@ function App() {
                   <ScreenTab 
                     key={screen.id} 
                     label={
-                      <ScreenTabContent>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <ScreenTitle>{screen.title}</ScreenTitle>
-                        <MoreOptionsSpan onClick={(e) => {
-                          e.stopPropagation();
-                          handleScreenMenuOpen(e as React.MouseEvent<HTMLElement>, index);
-                        }}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleScreenMenuOpen(e, index)}
+                          sx={{ ml: 1 }}
+                        >
                           <MoreVertIcon fontSize="small" />
-                        </MoreOptionsSpan>
-                      </ScreenTabContent>
+                        </IconButton>
+                      </Box>
                     }
                   />
                 ))}
