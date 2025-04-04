@@ -75,7 +75,7 @@ const StyledInput = styled('input')({
   border: '1px solid #333',
   borderRadius: '4px',
   fontSize: '16px',
-  backgroundColor: '#000',
+  backgroundColor: '#fff',
   color: '#fff',
   '&:focus': {
     outline: 'none',
@@ -94,7 +94,7 @@ const StyledTextArea = styled('textarea')({
   fontSize: '16px',
   minHeight: '100px',
   resize: 'vertical',
-  backgroundColor: '#000',
+  backgroundColor: '#fff',
   color: '#fff',
   '&:focus': {
     outline: 'none',
@@ -180,7 +180,7 @@ const StyledCheckbox = styled('input')({
   width: '18px',
   height: '18px',
   cursor: 'pointer',
-  backgroundColor: '#000',
+  backgroundColor: '#fff',
   borderColor: '#333',
   '&:checked': {
     backgroundColor: '#90caf9',
@@ -193,7 +193,7 @@ const StyledRadio = styled('input')({
   width: '18px',
   height: '18px',
   cursor: 'pointer',
-  backgroundColor: '#000',
+  backgroundColor: '#fff',
   borderColor: '#333',
   '&:checked': {
     backgroundColor: '#90caf9',
