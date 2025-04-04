@@ -671,8 +671,8 @@ function App() {
   };
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <AppContainer>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <AppContainer>
         <SidebarContainer>
           <Sidebar onAddComponent={handleAddComponent} />
         </SidebarContainer>
@@ -821,8 +821,8 @@ function App() {
             </Button>
           </DialogActions>
         </CreateScreenDialog>
-      </AppContainer>
-    </DragDropContext>
+          </AppContainer>
+        </DragDropContext>
   );
 }
 

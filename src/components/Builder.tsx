@@ -19,6 +19,22 @@ const BuildArea = styled.div`
   flex: 1;
   padding: 20px;
   overflow-y: auto;
+
+  /* Custom scrollbar styling for WebKit browsers */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #ffffff; /* white track */
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: lightgrey; /* light grey thumb */
+    border-radius: 4px;
+  }
+
+  /* Firefox scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: lightgrey #ffffff;
 `;
 
 const ComponentsList = styled.div`
@@ -28,10 +44,10 @@ const ComponentsList = styled.div`
   min-height: 100%;
 `;
 
-const ComponentWrapper = styled.div<DroppedComponentProps>`
+const ComponentWrapper = styled.div`
   background: white;
   border: 2px solid ${props => props.$isSelected ? '#2196f3' : '#e0e0e0'};
-  border-radius: 13px;
+  border-radius: 4px;
   padding: 10px;
   cursor: pointer;
   transition: all 0.2s ease;

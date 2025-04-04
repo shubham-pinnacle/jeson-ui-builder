@@ -34,6 +34,20 @@ const PropertiesPanel = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
   gap: theme.spacing(2),
   backgroundColor: theme.palette.background.paper,
+  // Custom scrollbar styling for WebKit browsers
+  "&::-webkit-scrollbar": {
+    width: "8px",
+  },
+  "&::-webkit-scrollbar-track": {
+    background: "#ffffff", // white track background
+  },
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: "lightgrey", // light grey scrollbar thumb
+    borderRadius: "4px",
+  },
+  // Firefox scrollbar styling
+  scrollbarWidth: "thin",
+  scrollbarColor: "lightgrey #ffffff",
 }));
 
 const Header = styled(Box)(({ theme }) => ({
