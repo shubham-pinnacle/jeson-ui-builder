@@ -203,9 +203,10 @@ const StyledRadio = styled('input')({
 
 interface MobilePreviewProps {
   components: Component[];
+  screenTitle: string;
 }
 
-const MobilePreview: React.FC<MobilePreviewProps> = ({ components }) => {
+const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }) => {
   const renderComponent = (component: Component) => {
     const getOptions = (options: any): string[] => {
       if (Array.isArray(options)) {
@@ -322,7 +323,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components }) => {
         return (
           <StyledButton 
             key={component.id}
-            variant={component.properties?.variant}
+            onClick={() => {}}
           >
             {component.properties?.buttonText || 'Submit'}
           </StyledButton>
@@ -358,7 +359,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components }) => {
     <PreviewContainer>
       <PreviewFrame>
         <PreviewHeader>
-          <PreviewTitle>Screen Name</PreviewTitle>
+          <PreviewTitle>{screenTitle}</PreviewTitle>
         </PreviewHeader>
         <PreviewContent>
           {components.map(component => renderComponent(component))}

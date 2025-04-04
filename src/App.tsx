@@ -755,7 +755,10 @@ function App() {
             />
           </JsonEditorContainer>
           <PreviewContainer isVisible={showPreview}>
-            <MobilePreview components={screens[activeScreenIndex].components} />
+            <MobilePreview 
+              components={screens[activeScreenIndex].components} 
+              screenTitle={screens[activeScreenIndex].title}
+            />
           </PreviewContainer>
         </MainContent>
 
