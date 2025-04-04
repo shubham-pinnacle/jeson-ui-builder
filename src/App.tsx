@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import { Button } from '@mui/material';
+import { Button, Box, Tabs, Tab, Typography, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Sidebar from './components/Sidebar';
 import Builder from './components/Builder';
 import MobilePreview from './components/MobilePreview';
@@ -98,17 +100,92 @@ const StyledButton = styled(Button)({
   },
 });
 
+const ScreenTabsContainer = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  padding: '8px 16px',
+  borderBottom: '1px solid #e0e0e0',
+  backgroundColor: '#f8f9fa',
+});
+
+const ScreenTab = styled(Tab)({
+  textTransform: 'none',
+  minWidth: '120px',
+  '&.Mui-selected': {
+    fontWeight: 600,
+  },
+});
+
+const AddScreenButton = styled(IconButton)({
+  marginLeft: '8px',
+  color: '#1976d2',
+});
+
+const DeleteScreenButton = styled(IconButton)({
+  marginLeft: '4px',
+  color: '#d32f2f',
+  '&:hover': {
+    backgroundColor: 'rgba(211, 47, 47, 0.04)',
+  },
+});
+
+const ScreenTitle = styled(Typography)({
+  fontSize: '14px',
+  fontWeight: 500,
+  color: '#333',
+  marginRight: '8px',
+});
+
+const CreateScreenDialog = styled(Dialog)({
+  '& .MuiDialog-paper': {
+    width: '500px',
+    maxWidth: '90vw',
+  }
+});
+
+const DialogTextField = styled(TextField)({
+  marginBottom: '16px',
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': {
+      borderColor: '#e0e0e0',
+    },
+    '&:hover fieldset': {
+      borderColor: '#1976d2',
+    },
+  },
+});
+
+interface Screen {
+  id: string;
+  title: string;
+  components: Component[];
+  terminal?: boolean;
+  success?: boolean;
+}
+
 function App() {
-  const [components, setComponents] = useState<Component[]>([]);
+  const [screens, setScreens] = useState<Screen[]>([
+    {
+      id: 'SCREEN_1',
+      title: 'Screen 1',
+      components: [],
+    }
+  ]);
+  const [activeScreenIndex, setActiveScreenIndex] = useState<number>(0);
   const [selectedComponent, setSelectedComponent] = useState<Component | null>(null);
   const [showPreview, setShowPreview] = useState<boolean>(false);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>('');
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [newScreenName, setNewScreenName] = useState('');
+  const [newScreenId, setNewScreenId] = useState('');
+  const [screenNameError, setScreenNameError] = useState('');
+  const [screenIdError, setScreenIdError] = useState('');
 
+  // Update JSON editor when screens change
   useEffect(() => {
     const jsonString = JSON.stringify(generateJson(), null, 2);
     setEditValue(jsonString);
-  }, [components]);
+  }, [screens]);
 
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
@@ -164,16 +241,22 @@ function App() {
           break;
       }
 
-      const newComponents = Array.from(components);
+      const updatedScreens = [...screens];
+      const currentScreen = updatedScreens[activeScreenIndex];
+      const newComponents = Array.from(currentScreen.components);
       newComponents.splice(destination.index, 0, newComponent);
-      setComponents(newComponents);
+      currentScreen.components = newComponents;
+      setScreens(updatedScreens);
       setSelectedComponent(newComponent);
     } else if (source.droppableId === 'builder' && destination.droppableId === 'builder') {
       // Reorder components in builder
-      const newComponents = Array.from(components);
+      const updatedScreens = [...screens];
+      const currentScreen = updatedScreens[activeScreenIndex];
+      const newComponents = Array.from(currentScreen.components);
       const [removed] = newComponents.splice(source.index, 1);
       newComponents.splice(destination.index, 0, removed);
-      setComponents(newComponents);
+      currentScreen.components = newComponents;
+      setScreens(updatedScreens);
     }
   };
 
@@ -225,7 +308,9 @@ function App() {
         break;
     }
 
-    setComponents([...components, newComponent]);
+    const updatedScreens = [...screens];
+    updatedScreens[activeScreenIndex].components = [...updatedScreens[activeScreenIndex].components, newComponent];
+    setScreens(updatedScreens);
     setSelectedComponent(newComponent);
   };
 
@@ -234,24 +319,32 @@ function App() {
   };
 
   const handlePropertyChange = (componentId: string, property: string, value: any) => {
-    const updatedComponents = components.map(component => {
-      if (component.id === componentId) {
+    const updatedScreens = screens.map((screen, index) => {
+      if (index === activeScreenIndex) {
         return {
-          ...component,
-          properties: {
-            ...component.properties,
-            [property]: value
-          }
+          ...screen,
+          components: screen.components.map(component => {
+            if (component.id === componentId) {
+              return {
+                ...component,
+                properties: {
+                  ...component.properties,
+                  [property]: value
+                }
+              };
+            }
+            return component;
+          })
         };
       }
-      return component;
+      return screen;
     });
 
-    setComponents(updatedComponents);
+    setScreens(updatedScreens);
     
     // Update the selected component if it's the one being changed
     if (selectedComponent?.id === componentId) {
-      const updatedSelectedComponent = updatedComponents.find(comp => comp.id === componentId);
+      const updatedSelectedComponent = updatedScreens[activeScreenIndex].components.find(comp => comp.id === componentId);
       if (updatedSelectedComponent) {
         setSelectedComponent(updatedSelectedComponent);
       }
@@ -263,8 +356,17 @@ function App() {
   };
 
   const handleDeleteComponent = (componentId: string) => {
-    const updatedComponents = components.filter(comp => comp.id !== componentId);
-    setComponents(updatedComponents);
+    const updatedScreens = screens.map((screen, index) => {
+      if (index === activeScreenIndex) {
+        return {
+          ...screen,
+          components: screen.components.filter(comp => comp.id !== componentId)
+        };
+      }
+      return screen;
+    });
+
+    setScreens(updatedScreens);
     if (selectedComponent?.id === componentId) {
       setSelectedComponent(null);
     }
@@ -279,78 +381,85 @@ function App() {
     setEditValue(newJson);
     try {
       const parsedJson = JSON.parse(newJson);
-      if (parsedJson.screens && parsedJson.screens[0]?.layout?.children) {
-        const form = parsedJson.screens[0].layout.children.find((child: any) => child.type === "Form");
-        if (form && form.children) {
-          const newComponents = form.children.map((child: any) => {
-            let type = '';
-            let properties: Record<string, any> = {};
-
-            switch (child.type) {
-              case 'TextHeading':
-                type = 'text-heading';
-                properties = { text: child.text || '' };
-                break;
-              case 'TextInput':
-                type = 'text-input';
-                properties = {
-                  label: child.label || '',
-                  name: child.name || `input_field_${Date.now()}`,
-                  required: child.required || false
-                };
-                break;
-              case 'TextArea':
-                type = 'text-area';
-                properties = {
-                  label: child.label || '',
-                  name: child.name || `textarea_field_${Date.now()}`
-                };
-                break;
-              case 'CheckboxGroup':
-                type = 'check-box';
-                properties = {
-                  label: child.label || '',
-                  name: child.name || `checkbox_group_${Date.now()}`,
-                  options: JSON.stringify(child['data-source']?.map((opt: any) => opt.title) || ['Option 1', 'Option 2', 'Option 3'])
-                };
-                break;
-              case 'RadioButtonsGroup':
-                type = 'radio-button';
-                properties = {
-                  label: child.label || '',
-                  name: child.name || `radio_group_${Date.now()}`,
-                  options: JSON.stringify(child['data-source']?.map((opt: any) => opt.title) || ['Option 1', 'Option 2', 'Option 3'])
-                };
-                break;
-              case 'Footer':
-                type = 'footer-button';
-                properties = {
-                  buttonText: child.label || 'Submit data',
-                  variant: 'contained'
-                };
-                break;
-            }
-
-            return {
-              id: `component_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-              type,
-              name: type.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-              properties
-            };
-          });
-
-          setComponents(newComponents);
+      if (parsedJson.screens && Array.isArray(parsedJson.screens)) {
+        const newScreens = parsedJson.screens.map((screen: any) => {
+          const components = screen.layout?.children?.find((child: any) => child.type === "Form")?.children || [];
           
-          // If there's a selected component, update it to match the new components
-          if (selectedComponent) {
-            const updatedSelectedComponent = newComponents.find(
-              (comp: Component) => comp.type === selectedComponent.type && 
-              comp.properties.label === selectedComponent.properties.label
-            );
-            
-            if (updatedSelectedComponent) {
-              setSelectedComponent(updatedSelectedComponent);
-            }
+          return {
+            id: screen.id || `SCREEN_${Date.now()}`,
+            title: screen.title || 'Untitled Screen',
+            components: components.map((child: any) => {
+              let type = '';
+              let properties: Record<string, any> = {};
+
+              switch (child.type) {
+                case 'TextHeading':
+                  type = 'text-heading';
+                  properties = { text: child.text || '' };
+                  break;
+                case 'TextInput':
+                  type = 'text-input';
+                  properties = {
+                    label: child.label || '',
+                    name: child.name || `input_field_${Date.now()}`,
+                    required: child.required || false
+                  };
+                  break;
+                case 'TextArea':
+                  type = 'text-area';
+                  properties = {
+                    label: child.label || '',
+                    name: child.name || `textarea_field_${Date.now()}`
+                  };
+                  break;
+                case 'CheckboxGroup':
+                  type = 'check-box';
+                  properties = {
+                    label: child.label || '',
+                    name: child.name || `checkbox_group_${Date.now()}`,
+                    options: JSON.stringify(child['data-source']?.map((opt: any) => opt.title) || ['Option 1', 'Option 2', 'Option 3'])
+                  };
+                  break;
+                case 'RadioButtonsGroup':
+                  type = 'radio-button';
+                  properties = {
+                    label: child.label || '',
+                    name: child.name || `radio_group_${Date.now()}`,
+                    options: JSON.stringify(child['data-source']?.map((opt: any) => opt.title) || ['Option 1', 'Option 2', 'Option 3'])
+                  };
+                  break;
+                case 'Footer':
+                  type = 'footer-button';
+                  properties = {
+                    buttonText: child.label || 'Submit data',
+                    variant: 'contained'
+                  };
+                  break;
+              }
+
+              return {
+                id: `component_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                type,
+                name: type.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                properties
+              };
+            }),
+            terminal: screen.terminal || false,
+            success: screen.success || false
+          };
+        });
+
+        setScreens(newScreens);
+        
+        // If there's a selected component, update it to match the new components
+        if (selectedComponent && activeScreenIndex < newScreens.length) {
+          const updatedSelectedComponent = newScreens[activeScreenIndex].components.find(
+            (comp: Component) => comp.type === selectedComponent.type && 
+            comp.properties.label === selectedComponent.properties.label
+          );
+          
+          if (updatedSelectedComponent) {
+            setSelectedComponent(updatedSelectedComponent);
           }
         }
       }
@@ -359,14 +468,63 @@ function App() {
     }
   };
 
+  const handleAddScreen = () => {
+    const newScreen: Screen = {
+      id: `SCREEN_${Date.now()}`,
+      title: `Screen ${screens.length + 1}`,
+      components: [],
+    };
+    
+    setScreens([...screens, newScreen]);
+    setActiveScreenIndex(screens.length);
+    setSelectedComponent(null);
+  };
+
+  const handleDeleteScreen = (index: number) => {
+    if (screens.length <= 1) return; // Don't delete the last screen
+    
+    const updatedScreens = screens.filter((_, i) => i !== index);
+    setScreens(updatedScreens);
+    
+    // Adjust active screen index if needed
+    if (activeScreenIndex >= updatedScreens.length) {
+      setActiveScreenIndex(updatedScreens.length - 1);
+    }
+    
+    // Clear selected component if it was in the deleted screen
+    if (selectedComponent) {
+      const componentExists = updatedScreens.some(screen => 
+        screen.components.some(comp => comp.id === selectedComponent.id)
+      );
+      
+      if (!componentExists) {
+        setSelectedComponent(null);
+      }
+    }
+  };
+
+  const handleScreenChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveScreenIndex(newValue);
+    setSelectedComponent(null);
+  };
+
   const generateJson = () => {
+    // Create routing model based on screen order
+    const routingModel: Record<string, string[]> = {};
+    
+    for (let i = 0; i < screens.length - 1; i++) {
+      routingModel[screens[i].id] = [screens[i + 1].id];
+    }
+    
     return {
-      version: "3.1",
-      screens: [{
-        id: "FORM_EXAMPLE",
-        title: "Demo Screen",
-        terminal: true,
-        success: true,
+      version: "7.0",
+      data_api_version: "3.0",
+      routing_model: routingModel,
+      screens: screens.map(screen => ({
+        id: screen.id,
+        title: screen.title,
+        terminal: screen.terminal || false,
+        success: screen.success || false,
         data: {},
         layout: {
           type: "SingleColumnLayout",
@@ -374,7 +532,7 @@ function App() {
             {
               type: "Form",
               name: "user_data",
-              children: components.map(comp => {
+              children: screen.components.map(comp => {
                 switch (comp.type) {
                   case 'text-heading':
                     return {
@@ -421,7 +579,7 @@ function App() {
                       type: "Footer",
                       label: comp.properties.buttonText || "Submit data",
                       'on-click-action': {
-                        name: "complete",
+                        name: "data_exchange",
                         payload: {}
                       }
                     };
@@ -432,12 +590,79 @@ function App() {
             }
           ]
         }
-      }]
+      }))
     };
   };
 
   const handleMetaGenerate = (metaJson: any) => {
     console.log('Meta JSON generated:', metaJson);
+  };
+
+  const validateScreenName = (name: string) => {
+    if (!name) {
+      setScreenNameError('Screen name is required');
+      return false;
+    }
+    if (!/^[a-zA-Z\s]+$/.test(name)) {
+      setScreenNameError('Screen name can only contain alphabets and spaces');
+      return false;
+    }
+    setScreenNameError('');
+    return true;
+  };
+
+  const validateScreenId = (id: string) => {
+    if (id && !/^[a-zA-Z_]+$/.test(id)) {
+      setScreenIdError('Screen ID can only contain alphabets and underscores');
+      return false;
+    }
+    if (id && screens.some(screen => screen.id === id)) {
+      setScreenIdError('Screen ID must be unique');
+      return false;
+    }
+    setScreenIdError('');
+    return true;
+  };
+
+  const handleCreateScreen = () => {
+    const isNameValid = validateScreenName(newScreenName);
+    const isIdValid = validateScreenId(newScreenId);
+
+    if (isNameValid && isIdValid) {
+      const screenId = newScreenId || newScreenName.toUpperCase().replace(/\s+/g, '_');
+      
+      if (screens.some(screen => screen.id === screenId)) {
+        setScreenIdError('Screen ID must be unique');
+        return;
+      }
+
+      const newScreen: Screen = {
+        id: screenId,
+        title: newScreenName,
+        components: [],
+      };
+      
+      setScreens([...screens, newScreen]);
+      setActiveScreenIndex(screens.length);
+      setSelectedComponent(null);
+      handleCloseDialog();
+    }
+  };
+
+  const handleOpenDialog = () => {
+    setIsCreateDialogOpen(true);
+    setNewScreenName('');
+    setNewScreenId('');
+    setScreenNameError('');
+    setScreenIdError('');
+  };
+
+  const handleCloseDialog = () => {
+    setIsCreateDialogOpen(false);
+    setNewScreenName('');
+    setNewScreenId('');
+    setScreenNameError('');
+    setScreenIdError('');
   };
 
   return (
@@ -451,7 +676,6 @@ function App() {
           <BuilderContainer isPreviewVisible={showPreview}>
             <ButtonGroupContainer>
               <StyledButton
-                style={{ marginLeft: 'auto' }}  // Positions the button to the right
                 variant="outlined"
                 size="small"
                 onClick={() => setShowPreview(!showPreview)}
@@ -460,8 +684,43 @@ function App() {
                 {showPreview ? 'Hide Preview' : 'Show Preview'}
               </StyledButton>
             </ButtonGroupContainer>
+            
+            <ScreenTabsContainer>
+              <Tabs 
+                value={activeScreenIndex} 
+                onChange={handleScreenChange}
+                variant="scrollable"
+                scrollButtons="auto"
+              >
+                {screens.map((screen, index) => (
+                  <ScreenTab 
+                    key={screen.id} 
+                    label={
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <ScreenTitle>{screen.title}</ScreenTitle>
+                        {screens.length > 1 && (
+                          <DeleteScreenButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteScreen(index);
+                            }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </DeleteScreenButton>
+                        )}
+                      </Box>
+                    }
+                  />
+                ))}
+              </Tabs>
+              <AddScreenButton onClick={handleOpenDialog} size="small">
+                <AddIcon />
+              </AddScreenButton>
+            </ScreenTabsContainer>
+            
             <Builder
-              components={components}
+              components={screens[activeScreenIndex].components}
               selectedComponent={selectedComponent}
               onComponentSelect={handleComponentSelect}
               onPropertyChange={handlePropertyChange}
@@ -471,10 +730,11 @@ function App() {
             />
           </BuilderContainer>
 
+         
+
           <JsonEditorContainer>
             <ButtonGroupContainer>
               <StyledButton
-                style={{ marginLeft: 'auto' }}  // Moves the Copy JSON button to the right
                 variant="outlined"
                 size="small"
                 onClick={handleCopyJson}
@@ -489,11 +749,70 @@ function App() {
               onMetaGenerate={handleMetaGenerate}
             />
           </JsonEditorContainer>
-
           <PreviewContainer isVisible={showPreview}>
-            <MobilePreview components={components} />
+            <MobilePreview components={screens[activeScreenIndex].components} />
           </PreviewContainer>
         </MainContent>
+
+        <CreateScreenDialog
+          open={isCreateDialogOpen}
+          onClose={handleCloseDialog}
+        >
+          <DialogTitle>Create New Screen</DialogTitle>
+          <DialogContent>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                Instructions:
+              </Typography>
+              <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                <li>If the screen name meets the Screen ID rules, then the Screen ID is used as its screen name</li>
+                <li>Screen ID must be unique.</li>
+                <li>Screen ID allows only alphabets and underscores ("_").</li>
+                <li>Provide a separate screen ID, if the screen title includes special characters or doesn't meet screen ID rules.</li>
+              </ul>
+            </Box>
+            <DialogTextField
+              fullWidth
+              label="Enter screen name"
+              value={newScreenName}
+              onChange={(e) => {
+                setNewScreenName(e.target.value);
+                validateScreenName(e.target.value);
+              }}
+              error={!!screenNameError}
+              helperText={screenNameError}
+            />
+            <DialogTextField
+              fullWidth
+              label="Enter screen ID (Optional)"
+              value={newScreenId}
+              onChange={(e) => {
+                setNewScreenId(e.target.value);
+                validateScreenId(e.target.value);
+              }}
+              error={!!screenIdError}
+              helperText={screenIdError}
+            />
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" color="primary">
+                Click here to import screen JSON file.
+              </Typography>
+              <Typography variant="caption" color="textSecondary">
+                (Only 1 file allowed)
+              </Typography>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Close</Button>
+            <Button 
+              onClick={handleCreateScreen}
+              variant="contained" 
+              disabled={!newScreenName || !!screenNameError || !!screenIdError}
+            >
+              Create
+            </Button>
+          </DialogActions>
+        </CreateScreenDialog>
       </AppContainer>
     </DragDropContext>
   );
