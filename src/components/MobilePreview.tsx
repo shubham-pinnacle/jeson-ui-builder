@@ -22,7 +22,17 @@ const PreviewFrame = styled.div`
   overflow-y: auto;
   border: 3px solid #333;
   margin: auto;
+  
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+
+  
   &:before {
     content: '';
     position: absolute;
