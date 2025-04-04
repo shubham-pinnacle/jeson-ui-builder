@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Component } from '../types';
+import { TextField, FormControl, FormLabel, FormGroup, FormControlLabel, Radio, RadioGroup, Checkbox, Button, Select, MenuItem, InputLabel } from '@mui/material';
 
 const PreviewContainer = styled.div`
   display: flex;
@@ -68,84 +69,38 @@ const PreviewContent = styled.div`
   gap: 16px;
 `;
 
-const FormControl = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+const StyledFormControl = styled(FormControl)`
+  width: 100%;
+  margin-bottom: 16px;
 `;
 
-const Label = styled.label`
-  font-size: 14px;
-  color: #333;
-`;
-
-const StyledInput = styled('input')({
-  width: '100%',
-  padding: '8px 12px',
-  border: '1px solid #333',
-  borderRadius: '4px',
-  fontSize: '16px',
-  backgroundColor: '#fff',
-  color: '#fff',
-  '&:focus': {
-    outline: 'none',
-    borderColor: '#90caf9',
-  },
-  '&::placeholder': {
-    color: '#666',
+const StyledTextField = styled(TextField)`
+  width: 100%;
+  & .MuiOutlinedInput-root {
+    background-color: #fff;
+    & fieldset {
+      border-color: rgba(0, 0, 0, 0.23);
+    }
+    &:hover fieldset {
+      border-color: rgba(0, 0, 0, 0.87);
+    }
+    &.Mui-focused fieldset {
+      border-color: #1976d2;
+    }
   }
-});
-
-const StyledTextArea = styled('textarea')({
-  width: '100%',
-  padding: '8px 12px',
-  border: '1px solid #333',
-  borderRadius: '4px',
-  fontSize: '16px',
-  minHeight: '100px',
-  resize: 'vertical',
-  backgroundColor: '#fff',
-  color: '#fff',
-  '&:focus': {
-    outline: 'none',
-    borderColor: '#90caf9',
-  },
-  '&::placeholder': {
-    color: '#666',
-  }
-});
-
-const Select = styled.select`
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  background: white;
-  color: #333;
-
-  &:focus {
-    outline: none;
-    border-color: #2196f3;
+  & .MuiInputLabel-root {
+    color: rgba(0, 0, 0, 0.6);
+    &.Mui-focused {
+      color: #1976d2;
+    }
   }
 `;
 
-const StyledButton = styled('button')({
-  width: '100%',
-  padding: '12px',
-  backgroundColor: '#2196f3',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '4px',
-  fontSize: '16px',
-  cursor: 'pointer',
-  '&:hover': {
-    backgroundColor: '#1976d2',
-  },
-  '&:disabled': {
-    backgroundColor: '#666',
-    cursor: 'not-allowed',
-  }
-});
+const StyledButton = styled(Button)`
+  width: 100%;
+  margin-top: 8px;
+  text-transform: none;
+`;
 
 const Heading = styled.h2`
   font-size: 24px;
@@ -172,44 +127,6 @@ const Caption = styled.p`
   line-height: 1.5;
   margin: 0;
 `;
-
-const CheckboxGroup = styled.div`
-  display: flex;
-  gap: 8px;
-  align-items: center;
-`;
-
-const RadioGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
-const StyledCheckbox = styled('input')({
-  marginRight: '8px',
-  width: '18px',
-  height: '18px',
-  cursor: 'pointer',
-  backgroundColor: '#fff',
-  borderColor: '#333',
-  '&:checked': {
-    backgroundColor: '#90caf9',
-    borderColor: '#90caf9',
-  }
-});
-
-const StyledRadio = styled('input')({
-  marginRight: '8px',
-  width: '18px',
-  height: '18px',
-  cursor: 'pointer',
-  backgroundColor: '#fff',
-  borderColor: '#333',
-  '&:checked': {
-    backgroundColor: '#90caf9',
-    borderColor: '#90caf9',
-  }
-});
 
 interface MobilePreviewProps {
   components: Component[];
@@ -264,75 +181,89 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
 
       case 'text-input':
         return (
-          <FormControl key={component.id}>
-            <Label>{component.properties?.label || 'Label'}</Label>
-            <StyledInput 
-              type={component.properties?.inputType || 'text'}
-              placeholder={component.properties?.placeholder}
-              required={component.properties?.required === 'true'}
-            />
-          </FormControl>
+          <StyledTextField
+            key={component.id}
+            label={component.properties?.label || 'Label'}
+            variant="outlined"
+            fullWidth
+            size="small"
+            required={component.properties?.required === 'true'}
+            placeholder={component.properties?.placeholder}
+            type={component.properties?.inputType || 'text'}
+          />
         );
 
       case 'text-area':
         return (
-          <FormControl key={component.id}>
-            <Label>{component.properties?.label || 'Label'}</Label>
-            <StyledTextArea 
-              placeholder={component.properties?.placeholder}
-              required={component.properties?.required === 'true'}
-            />
-          </FormControl>
+          <StyledTextField
+            key={component.id}
+            label={component.properties?.label || 'Label'}
+            variant="outlined"
+            fullWidth
+            multiline
+            rows={4}
+            required={component.properties?.required === 'true'}
+            placeholder={component.properties?.placeholder}
+          />
         );
 
       case 'drop-down':
         return (
-          <FormControl key={component.id}>
-            <Label>{component.properties?.label || 'Select'}</Label>
+          <StyledFormControl key={component.id}>
+            <InputLabel>{component.properties?.label || 'Select'}</InputLabel>
             <Select
+              label={component.properties?.label || 'Select'}
               required={component.properties?.required === 'true'}
+              defaultValue=""
             >
-              <option value="">{component.properties?.placeholder || 'Select an option'}</option>
+              <MenuItem value="">{component.properties?.placeholder || 'Select an option'}</MenuItem>
               {getOptions(component.properties?.options).map((option: string) => (
-                <option key={option} value={option}>{option}</option>
+                <MenuItem key={option} value={option}>{option}</MenuItem>
               ))}
             </Select>
-          </FormControl>
+          </StyledFormControl>
         );
 
       case 'radio-button':
         return (
-          <FormControl key={component.id}>
-            <Label>{component.properties?.label || 'Options'}</Label>
+          <StyledFormControl key={component.id}>
+            <FormLabel>{component.properties?.label || 'Options'}</FormLabel>
             <RadioGroup>
               {getOptions(component.properties?.options).map((option: string) => (
-                <CheckboxGroup key={option}>
-                  <StyledRadio type="radio" name={component.id} value={option} />
-                  <Label>{option}</Label>
-                </CheckboxGroup>
+                <FormControlLabel
+                  key={option}
+                  value={option}
+                  control={<Radio />}
+                  label={option}
+                />
               ))}
             </RadioGroup>
-          </FormControl>
+          </StyledFormControl>
         );
 
       case 'check-box':
         return (
-          <FormControl key={component.id}>
-            <Label>{component.properties?.label || 'Options'}</Label>
-            {getOptions(component.properties?.options).map((option: string) => (
-              <CheckboxGroup key={option}>
-                <StyledCheckbox type="checkbox" value={option} />
-                <Label>{option}</Label>
-              </CheckboxGroup>
-            ))}
-          </FormControl>
+          <StyledFormControl key={component.id}>
+            <FormLabel>{component.properties?.label || 'Options'}</FormLabel>
+            <FormGroup>
+              {getOptions(component.properties?.options).map((option: string) => (
+                <FormControlLabel
+                  key={option}
+                  control={<Checkbox />}
+                  label={option}
+                />
+              ))}
+            </FormGroup>
+          </StyledFormControl>
         );
 
       case 'footer-button':
       case 'embedded-link':
         return (
-          <StyledButton 
+          <StyledButton
             key={component.id}
+            variant="contained"
+            color="primary"
             onClick={() => {}}
           >
             {component.properties?.buttonText || 'Submit'}
@@ -341,23 +272,30 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
 
       case 'opt-in':
         return (
-          <CheckboxGroup key={component.id}>
-            <StyledCheckbox type="checkbox" required={component.properties?.required === 'true'} />
-            <Label>{component.properties?.label || 'I agree'}</Label>
-          </CheckboxGroup>
+          <FormControlLabel
+            key={component.id}
+            control={<Checkbox required={component.properties?.required === 'true'} />}
+            label={component.properties?.label || 'I agree'}
+          />
         );
 
       case 'photo':
       case 'document':
         return (
-          <FormControl key={component.id}>
-            <Label>{component.properties?.label || 'Upload File'}</Label>
-            <StyledInput 
+          <StyledFormControl key={component.id}>
+            <FormLabel>{component.properties?.label || 'Upload File'}</FormLabel>
+            <input
               type="file"
               accept={component.properties?.accept}
               required={component.properties?.required === 'true'}
+              style={{
+                marginTop: '8px',
+                padding: '8px',
+                border: '1px solid rgba(0, 0, 0, 0.23)',
+                borderRadius: '4px'
+              }}
             />
-          </FormControl>
+          </StyledFormControl>
         );
 
       default:
