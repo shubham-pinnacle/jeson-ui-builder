@@ -11,7 +11,7 @@ import { Component } from '../types';
 const SidebarContainer = styled.div`
   width: 300px;
   background: white;
-  height: 100vh;
+  height: 90vh;
   padding: 20px;
   border-right: 0.5px solid #ffff;
   overflow-y: scroll; /* Still allow scrolling */
