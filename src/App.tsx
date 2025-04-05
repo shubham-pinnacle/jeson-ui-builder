@@ -553,98 +553,103 @@ function App() {
       version: "7.0",
       data_api_version: "3.0",
       routing_model: routingModel,
-      screens: screens.map(screen => ({
-        id: screen.id,
-        title: screen.title,
-        terminal: screen.terminal || false,
-        success: screen.success || false,
-        data: {},
-        layout: {
-          type: "SingleColumnLayout",
-          children: [
-            {
-              type: "Form",
-              name: "user_data",
-              children: screen.components.map(comp => {
-                switch (comp.type) {
-                  case 'text-heading':
-                    return {
-                      type: "TextHeading",
-                      text: comp.properties?.text || '',
-                      //style: { color: comp.properties?.color || '#333333' }
-                    };
-                  case 'sub-heading':
-                    return {
-                      type: "TextSubheading",
-                      text: comp.properties?.text || '',
-                      //style: { color: comp.properties?.color || '#666666' }
-                    };
-                  case 'text-body':
-                    return {
-                      type: "TextBody",
-                      text: comp.properties?.text || '',
-                      //style: { color: comp.properties?.color || '#666666' }
-                    };
-                  case 'text-caption':
-                    return {
-                      type: "TextCaption",
-                      text: comp.properties?.text || '',
-                      //style: { color: comp.properties?.color || '#999999' }
-                    };
-                  case 'text-input':
-                    return {
-                      type: "TextInput",
-                      required: comp.properties.required || true,
-                      label: comp.properties.label || "",
-                      name: comp.properties.name || "input_field"
-                    };
-                  case 'text-area':
-                    return {
-                      type: "TextArea",
-                      label: comp.properties.label || "",
-                      name: comp.properties.name || "textarea_field"
-                    };
-                  case 'check-box':
-                    return {
-                      type: "CheckboxGroup",
-                      name: comp.properties.name || "checkbox_group",
-                      'data-source': comp.properties.options ? 
-                        JSON.parse(comp.properties.options).map((option: string) => ({
-                          id: option.toLowerCase().replace(/\s+/g, '_'),
-                          title: option
-                        })) : 
-                        [{ id: 'default_option', title: 'Default Option' }]
-                    };
-                  case 'radio-button':
-                    return {
-                      type: "RadioButtonsGroup",
-                      name: comp.properties.name || "radio_group",
-                      'data-source': comp.properties.options ? 
-                        JSON.parse(comp.properties.options).map((option: string) => ({
-                          id: option.toLowerCase().replace(/\s+/g, '_'),
-                          title: option
-                        })) : 
-                        [{ id: 'default_option', title: 'Default Option' }]
-                    };
-                  case 'footer-button':
-                    return {
-                      type: "Footer",
-                      label: comp.properties.buttonText || "Submit data",
-                      'on-click-action': {
-                        name: "data_exchange",
-                        payload: {}
-                      }
-                    };
-                  default:
-                    return null;
-                }
-              }).filter(Boolean)
-            }
-          ]
+      screens: screens.map((screen, index) => {
+        // Build the base screen JSON object without terminal and success fields.
+        const baseScreen = {
+          id: screen.id,
+          title: screen.title,
+          data: {},
+          layout: {
+            type: "SingleColumnLayout",
+            children: [
+              {
+                type: "Form",
+                name: "user_data",
+                children: screen.components.map(comp => {
+                  switch (comp.type) {
+                    case 'text-heading':
+                      return {
+                        type: "TextHeading",
+                        text: comp.properties?.text || '',
+                      };
+                    case 'sub-heading':
+                      return {
+                        type: "TextSubheading",
+                        text: comp.properties?.text || '',
+                      };
+                    case 'text-body':
+                      return {
+                        type: "TextBody",
+                        text: comp.properties?.text || '',
+                      };
+                    case 'text-caption':
+                      return {
+                        type: "TextCaption",
+                        text: comp.properties?.text || '',
+                      };
+                    case 'text-input':
+                      return {
+                        type: "TextInput",
+                        required: comp.properties.required || true,
+                        label: comp.properties.label || "",
+                        name: comp.properties.name || "input_field"
+                      };
+                    case 'text-area':
+                      return {
+                        type: "TextArea",
+                        label: comp.properties.label || "",
+                        name: comp.properties.name || "textarea_field"
+                      };
+                    case 'check-box':
+                      return {
+                        type: "CheckboxGroup",
+                        name: comp.properties.name || "checkbox_group",
+                        'data-source': comp.properties.options ? 
+                          JSON.parse(comp.properties.options).map((option: string) => ({
+                            id: option.toLowerCase().replace(/\s+/g, '_'),
+                            title: option
+                          })) : 
+                          [{ id: 'default_option', title: 'Default Option' }]
+                      };
+                    case 'radio-button':
+                      return {
+                        type: "RadioButtonsGroup",
+                        name: comp.properties.name || "radio_group",
+                        'data-source': comp.properties.options ? 
+                          JSON.parse(comp.properties.options).map((option: string) => ({
+                            id: option.toLowerCase().replace(/\s+/g, '_'),
+                            title: option
+                          })) : 
+                          [{ id: 'default_option', title: 'Default Option' }]
+                      };
+                    case 'footer-button':
+                      return {
+                        type: "Footer",
+                        label: comp.properties.buttonText || "Submit data",
+                        'on-click-action': {
+                          name: "data_exchange",
+                          payload: {}
+                        }
+                      };
+                    default:
+                      return null;
+                  }
+                }).filter(Boolean)
+              }
+            ]
+          }
+        };
+
+        // Only the last screen gets terminal and success set to true.
+        if (index === screens.length - 1) {
+          return { ...baseScreen, terminal: true, success: true };
         }
-      }))
+        return baseScreen;
+      })
     };
   };
+
+  
 
   const handleMetaGenerate = (metaJson: any) => {
     console.log('Meta JSON generated:', metaJson);
