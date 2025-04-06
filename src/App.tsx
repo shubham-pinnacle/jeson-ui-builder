@@ -221,13 +221,13 @@ function App() {
           newComponent.properties = { text: ''};
           break;
         case 'sub-heading':
-          newComponent.properties = { text: 'Sub Heading Text', color: '#666666' };
+          newComponent.properties = { text: 'Sub Heading Text'};
           break;
         case 'text-body':
-          newComponent.properties = { text: 'Body Text Content', color: '#666666' };
+          newComponent.properties = { text: 'Body Text Content'};
           break;
         case 'text-caption':
-          newComponent.properties = { text: 'Caption Text', color: '#999999' };
+          newComponent.properties = { text: 'Caption Text'};
           break;
         case 'text-input':
           newComponent.properties = { 
@@ -258,7 +258,7 @@ function App() {
           break;
         case 'footer-button':
           newComponent.properties = { 
-            buttonText: 'Submit data',
+            buttonText: '',
             variant: 'contained'
           };
           break;
@@ -334,7 +334,7 @@ function App() {
         break;
       case 'footer-button':
         newComponent.properties = { 
-          buttonText: 'Submit data',
+          buttonText: '',
           variant: 'contained'
         };
         break;
@@ -429,28 +429,24 @@ function App() {
                   type = 'text-heading';
                   properties = {
                     text: child.text || '',
-                    color: child.style?.color || '#333333'
                   };
                   break;
                 case 'SubHeading':
                   type = 'sub-heading';
                   properties = {
                     text: child.text || '',
-                    color: child.style?.color || '#666666'
                   };
                   break;
                 case 'TextBody':
                   type = 'text-body';
                   properties = {
                     text: child.text || '',
-                    color: child.style?.color || '#666666'
                   };
                   break;
                 case 'TextCaption':
                   type = 'text-caption';
                   properties = {
                     text: child.text || '',
-                    color: child.style?.color || '#999999'
                   };
                   break;
                 case 'TextInput':
@@ -487,7 +483,7 @@ function App() {
                 case 'Footer':
                   type = 'footer-button';
                   properties = {
-                    buttonText: child.label || 'Submit data',
+                    buttonText: child.label || '',
                     variant: 'contained'
                   };
                   break;
@@ -625,7 +621,7 @@ function App() {
                     case 'footer-button':
                       return {
                         type: "Footer",
-                        label: comp.properties.buttonText || "Submit data",
+                        label: comp.properties.buttonText || "",
                         'on-click-action': {
                           name: "data_exchange",
                           payload: {}
