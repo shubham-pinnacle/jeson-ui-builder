@@ -604,23 +604,23 @@ function App() {
                   return {
                     type: "TextHeading",
                     text: component.properties.text || '',
-                    color: component.properties.color || '#333333',
-                    fontSize: component.properties.fontSize || '24px',
+                    // color: component.properties.color || '#333333',
+                    // fontSize: component.properties.fontSize || '24px',
                     visible: component.properties.visible || true
                   };
                 case 'sub-heading':
                   return {
                     type: "TextSubheading",
                     text: component.properties.text || '',
-                    color: component.properties.color || '#666666',
-                    fontSize: component.properties.fontSize || '18px'
+                    // color: component.properties.color || '#666666',
+                    // fontSize: component.properties.fontSize || '18px'
                   };
                 case 'text-caption':
                   return {
                     type: "TextCaption",
                     text: component.properties.text || '',
-                    color: component.properties.color || '#999999',
-                    fontSize: component.properties.fontSize || '12px'
+                    // color: component.properties.color || '#999999',
+                    // fontSize: component.properties.fontSize || '12px'
                   };
                 case 'text-input':
                   return {
