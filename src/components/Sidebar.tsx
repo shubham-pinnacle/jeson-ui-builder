@@ -7,11 +7,34 @@ import { IoMdArrowDropdown } from 'react-icons/io';
 import { BiImageAlt } from 'react-icons/bi';
 import { AiOutlineLink } from 'react-icons/ai';
 import { Component } from '../types';
+import { Button } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import Grid from '@mui/material/Grid';
+
+const FlowNameContainer = styled.div`
+  display: flex;
+  justify-content: center; /* Centers content horizontally */
+  align-items: center; /* Centers content vertically */
+  // border: 1px solid #ccc;
+  background-color:#eee;
+  padding: 10px;
+  border-radius: 5px;
+`;
+
+
+const ComponentsContainer = styled.div`
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+`;
 
 const SidebarContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   width: 300px;
   background: white;
-  height: 90vh;
+  height: 100vh;
   padding: 20px;
   border-right: 0.5px solid #ffff;
   overflow-y: scroll; /* Still allow scrolling */
@@ -44,8 +67,7 @@ const ComponentsGrid = styled.div`
 
 const ComponentCard = styled.div`
   background: white;
-  border: 1px solid  #a7adb8
-;
+  border: 1px solid #eee;
   border-radius: 8px;
   padding: 15px;
   display: flex;
@@ -67,7 +89,7 @@ const ComponentName = styled.span`
   font-size: 12px;
   color: #666;
   text-align: center;
-  font-weight:bold;
+  font-weight: bold;
 `;
 
 const components = {
@@ -109,6 +131,27 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddComponent }) => {
 
   return (
     <SidebarContainer>
+      <FlowNameContainer>
+        <b>Flow Name</b>
+        <Grid ml={1}>
+          <EditIcon sx={{ fontSize: "14px", color: "primary.main" }} />
+          <Button
+            size="small"
+            variant="contained"
+            color="primary"
+            sx={{
+              marginLeft: "10px",
+              borderRadius: "10px",
+              padding: "3px 10px",
+              fontSize: "10px",
+              minWidth: "auto"
+            }}
+          >
+            Draft
+          </Button>
+
+        </Grid>
+      </FlowNameContainer>
       {Object.entries(components).map(([section, items]) => (
         <div key={section}>
           <SectionTitle>{section.split(/(?=[A-Z])/).join(' ')}</SectionTitle>

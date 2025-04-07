@@ -515,10 +515,10 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           onChange={(e) => handleChange('onClickAction', e.target.value)}
           label="On Click Action"
         >
-          <MenuItem value="">Select action</MenuItem>
-          <MenuItem value="submit">Submit</MenuItem>
-          <MenuItem value="reset">Reset</MenuItem>
-          <MenuItem value="cancel">Cancel</MenuItem>
+          
+          <MenuItem value="complete">Complete</MenuItem>
+          <MenuItem value="navigate">Navigate</MenuItem>
+          <MenuItem value="data_exchange">Data Exchange</MenuItem>
         </Select>
       </FormControl>
     </Stack>

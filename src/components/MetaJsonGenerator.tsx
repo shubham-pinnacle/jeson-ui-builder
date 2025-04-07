@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, TextField } from '@mui/material';
+
 const Container = styled(Box)({
   flex: 1,
   display: 'flex',
@@ -8,16 +9,19 @@ const Container = styled(Box)({
   backgroundColor: '#ffffff',
   height: '100%',
   gap: '16px',
-  overflowY: 'auto',
+
+  // Let this container scroll if content exceeds its height
+  overflow: 'auto',
+
   /* Custom scrollbar styling for WebKit browsers */
   '&::-webkit-scrollbar': {
     width: '8px',
   },
   '&::-webkit-scrollbar-track': {
-    background: '#ffffff', // white track
+    background: '#ffffff',
   },
   '&::-webkit-scrollbar-thumb': {
-    backgroundColor: 'lightgrey', // light grey thumb
+    backgroundColor: 'lightgrey',
     borderRadius: '4px',
   },
   /* Firefox scrollbar styling */
@@ -25,18 +29,48 @@ const Container = styled(Box)({
   scrollbarColor: 'lightgrey #ffffff',
 });
 
-// Updated StyledTextField remains largely unchanged
+// A horizontal row: gutter on the left, text area on the right
+const EditorContainer = styled(Box)({
+  display: 'flex',
+  width: '100%',
+  // The parent Container can scroll vertically,
+  // so we don't need overflow here unless you want horizontal scrolling too.
+});
+
+// The line-number gutter
+const Gutter = styled('div')({
+  // Sticky positioning keeps it pinned horizontally but lets it scroll vertically
+  position: 'sticky',
+  top: 0,
+  left: 0,
+  // Make sure it has a background so text won't bleed behind it
+  backgroundColor: '#f5f5f5',
+  borderRight: '1px solid #ddd',
+  textAlign: 'right',
+  paddingRight: '8px',
+  fontFamily: 'monospace',
+  fontSize: '14px',
+  lineHeight: '1.5',
+  userSelect: 'none',
+  width: '40px',
+  // so it’s above the text field background
+  zIndex: 1,
+});
+
+// The JSON text field
 const StyledTextField = styled(TextField)({
   width: '100%',
   '& .MuiOutlinedInput-root': {
     fontFamily: 'monospace',
     fontSize: '14px',
     lineHeight: '1.5',
-    overflow: 'hidden', // ensures the container of the textarea scrolls if needed
+
+    // Let the TextField grow as needed; the parent will handle scrolling.
     '& textarea': {
-      overflow: 'hidden', // enables scrolling for the textarea when content overflows
-      resize: 'vertical', // allow user to resize if needed
-      minHeight: '300px', // sets a minimum height so that extra content will trigger a scrollbar
+      resize: 'vertical',
+      minHeight: '300px',
+      // A small left padding so text doesn’t run right against the gutter’s border
+      paddingLeft: '8px',
     },
   },
 });
@@ -52,26 +86,31 @@ const MetaJsonGenerator: React.FC<MetaJsonGeneratorProps> = ({
   onJsonChange,
   onMetaGenerate,
 }) => {
+  // Split lines to generate line numbers
+  const lines = useMemo(() => jsonInput.split('\n'), [jsonInput]);
+
   const handleEditorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onJsonChange(event.target.value);
   };
 
   return (
     <Container>
-      <StyledTextField
-        multiline
-        fullWidth
-        value={jsonInput}
-        onChange={handleEditorChange}
-        variant="outlined"
-        InputProps={{
-          sx: {
-            height: '100%',
-          },
-        }}
-      />
+      <EditorContainer>
+        <Gutter>
+          {lines.map((_, i) => (
+            <div key={i}>{i + 1}</div>
+          ))}
+        </Gutter>
+        <StyledTextField
+          multiline
+          fullWidth
+          variant="outlined"
+          value={jsonInput}
+          onChange={handleEditorChange}
+        />
+      </EditorContainer>
     </Container>
   );
 };
 
-export default MetaJsonGenerator; 
+export default MetaJsonGenerator;
