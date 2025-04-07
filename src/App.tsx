@@ -470,8 +470,8 @@ function App() {
                   label: child.label || '',
                   name: child.name || `field_${Date.now()}`,
                   required: child.required || false,
-                  placeholder: child.placeholder || '',
-                  value: child.value || ''
+                  // placeholder: child.placeholder || '',
+                  // value: child.value || ''
                 };
                 break;
               case 'TextArea':
@@ -606,8 +606,8 @@ function App() {
                     name: component.properties.name || `field_${Date.now()}`,
                     label: component.properties.label || '',
                     required: component.properties.required || false,
-                    placeholder: component.properties.placeholder || '',
-                    value: component.properties.value || ''
+                    // placeholder: component.properties.placeholder || '',
+                    // value: component.properties.value || ''
                   };
                 case 'text-area':
                   return {
