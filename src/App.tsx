@@ -218,7 +218,7 @@ function App() {
       // Set default properties based on component type
       switch (draggableId) {
         case 'text-heading':
-          newComponent.properties = { text: ''};
+          newComponent.properties = { text: '',visible : true};
           break;
         case 'sub-heading':
           newComponent.properties = { text: 'Sub Heading Text'};
@@ -294,7 +294,7 @@ function App() {
     // Set default properties based on component type
     switch (type) {
       case 'text-heading':
-        newComponent.properties = { text: '' };
+        newComponent.properties = { text: '' ,visible : true};
         break;
       case 'sub-heading':
         newComponent.properties = { text: '' };
@@ -429,6 +429,7 @@ function App() {
                   type = 'text-heading';
                   properties = {
                     text: child.text || '',
+                    visible: child.visible || true,
                   };
                   break;
                 case 'SubHeading':
@@ -567,6 +568,7 @@ function App() {
                       return {
                         type: "TextHeading",
                         text: comp.properties?.text || '',
+                        visible: comp.properties?.visible || true,
                       };
                     case 'sub-heading':
                       return {
