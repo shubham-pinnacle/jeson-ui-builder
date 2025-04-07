@@ -53,7 +53,7 @@ const Gutter = styled('div')({
   lineHeight: '1.5',
   userSelect: 'none',
   width: '40px',
-  // so it’s above the text field background
+  // so it's above the text field background
   zIndex: 1,
 });
 
@@ -69,7 +69,7 @@ const StyledTextField = styled(TextField)({
     '& textarea': {
       resize: 'vertical',
       minHeight: '300px',
-      // A small left padding so text doesn’t run right against the gutter’s border
+      // A small left padding so text doesn't run right against the gutter's border
       paddingLeft: '8px',
     },
   },
@@ -89,8 +89,11 @@ const MetaJsonGenerator: React.FC<MetaJsonGeneratorProps> = ({
   // Split lines to generate line numbers
   const lines = useMemo(() => jsonInput.split('\n'), [jsonInput]);
 
-  const handleEditorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onJsonChange(event.target.value);
+  const handleEditorChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const value = event.target.value;
+    if (value !== undefined) {
+      onJsonChange(value);
+    }
   };
 
   return (

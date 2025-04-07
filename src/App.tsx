@@ -412,112 +412,130 @@ function App() {
   const handleJsonChange = (newJson: string) => {
     setEditValue(newJson);
     try {
-      const parsedJson = JSON.parse(newJson);
-      if (parsedJson.screens && Array.isArray(parsedJson.screens)) {
-        const newScreens = parsedJson.screens.map((screen: any) => {
-          const components = screen.layout?.children?.find((child: any) => child.type === "Form")?.children || [];
-          
-          return {
-            id: screen.id || `SCREEN_${Date.now()}`,
-            title: screen.title || 'Untitled Screen',
-            components: components.map((child: any) => {
-              let type = '';
-              let properties: Record<string, any> = {};
+      const trimmedJson = newJson.trim();
+      if (!trimmedJson) {
+        return;
+      }
 
-              switch (child.type) {
-                case 'TextHeading':
-                  type = 'text-heading';
-                  properties = {
-                    text: child.text || '',
-                    visible: child.visible || true,
-                  };
-                  break;
-                case 'SubHeading':
-                  type = 'sub-heading';
-                  properties = {
-                    text: child.text || '',
-                  };
-                  break;
-                case 'TextBody':
-                  type = 'text-body';
-                  properties = {
-                    text: child.text || '',
-                  };
-                  break;
-                case 'TextCaption':
-                  type = 'text-caption';
-                  properties = {
-                    text: child.text || '',
-                  };
-                  break;
-                case 'TextInput':
-                  type = 'text-input';
-                  properties = {
-                    label: child.label || '',
-                    name: child.name || `input_field_${Date.now()}`,
-                    required: child.required || false
-                  };
-                  break;
-                case 'TextArea':
-                  type = 'text-area';
-                  properties = {
-                    label: child.label || '',
-                    name: child.name || `textarea_field_${Date.now()}`
-                  };
-                  break;
-                case 'CheckboxGroup':
-                  type = 'check-box';
-                  properties = {
-                    label: child.label || '',
-                    name: child.name || `checkbox_group_${Date.now()}`,
-                    options: JSON.stringify(child['data-source']?.map((opt: any) => opt.title) || ['Option 1', 'Option 2', 'Option 3'])
-                  };
-                  break;
-                case 'RadioButtonsGroup':
-                  type = 'radio-button';
-                  properties = {
-                    label: child.label || '',
-                    name: child.name || `radio_group_${Date.now()}`,
-                    options: JSON.stringify(child['data-source']?.map((opt: any) => opt.title) || ['Option 1', 'Option 2', 'Option 3'])
-                  };
-                  break;
-                case 'Footer':
-                  type = 'footer-button';
-                  properties = {
-                    buttonText: child.label || '',
-                    variant: 'contained'
-                  };
-                  break;
-              }
+      const parsedJson = JSON.parse(trimmedJson);
+      if (!parsedJson || typeof parsedJson !== 'object') {
+        console.error('Invalid JSON: Expected an object');
+        return;
+      }
 
-              return {
-                id: `component_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                type,
-                name: type.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-                properties
-              };
-            }),
-            terminal: screen.terminal || false,
-            success: screen.success || false
-          };
-        });
+      if (!parsedJson.screens || !Array.isArray(parsedJson.screens)) {
+        console.error('Invalid JSON: Missing or invalid screens array');
+        return;
+      }
 
-        setScreens(newScreens);
+      const newScreens = parsedJson.screens.map((screen: any) => {
+        const layoutChildren = screen.layout?.children || [];
         
-        // If there's a selected component, update it to match the new components
-        if (selectedComponent && activeScreenIndex < newScreens.length) {
-          const updatedSelectedComponent = newScreens[activeScreenIndex].components.find(
-            (comp: Component) => comp.type === selectedComponent.type && 
-            comp.properties.label === selectedComponent.properties.label
-          );
-          
-          if (updatedSelectedComponent) {
-            setSelectedComponent(updatedSelectedComponent);
-          }
+        return {
+          id: screen.id || `SCREEN_${Date.now()}`,
+          title: screen.title || 'Untitled Screen',
+          components: layoutChildren.map((child: any) => {
+            let type = '';
+            let properties: Record<string, any> = {};
+
+            switch (child.type) {
+              case 'TextHeading':
+                type = 'text-heading';
+                properties = {
+                  text: child.text || '',
+                  color: child.color || '#333333',
+                  fontSize: child.fontSize || '24px',
+                  visible: child.visible || true
+                };
+                break;
+              case 'TextSubheading':
+                type = 'sub-heading';
+                properties = {
+                  text: child.text || '',
+                  color: child.color || '#666666',
+                  fontSize: child.fontSize || '18px'
+                };
+                break;
+              case 'TextCaption':
+                type = 'text-caption';
+                properties = {
+                  text: child.text || '',
+                  color: child.color || '#999999',
+                  fontSize: child.fontSize || '12px'
+                };
+                break;
+              case 'TextInput':
+                type = 'text-input';
+                properties = {
+                  label: child.label || '',
+                  name: child.name || `field_${Date.now()}`,
+                  required: child.required || false,
+                  placeholder: child.placeholder || '',
+                  value: child.value || ''
+                };
+                break;
+              case 'TextArea':
+                type = 'text-area';
+                properties = {
+                  label: child.label || '',
+                  name: child.name || `textarea_field_${Date.now()}`
+                };
+                break;
+              case 'CheckboxGroup':
+                type = 'check-box';
+                properties = {
+                  label: child.label || '',
+                  name: child.name || `checkbox_group_${Date.now()}`,
+                  options: JSON.stringify(child['data-source']?.map((opt: any) => opt.title) || ['Option 1', 'Option 2', 'Option 3'])
+                };
+                break;
+              case 'RadioButtonsGroup':
+                type = 'radio-button';
+                properties = {
+                  label: child.label || '',
+                  name: child.name || `radio_group_${Date.now()}`,
+                  options: JSON.stringify(child['data-source']?.map((opt: any) => opt.title) || ['Option 1', 'Option 2', 'Option 3'])
+                };
+                break;
+              case 'Footer':
+                type = 'footer-button';
+                properties = {
+                  buttonText: child.label || '',
+                  variant: 'contained'
+                };
+                break;
+            }
+
+            return {
+              id: `component_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+              type,
+              name: type.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+              properties
+            };
+          }),
+          terminal: screen.terminal || false,
+          success: screen.success || false
+        };
+      });
+
+      setScreens(newScreens);
+      
+      if (selectedComponent && activeScreenIndex < newScreens.length) {
+        const updatedSelectedComponent = newScreens[activeScreenIndex].components.find(
+          (comp: Component) => comp.type === selectedComponent.type && 
+          comp.properties.label === selectedComponent.properties.label
+        );
+        
+        if (updatedSelectedComponent) {
+          setSelectedComponent(updatedSelectedComponent);
         }
       }
     } catch (error) {
-      console.error('Invalid JSON:', error);
+      if (error instanceof SyntaxError) {
+        console.error('JSON Syntax Error:', error.message);
+      } else {
+        console.error('Error parsing JSON:', error);
+      }
     }
   };
 
@@ -541,113 +559,118 @@ function App() {
   const generateJson = () => {
     // Create routing model based on screen order
     const routingModel: Record<string, string[]> = {};
-  
     for (let i = 0; i < screens.length - 1; i++) {
       routingModel[screens[i].id] = [screens[i + 1].id];
     }
-  
+
     return {
       version: "7.0",
-      data_api_version: "3.0",
       routing_model: routingModel,
       screens: screens.map((screen, index) => {
-        // Build the base screen JSON object without terminal and success fields.
-        const baseScreen = {
+        const isLastScreen = index === screens.length - 1;
+        const nextScreen = !isLastScreen ? screens[index + 1] : null;
+
+        return {
           id: screen.id,
           title: screen.title,
-          data: {},
+          ...(isLastScreen ? { terminal: true } : {}),
           layout: {
             type: "SingleColumnLayout",
-            children: [
-              {
-                type: "Form",
-                name: "user_data",
-                children: screen.components.map(comp => {
-                  switch (comp.type) {
-                    case 'text-heading':
-                      return {
-                        type: "TextHeading",
-                        text: comp.properties?.text || '',
-                        visible: comp.properties?.visible || true,
-                      };
-                    case 'sub-heading':
-                      return {
-                        type: "TextSubheading",
-                        text: comp.properties?.text || '',
-                      };
-                    case 'text-body':
-                      return {
-                        type: "TextBody",
-                        text: comp.properties?.text || '',
-                      };
-                    case 'text-caption':
-                      return {
-                        type: "TextCaption",
-                        text: comp.properties?.text || '',
-                      };
-                    case 'text-input':
-                      return {
-                        type: "TextInput",
-                        required: comp.properties.required || true,
-                        label: comp.properties.label || "",
-                        name: comp.properties.name || "input_field"
-                      };
-                    case 'text-area':
-                      return {
-                        type: "TextArea",
-                        label: comp.properties.label || "",
-                        name: comp.properties.name || "textarea_field"
-                      };
-                    case 'check-box':
-                      return {
-                        type: "CheckboxGroup",
-                        name: comp.properties.name || "checkbox_group",
-                        'data-source': comp.properties.options ? 
-                          JSON.parse(comp.properties.options).map((option: string) => ({
-                            id: option.toLowerCase().replace(/\s+/g, '_'),
-                            title: option
-                          })) : 
-                          [{ id: 'default_option', title: 'Default Option' }]
-                      };
-                    case 'radio-button':
-                      return {
-                        type: "RadioButtonsGroup",
-                        name: comp.properties.name || "radio_group",
-                        'data-source': comp.properties.options ? 
-                          JSON.parse(comp.properties.options).map((option: string) => ({
-                            id: option.toLowerCase().replace(/\s+/g, '_'),
-                            title: option
-                          })) : 
-                          [{ id: 'default_option', title: 'Default Option' }]
-                      };
-                    case 'footer-button':
-                      return {
-                        type: "Footer",
-                        label: comp.properties.buttonText || "",
-                        'on-click-action': {
-                          name: "data_exchange",
-                          payload: {}
+            children: screen.components.map(component => {
+              switch (component.type) {
+                case 'text-heading':
+                  return {
+                    type: "TextHeading",
+                    text: component.properties.text || '',
+                    color: component.properties.color || '#333333',
+                    fontSize: component.properties.fontSize || '24px',
+                    visible: component.properties.visible || true
+                  };
+                case 'sub-heading':
+                  return {
+                    type: "TextSubheading",
+                    text: component.properties.text || '',
+                    color: component.properties.color || '#666666',
+                    fontSize: component.properties.fontSize || '18px'
+                  };
+                case 'text-caption':
+                  return {
+                    type: "TextCaption",
+                    text: component.properties.text || '',
+                    color: component.properties.color || '#999999',
+                    fontSize: component.properties.fontSize || '12px'
+                  };
+                case 'text-input':
+                  return {
+                    type: "TextInput",
+                    name: component.properties.name || `field_${Date.now()}`,
+                    label: component.properties.label || '',
+                    required: component.properties.required || false,
+                    placeholder: component.properties.placeholder || '',
+                    value: component.properties.value || ''
+                  };
+                case 'text-area':
+                  return {
+                    type: "TextArea",
+                    name: component.properties.name || `textarea_${Date.now()}`,
+                    label: component.properties.label || ''
+                  };
+                case 'check-box':
+                  return {
+                    type: "CheckboxGroup",
+                    name: component.properties.name || `checkbox_${Date.now()}`,
+                    'data-source': component.properties.options ? 
+                      JSON.parse(component.properties.options).map((option: string) => ({
+                        id: option.toLowerCase().replace(/\s+/g, '_'),
+                        title: option
+                      })) : 
+                      [{ id: 'default_option', title: 'Default Option' }]
+                  };
+                case 'radio-button':
+                  return {
+                    type: "RadioButtonsGroup",
+                    name: component.properties.name || `radio_${Date.now()}`,
+                    label: component.properties.label || '',
+                    'data-source': component.properties.options ? 
+                      JSON.parse(component.properties.options).map((option: string) => ({
+                        id: option.toLowerCase().replace(/\s+/g, '_'),
+                        title: option
+                      })) : 
+                      [{ id: 'default_option', title: 'Default Option' }]
+                  };
+                case 'footer-button':
+                  return {
+                    type: "Footer",
+                    label: component.properties.buttonText || '',
+                    'on-click-action': {
+                      name: isLastScreen ? "complete" : "navigate",
+                      ...(isLastScreen ? {
+                        payload: {
+                          ...screen.components.reduce((acc: Record<string, string>, comp) => {
+                            if (comp.type === 'text-input' || comp.type === 'radio-button' || comp.type === 'check-box') {
+                              acc[comp.properties.name] = `\${screen.${screen.id}.form.${comp.properties.name}}`;
+                            }
+                            return acc;
+                          }, {})
                         }
-                      };
-                    default:
-                      return null;
-                  }
-                }).filter(Boolean)
+                      } : {
+                        next: {
+                          type: "screen",
+                          name: nextScreen?.id
+                        },
+                        payload: {}
+                      })
+                    }
+                  };
+                default:
+                  return null;
               }
-            ]
+            }).filter(Boolean)
           }
         };
-
-        // Only the last screen gets terminal and success set to true.
-        if (index === screens.length - 1) {
-          return { ...baseScreen, terminal: true, success: true };
-        }
-        return baseScreen;
       })
     };
   };
-
-  
 
   const handleMetaGenerate = (metaJson: any) => {
     console.log('Meta JSON generated:', metaJson);
@@ -816,13 +839,16 @@ function App() {
                     label={
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <ScreenTitle>{screen.title}</ScreenTitle>
-                        <IconButton
-                          size="small"
-                          onClick={(e) => handleScreenMenuOpen(e, index)}
-                          sx={{ ml: 1 }}
+                        <Box
+                          component="div"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleScreenMenuOpen(e, index);
+                          }}
+                          sx={{ ml: 1, cursor: 'pointer' }}
                         >
                           <MoreVertIcon fontSize="small" />
-                        </IconButton>
+                        </Box>
                       </Box>
                     }
                   />

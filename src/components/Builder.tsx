@@ -78,12 +78,35 @@ const ComponentTitle = styled.div`
   color: #333;
 `;
 
-const ComponentContent = styled.div<{ color?: string; fontSize?: string }>`
-  padding: 10px;
-  background: #f5f5f5;
+const ComponentContent = styled('div')<{ $type?: string; color?: string; fontSize?: string }>`
+  padding: 8px;
   border-radius: 4px;
-  font-size: ${props => props.fontSize || '14px'};
-  color: ${props => props.color || '#666'};
+  background-color: ${props => props.$type === 'text-heading' ? '#f5f5f5' : 'transparent'};
+  color: ${props => props.color || '#333333'};
+  font-size: ${props => {
+    switch (props.$type) {
+      case 'text-heading':
+        return '24px';
+      case 'sub-heading':
+        return '18px';
+      case 'text-caption':
+        return '12px';
+      case 'text-input':
+        return '14px';
+      default:
+        return '14px';
+    }
+  }};
+  font-weight: ${props => props.$type === 'text-heading' ? 'bold' : 'normal'};
+  width: 100%;
+  min-height: ${props => props.$type === 'text-input' ? '40px' : 'auto'};
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  border: ${props => props.$type === 'text-input' ? '1px solid #e0e0e0' : 'none'};
+  border-radius: ${props => props.$type === 'text-input' ? '4px' : '0'};
+  padding: ${props => props.$type === 'text-input' ? '8px 12px' : '8px'};
+  background-color: ${props => props.$type === 'text-input' ? '#ffffff' : 'transparent'};
 `;
 
 const Builder: React.FC<BuilderProps> = ({
@@ -109,18 +132,60 @@ const Builder: React.FC<BuilderProps> = ({
     onAddComponent(type);
   };
 
-  const renderComponentContent = (component: Component) => {
+  const renderComponent = (component: Component) => {
     switch (component.type) {
       case 'text-heading':
         return (
-          <ComponentContent fontSize="24px" color={component.properties?.color || '#333333'}>
-            {component.properties?.text || 'Heading Text'}
+          <ComponentContent
+            $type="text-heading"
+            color={component.properties.color}
+            fontSize={component.properties.fontSize}
+          >
+            {component.properties.text || 'Heading Text'}
           </ComponentContent>
         );
       case 'sub-heading':
         return (
-          <ComponentContent fontSize="18px" color={component.properties?.color || '#666666'}>
-            {component.properties?.text || 'Sub Heading Text'}
+          <ComponentContent
+            $type="sub-heading"
+            color={component.properties.color || '#666666'}
+            fontSize={component.properties.fontSize}
+          >
+            {component.properties.text || 'Sub Heading Text'}
+          </ComponentContent>
+        );
+      case 'text-caption':
+        return (
+          <ComponentContent
+            $type="text-caption"
+            color={component.properties.color || '#999999'}
+            fontSize={component.properties.fontSize}
+          >
+            {component.properties.text || 'Caption Text'}
+          </ComponentContent>
+        );
+        console.log(component.properties,"jsdksks")
+      case 'text-input':
+        console.log('TextInput Component Properties:', {
+          id: component.id,
+          properties: component.properties,
+          label: component.properties.label,
+          placeholder: component.properties.placeholder,
+          value: component.properties.value
+        });
+        return (
+          <ComponentContent $type="text-input">
+            <div style={{ marginBottom: '8px' }}>
+              <label style={{ 
+                display: 'block', 
+                fontSize: '14px', 
+                color: '#333', 
+                marginBottom: '4px' 
+              }}>
+                {component.properties.label || 'Label'}
+              </label>
+            </div>
+            
           </ComponentContent>
         );
       case 'text-body':
@@ -129,14 +194,6 @@ const Builder: React.FC<BuilderProps> = ({
             {component.properties?.text || 'Body Text Content'}
           </ComponentContent>
         );
-      case 'text-caption':
-        return (
-          <ComponentContent fontSize="12px" color={component.properties?.color || '#999999'}>
-            {component.properties?.text || 'Caption Text'}
-          </ComponentContent>
-        );
-      case 'text-input':
-        return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
       case 'text-area':
         return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
       case 'check-box':
@@ -170,7 +227,7 @@ const Builder: React.FC<BuilderProps> = ({
                   draggableId={component.id}
                   index={index}
                 >
-                  {(provided, snapshot) => (
+                  {(provided, snapshot) => (  
                     <ComponentWrapper
                       ref={provided.innerRef}
                       {...provided.draggableProps}
@@ -197,7 +254,7 @@ const Builder: React.FC<BuilderProps> = ({
                           />
                         </div>
                       </ComponentHeader>
-                      {renderComponentContent(component)}
+                      {renderComponent(component)}
                     </ComponentWrapper>
                   )}
                 </Draggable>

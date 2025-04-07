@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Component } from '../types';
-import { TextField, FormControl, FormLabel, FormGroup, FormControlLabel, Radio, RadioGroup, Checkbox, Button, Select, MenuItem, InputLabel } from '@mui/material';
+import { TextField, FormControl, FormLabel, FormGroup, FormControlLabel, Radio, RadioGroup, Checkbox, Button, Select, MenuItem, InputLabel, Typography } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 const PreviewContainer = styled.div`
@@ -156,16 +156,32 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
     switch (component.type) {
       case 'text-heading':
         return (
-          <Heading key={component.id}>
-            {component.properties?.text || 'Heading'}
-          </Heading>
+          <Typography
+            key={`${component.id}_heading`}
+            variant="h5"
+            style={{
+              color: component.properties.color || '#333333',
+              fontSize: component.properties.fontSize || '24px',
+              marginBottom: '16px'
+            }}
+          >
+            {component.properties.text || 'Heading Text'}
+          </Typography>
         );
 
       case 'sub-heading':
         return (
-          <SubHeading key={component.id}>
-            {component.properties?.text || 'Sub Heading'}
-          </SubHeading>
+          <Typography
+            key={`${component.id}_subheading`}
+            variant="h6"
+            style={{
+              color: component.properties.color || '#666666',
+              fontSize: component.properties.fontSize || '18px',
+              marginBottom: '12px'
+            }}
+          >
+            {component.properties.text || 'Sub Heading Text'}
+          </Typography>
         );
 
       case 'text-body':
@@ -177,29 +193,46 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
 
       case 'text-caption':
         return (
-          <Caption key={component.id}>
-            {component.properties?.text || 'Caption text'}
-          </Caption>
+          <Typography
+            key={`${component.id}_caption`}
+            variant="body2"
+            style={{
+              color: component.properties.color || '#999999',
+              fontSize: component.properties.fontSize || '12px',
+              marginBottom: '8px'
+            }}
+          >
+            {component.properties.text || 'Caption Text'}
+          </Typography>
         );
 
       case 'text-input':
         return (
-          <StyledTextField
-            key={component.id}
-            label={component.properties?.label || 'Label'}
+          <TextField
+            key={`${component.id}_input`}
+            label={component.properties.label || 'Label'}
+            placeholder={component.properties.placeholder || 'Enter text...'}
             variant="outlined"
-            fullWidth
-            size="small"
-            required={component.properties?.required === 'true'}
-            placeholder={component.properties?.placeholder}
-            type={component.properties?.inputType || 'text'}
+            margin="normal"
+            required={component.properties.required || false}
+            InputLabelProps={{
+              style: {
+                fontSize: '14px',
+                color: '#666666'
+              }
+            }}
+            InputProps={{
+              style: {
+                fontSize: '14px'
+              }
+            }}
           />
         );
 
       case 'text-area':
         return (
           <StyledTextField
-            key={component.id}
+            key={`${component.id}_textarea`}
             label={component.properties?.label || 'Label'}
             variant="outlined"
             fullWidth
@@ -229,12 +262,12 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
 
       case 'radio-button':
         return (
-          <StyledFormControl key={component.id}>
+          <StyledFormControl key={`${component.id}_radio`}>
             <FormLabel>{component.properties?.label || 'Options'}</FormLabel>
             <RadioGroup>
-              {getOptions(component.properties?.options).map((option: string) => (
+              {getOptions(component.properties?.options).map((option: string, index: number) => (
                 <FormControlLabel
-                  key={option}
+                  key={`${component.id}_radio_${index}`}
                   value={option}
                   control={<Radio />}
                   label={option}
@@ -246,12 +279,12 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
 
       case 'check-box':
         return (
-          <StyledFormControl key={component.id}>
+          <StyledFormControl key={`${component.id}_checkbox`}>
             <FormLabel>{component.properties?.label || 'Options'}</FormLabel>
             <FormGroup>
-              {getOptions(component.properties?.options).map((option: string) => (
+              {getOptions(component.properties?.options).map((option: string, index: number) => (
                 <FormControlLabel
-                  key={option}
+                  key={`${component.id}_checkbox_${index}`}
                   control={<Checkbox />}
                   label={option}
                 />
@@ -264,7 +297,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
       case 'embedded-link':
         return (
           <StyledButton
-            key={component.id}
+            key={`${component.id}_button`}
             variant="contained"
             color="primary"
             onClick={() => {}}
