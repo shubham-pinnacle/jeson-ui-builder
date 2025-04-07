@@ -470,8 +470,6 @@ function App() {
                   label: child.label || '',
                   name: child.name || `field_${Date.now()}`,
                   required: child.required || false,
-                  // placeholder: child.placeholder || '',
-                  // value: child.value || ''
                 };
                 break;
               case 'TextArea':
@@ -500,8 +498,31 @@ function App() {
               case 'Footer':
                 type = 'footer-button';
                 properties = {
-                  buttonText: child.label || '',
-                  variant: 'contained'
+                  buttonText: child.label || 'Submit'
+                };
+                break;
+              case 'Photo':
+                type = 'photo';
+                properties = {
+                  label: child.label || 'Upload Photo',
+                  required: child.required || false,
+                  accept: child.accept || 'image/*'
+                };
+                break;
+              case 'Document':
+                type = 'document';
+                properties = {
+                  label: child.label || 'Upload Document',
+                  required: child.required || false,
+                  accept: child.accept || '.pdf,.doc,.docx'
+                };
+                break;
+              case 'Image':
+                type = 'image';
+                properties = {
+                  src: child.src || '',
+                  width: child.width || 200,
+                  height: child.height || 200
                 };
                 break;
             }
@@ -569,6 +590,7 @@ function App() {
       screens: screens.map((screen, index) => {
         const isLastScreen = index === screens.length - 1;
         const nextScreen = !isLastScreen ? screens[index + 1] : null;
+        const nextScreenId = nextScreen?.id || '';
 
         return {
           id: screen.id,
@@ -606,8 +628,6 @@ function App() {
                     name: component.properties.name || `field_${Date.now()}`,
                     label: component.properties.label || '',
                     required: component.properties.required || false,
-                    // placeholder: component.properties.placeholder || '',
-                    // value: component.properties.value || ''
                   };
                 case 'text-area':
                   return {
@@ -641,7 +661,7 @@ function App() {
                 case 'footer-button':
                   return {
                     type: "Footer",
-                    label: component.properties.buttonText || '',
+                    label: component.properties.buttonText || 'Submit',
                     'on-click-action': {
                       name: isLastScreen ? "complete" : "navigate",
                       ...(isLastScreen ? {
@@ -661,6 +681,27 @@ function App() {
                         payload: {}
                       })
                     }
+                  };
+                // case 'photo':
+                //   return {
+                //     type: "Photo",
+                //     label: component.properties.label || '',
+                //     required: component.properties.required || false,
+                //     accept: component.properties.accept || 'image/*'
+                //   };
+                case 'document':
+                  return {
+                    type: "Document",
+                    label: component.properties.label || 'Upload Document',
+                    required: component.properties.required || false,
+                    accept: component.properties.accept || '.pdf,.doc,.docx'
+                  };
+                case 'photo':
+                  return {
+                    type: "Image",
+                    src: component.properties.src || '',
+                    width: component.properties.width || 200,
+                    height: component.properties.height || 200
                   };
                 default:
                   return null;
