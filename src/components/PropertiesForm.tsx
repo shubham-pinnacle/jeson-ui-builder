@@ -165,6 +165,32 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
     </Stack>
   );
 
+
+  const renderTextHeading = () => (
+    <Stack spacing={2}>
+      <TextField
+        label='text-heading' 
+        required
+        fullWidth
+        value={component.properties?.text || ''}
+        onChange={(e) => handleChange('text', e.target.value)}
+        size="small"
+      />
+      <FormControl fullWidth size="small">
+        <InputLabel>Visible (Optional)</InputLabel>
+        <Select
+          value={component.properties?.visible || 'true'}
+          onChange={(e) => handleChange('visible', e.target.value)}
+          label="Visible (Optional)"
+        >
+          <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
+        </Select>
+      </FormControl>
+      
+    </Stack>
+  );
+
   const renderInputFields = () => (
     <Stack spacing={2}>
       <TextField
@@ -197,8 +223,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           onChange={(e) => handleChange('required', e.target.value)}
           label="Required (Optional)"
         >
-          <MenuItem value="false">False</MenuItem>
           <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
         </Select>
       </FormControl>
       {component.type === 'text-input' && (
@@ -216,6 +242,17 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           </Select>
         </FormControl>
       )}
+      <FormControl fullWidth size="small">
+        <InputLabel>Visible (Optional)</InputLabel>
+        <Select
+          value={component.properties?.visible || 'true'}
+          onChange={(e) => handleChange('visible', e.target.value)}
+          label="Visible (Optional)"
+        >
+          <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
+        </Select>
+      </FormControl>  
       {component.type === 'text-input' ? (
         <>
           <TextField
@@ -234,6 +271,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             onChange={(e) => handleChange('maxChars', e.target.value)}
             size="small"
           />
+          
         </>
       ) : (
         <TextField
@@ -265,13 +303,14 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         onChange={(e) => handleChange('label', e.target.value)}
         size="small"
       />
+       {component.type !== 'drop-down' && (
       <TextField
         label="Description (Optional)"
         fullWidth
         value={component.properties?.description || ''}
         onChange={(e) => handleChange('description', e.target.value)}
         size="small"
-      />
+      />)}
       <TextField
         label="Output Variable"
         required
@@ -353,6 +392,29 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           <MenuItem value="true">True</MenuItem>
         </Select>
       </FormControl>
+      <FormControl fullWidth size="small">
+        <InputLabel>Visible (Optional)</InputLabel>
+        <Select
+          value={component.properties?.visible || 'true'}
+          onChange={(e) => handleChange('visible', e.target.value)}
+          label="Visible (Optional)"
+        >
+          <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
+        </Select>
+      </FormControl>
+
+      <FormControl fullWidth size="small">
+        <InputLabel>Enabled (Optional)</InputLabel>
+        <Select
+          value={component.properties?.visible || 'true'}
+          onChange={(e) => handleChange('visible', e.target.value)}
+          label="Visible (Optional)"
+        >
+          <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
+        </Select>
+      </FormControl>
       {component.type === 'check-box' && (
         <>
           <TextField
@@ -378,6 +440,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
 
   const renderButtonFields = () => (
     <Stack spacing={2}>
+      {component.type !== 'embedded-link' && (
       <TextField
         label="Label"
         required
@@ -385,7 +448,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         value={component.properties?.label || ''}
         onChange={(e) => handleChange('label', e.target.value)}
         size="small"
-      />
+      />)}
       {component.type === 'footer-button' && (
         <>
           <TextField
@@ -409,6 +472,17 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             onChange={(e) => handleChange('rightCaption', e.target.value)}
             size="small"
           />
+          <FormControl fullWidth size="small">
+        <InputLabel>Enabled (Optional)</InputLabel>
+        <Select
+          value={component.properties?.visible || 'true'}
+          onChange={(e) => handleChange('visible', e.target.value)}
+          label="Visible (Optional)"
+        >
+          <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
+        </Select>
+      </FormControl>
         </>
       )}
       {component.type === 'embedded-link' && (
@@ -539,12 +613,19 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
 
   const renderFields = () => {
     switch (component.type) {
-      case 'text-heading':
-      case 'sub-heading':
+      
+      
       case 'text-body':
       case 'text-caption':
-      case 'rich-text':
+      
         return renderTextFields();
+
+      case 'text-heading':
+      case 'sub-heading':
+       return renderTextHeading();
+
+       case 'rich-text':
+        
       case 'text-input':
       case 'text-area':
         return renderInputFields();
@@ -563,38 +644,52 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
       default:
         return null;
     }
-  };
+  }; 
 
   return (
-    <PropertiesPanel elevation={0}>
-      <Box sx={{ mb: 3 }}>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={component.properties?.isDynamic === 'true'}
-              onChange={(e) => handleChange('isDynamic', e.target.checked.toString())}
-              color="primary"
-            />
-          }
-          label="Use Dynamic Variable"
-        />
-      </Box>
-      <Header>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <IoMdInformationCircleOutline size={20} />
-          <Typography variant="subtitle1" fontWeight={500}>
-            {component.name}
-          </Typography>
-        </Box>
-        <IconButton size="small" onClick={onClose}>
-          <FaTimes />
-        </IconButton>
-      </Header>
-      <Divider />
-      <Box sx={{ mt: 2 }}>
-        {renderFields()}
-      </Box>
-    </PropertiesPanel>
+    <PropertiesPanel elevation={0} >
+  <Header
+  sx={{
+    backgroundColor: 'rgba(128, 128, 128, 0.2)', // 80% transparency
+    padding: '10px',
+    borderRadius: 0,
+    marginX: '-24px', // adjust based on padding of PropertiesPanel
+    marginTop: '-24px',
+    marginBottom: '-4px',
+  }}
+>
+  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+    <IoMdInformationCircleOutline size={20} />
+    <Typography variant="subtitle1" fontWeight={500}>
+      {component.name}
+    </Typography>
+  </Box>
+  <IconButton size="small" onClick={onClose}>
+    <FaTimes />
+  </IconButton>
+</Header>
+
+    <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: -0.4   ,marginX: '-11px'}}>
+      <FormControlLabel
+        label="Use Dynamic Variable"
+        labelPlacement="start"
+        control={
+          <Switch
+            checked={component.properties?.isDynamic === 'true'}
+            onChange={(e) => handleChange('isDynamic', e.target.checked.toString())}
+            color="primary"
+          />
+        }
+      />
+    </Box>
+    
+    
+    <Box sx={{ mt: 0.2 }}>
+      {renderFields()}
+    </Box>
+  </PropertiesPanel>
+  
+
   );
 };
 

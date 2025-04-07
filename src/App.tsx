@@ -218,7 +218,7 @@ function App() {
       // Set default properties based on component type
       switch (draggableId) {
         case 'text-heading':
-          newComponent.properties = { text: ''};
+          newComponent.properties = { text: '',visible : true};
           break;
         case 'sub-heading':
           newComponent.properties = { text: 'Sub Heading Text'};
@@ -294,7 +294,7 @@ function App() {
     // Set default properties based on component type
     switch (type) {
       case 'text-heading':
-        newComponent.properties = { text: '' };
+        newComponent.properties = { text: '' ,visible : true};
         break;
       case 'sub-heading':
         newComponent.properties = { text: '' };
@@ -429,6 +429,7 @@ function App() {
                   type = 'text-heading';
                   properties = {
                     text: child.text || '',
+                    visible: child.visible || true,
                   };
                   break;
                 case 'SubHeading':
@@ -540,11 +541,11 @@ function App() {
   const generateJson = () => {
     // Create routing model based on screen order
     const routingModel: Record<string, string[]> = {};
-    
+  
     for (let i = 0; i < screens.length - 1; i++) {
       routingModel[screens[i].id] = [screens[i + 1].id];
     }
-    
+  
     return {
       version: "7.0",
       data_api_version: "3.0",
@@ -567,6 +568,7 @@ function App() {
                       return {
                         type: "TextHeading",
                         text: comp.properties?.text || '',
+                        visible: comp.properties?.visible || true,
                       };
                     case 'sub-heading':
                       return {
