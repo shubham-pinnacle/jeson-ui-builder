@@ -516,11 +516,11 @@ function App() {
   const generateJson = () => {
     // Create routing model based on screen order
     const routingModel: Record<string, string[]> = {};
-    
+  
     for (let i = 0; i < screens.length - 1; i++) {
       routingModel[screens[i].id] = [screens[i + 1].id];
     }
-    
+  
     return {
       version: "7.0",
       data_api_version: "3.0",
@@ -547,7 +547,11 @@ function App() {
                   case 'text-input':
                     return {
                       type: "TextInput",
-                      required: comp.properties.required || true,
+                      // Updated conversion to boolean for the required field
+                      required:
+                        typeof comp.properties.required === "string"
+                          ? comp.properties.required.toLowerCase() === "true"
+                          : comp.properties.required,
                       label: comp.properties.label || "",
                       name: comp.properties.name || "input_field"
                     };
@@ -598,6 +602,7 @@ function App() {
       }))
     };
   };
+  
 
   const handleMetaGenerate = (metaJson: any) => {
     console.log('Meta JSON generated:', metaJson);
