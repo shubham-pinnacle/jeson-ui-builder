@@ -1,5 +1,3 @@
-// ScreenDialog.tsx
-
 import React, { useEffect } from 'react';
 import {
   Dialog,
@@ -115,11 +113,12 @@ const ScreenDialog: React.FC<ScreenDialogProps> = ({
     }
   }, [open, initialData, mode]);
 
+  // Updated generator: Remove any character that is not an alphabet, underscore or space.
   const generateScreenId = (name: string): string => {
     if (!name) return '';
     return name
-      .replace(/[^a-zA-Z0-9_\s]/g, '')
-      .replace(/\s+/g, '_')
+      .replace(/[^a-zA-Z_\s]/g, '') // Remove numbers and special characters except underscore and spaces
+      .replace(/\s+/g, '_')         // Replace one or more spaces with an underscore
       .toUpperCase();
   };
 
@@ -137,7 +136,7 @@ const ScreenDialog: React.FC<ScreenDialogProps> = ({
       setIdError('Screen ID is required');
       return false;
     }
-    if (!/^[a-zA-Z_]+$/.test(id)) {
+    if (!/^[A-Z_]+$/.test(id)) {
       setIdError('Screen ID can only contain alphabets and underscores');
       return false;
     }
