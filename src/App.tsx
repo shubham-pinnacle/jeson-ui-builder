@@ -224,16 +224,16 @@ function App() {
           newComponent.properties = { text: 'Sub Heading Text'};
           break;
         case 'text-body':
-          newComponent.properties = { text: 'Body Text Content'};
+          newComponent.properties = { text: 'Body Text Content', fontWeight: 'normal', visible : true,strikethrough:false};
           break;
         case 'text-caption':
-          newComponent.properties = { text: 'Caption Text'};
+          newComponent.properties = { text: 'Caption Text',fontWeight: 'normal', visible : true,strikethrough:false};
           break;
         case 'text-input':
           newComponent.properties = { 
             label: '', 
-            name: `input_field_${Date.now()}`,
-            required: true
+            
+            
           };
           break;
         case 'text-area':
@@ -300,7 +300,7 @@ function App() {
         newComponent.properties = { text: '' };
         break;
       case 'text-body':
-        newComponent.properties = { text: ''};
+          newComponent.properties = { text: '', fontWeight: 'normal',strikethrough:false, visible : true};
         break;
       case 'text-caption':
         newComponent.properties = { text: '' };
@@ -308,8 +308,8 @@ function App() {
       case 'text-input':
         newComponent.properties = { 
           label: '', 
-          name: `input_field_${Date.now()}`,
-          required: true
+          name: `input_field`,
+          required: false,          
         };
         break;
       case 'text-area':
@@ -436,26 +436,36 @@ function App() {
                   type = 'sub-heading';
                   properties = {
                     text: child.text || '',
+                    visible: child.visible || true,
+
                   };
                   break;
                 case 'TextBody':
                   type = 'text-body';
                   properties = {
                     text: child.text || '',
+                    visible: child.visible || true,
+                    fontWeight: child.fontWeight || 'normal',
+                    strikethrough:child.strikethrough || false
                   };
                   break;
                 case 'TextCaption':
                   type = 'text-caption';
                   properties = {
                     text: child.text || '',
+                    visible: child.visible || true,
+                    fontWeight: child.fontWeight || 'normal',
+                    strikethrough:child.strikethrough || false
                   };
                   break;
                 case 'TextInput':
                   type = 'text-input';
                   properties = {
                     label: child.label || '',
-                    name: child.name || `input_field_${Date.now()}`,
-                    required: child.required || false
+                    name: child.name || `input_field`,
+                    initValue: child.initValue || '',
+                    required: child.required ,
+                    
                   };
                   break;
                 case 'TextArea':
@@ -551,7 +561,6 @@ function App() {
       data_api_version: "3.0",
       routing_model: routingModel,
       screens: screens.map((screen, index) => {
-        // Build the base screen JSON object without terminal and success fields.
         const baseScreen = {
           id: screen.id,
           title: screen.title,
@@ -563,34 +572,64 @@ function App() {
                 type: "Form",
                 name: "user_data",
                 children: screen.components.map(comp => {
+                  const visible =
+                    comp.properties?.visible === "false" ||
+                    comp.properties?.visible === false
+                      ? false
+                      : true;
+  
+                  const required =
+                    comp.properties?.required === "false" ||
+                    comp.properties?.required === false
+                      ? false
+                      : true;
+
+                  const strikethrough= 
+                  comp.properties?.strikethrough === "false" ||
+                  comp.properties?.strikethrough === false
+                    ? false
+                    : true;
+  
                   switch (comp.type) {
                     case 'text-heading':
                       return {
                         type: "TextHeading",
                         text: comp.properties?.text || '',
-                        visible: comp.properties?.visible || true,
+                        visible
                       };
                     case 'sub-heading':
                       return {
                         type: "TextSubheading",
                         text: comp.properties?.text || '',
+                        visible
                       };
                     case 'text-body':
                       return {
                         type: "TextBody",
                         text: comp.properties?.text || '',
+                        visible,
+                        ['font-weight']: comp.properties.fontWeight,
+                        strikethrough
+                        
+                        
                       };
                     case 'text-caption':
                       return {
                         type: "TextCaption",
                         text: comp.properties?.text || '',
+                        visible,
+                        ['font-weight']: comp.properties.fontWeight,
+                        strikethrough
                       };
                     case 'text-input':
                       return {
                         type: "TextInput",
-                        required: comp.properties.required || true,
+                        
                         label: comp.properties.label || "",
-                        name: comp.properties.name || "input_field"
+                        name: comp.properties.name || "input_field",
+                        required,
+                        [`init-value`]: comp.properties.initValue 
+
                       };
                     case 'text-area':
                       return {
@@ -602,23 +641,23 @@ function App() {
                       return {
                         type: "CheckboxGroup",
                         name: comp.properties.name || "checkbox_group",
-                        'data-source': comp.properties.options ? 
-                          JSON.parse(comp.properties.options).map((option: string) => ({
-                            id: option.toLowerCase().replace(/\s+/g, '_'),
-                            title: option
-                          })) : 
-                          [{ id: 'default_option', title: 'Default Option' }]
+                        'data-source': comp.properties.options
+                          ? JSON.parse(comp.properties.options).map((option: string) => ({
+                              id: option.toLowerCase().replace(/\s+/g, '_'),
+                              title: option
+                            }))
+                          : [{ id: 'default_option', title: 'Default Option' }]
                       };
                     case 'radio-button':
                       return {
                         type: "RadioButtonsGroup",
                         name: comp.properties.name || "radio_group",
-                        'data-source': comp.properties.options ? 
-                          JSON.parse(comp.properties.options).map((option: string) => ({
-                            id: option.toLowerCase().replace(/\s+/g, '_'),
-                            title: option
-                          })) : 
-                          [{ id: 'default_option', title: 'Default Option' }]
+                        'data-source': comp.properties.options
+                          ? JSON.parse(comp.properties.options).map((option: string) => ({
+                              id: option.toLowerCase().replace(/\s+/g, '_'),
+                              title: option
+                            }))
+                          : [{ id: 'default_option', title: 'Default Option' }]
                       };
                     case 'footer-button':
                       return {
@@ -637,8 +676,8 @@ function App() {
             ]
           }
         };
-
-        // Only the last screen gets terminal and success set to true.
+  
+        // Add terminal and success only to the last screen
         if (index === screens.length - 1) {
           return { ...baseScreen, terminal: true, success: true };
         }
@@ -646,7 +685,8 @@ function App() {
       })
     };
   };
-
+  
+  
   
 
   const handleMetaGenerate = (metaJson: any) => {

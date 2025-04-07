@@ -111,17 +111,17 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
   const renderTextFields = () => (
     <Stack spacing={2}>
       <TextField
-        label={`Text ${component.type === 'text-heading' ? 'Heading' : component.type === 'text-body' ? 'Body' : 'Caption'}`}
+        label={`Text ${component.type === 'text-body' ? 'Body' : 'Caption'}`}
         required
         fullWidth
         value={component.properties?.text || ''}
         onChange={(e) => handleChange('text', e.target.value)}
         size="small"
       />
-      <FormControl fullWidth size="small">
+       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>
         <Select
-          value={component.properties?.visible || 'true'}
+          value={component.properties?.visible || true}
           onChange={(e) => handleChange('visible', e.target.value)}
           label="Visible (Optional)"
         >
@@ -129,26 +129,36 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           <MenuItem value="false">False</MenuItem>
         </Select>
       </FormControl>
+
+
+     
+
+
+
+
       <FormControl fullWidth size="small">
         <InputLabel>Font Weight (Optional)</InputLabel>
         <Select
-          value={component.properties?.fontWeight || 'normal'}
+          value={component.properties?.fontWeight }
           onChange={(e) => handleChange('fontWeight', e.target.value)}
           label="Font Weight (Optional)"
         >
           <MenuItem value="normal">Normal</MenuItem>
           <MenuItem value="bold">Bold</MenuItem>
+          <MenuItem value="italic">Italic</MenuItem>
+          <MenuItem value="bold_italic">Bold_Italic</MenuItem>
+
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">
         <InputLabel>Strike Through (Optional)</InputLabel>
         <Select
-          value={component.properties?.strikeThrough || 'false'}
-          onChange={(e) => handleChange('strikeThrough', e.target.value)}
+          value={component.properties?.strikethrough || 'false'}
+          onChange={(e) => handleChange('strikethrough', e.target.value)}
           label="Strike Through (Optional)"
         >
-          <MenuItem value="false">False</MenuItem>
           <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">
@@ -158,8 +168,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           onChange={(e) => handleChange('markdown', e.target.value)}
           label="Markdown (Optional)"
         >
-          <MenuItem value="false">False</MenuItem>
           <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
         </Select>
       </FormControl>
     </Stack>
@@ -169,7 +179,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
   const renderTextHeading = () => (
     <Stack spacing={2}>
       <TextField
-        label='text-heading' 
+      label={`Text ${component.type === 'text-heading' ? 'heading' : 'Sub Heading'}`}
+        // label='text-heading' 
         required
         fullWidth
         value={component.properties?.text || ''}
@@ -179,7 +190,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>
         <Select
-          value={component.properties?.visible || 'true'}
+          value={component.properties?.visible || true}
           onChange={(e) => handleChange('visible', e.target.value)}
           label="Visible (Optional)"
         >
@@ -205,8 +216,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         label="Output Variable"
         required
         fullWidth
-        value={component.properties?.outputVariable || ''}
-        onChange={(e) => handleChange('outputVariable', e.target.value)}
+        value={component.properties?.name}
+        onChange={(e) => handleChange('name', e.target.value)}
         size="small"
       />
       <TextField
@@ -219,7 +230,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
       <FormControl fullWidth size="small">
         <InputLabel>Required (Optional)</InputLabel>
         <Select
-          value={component.properties?.required || 'false'}
+          value={component.properties?.required || false}
           onChange={(e) => handleChange('required', e.target.value)}
           label="Required (Optional)"
         >

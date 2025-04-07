@@ -3,7 +3,11 @@ export interface ComponentType {
   type: string;
   label?: string;
   name?: string;
+  visible?: boolean;
   required?: boolean;
+  initialValue?: string;
+  fontWeight?: string;
+  strikethrough?: boolean;
   children?: ComponentType[];
   data?: {
     extraDetails?: {

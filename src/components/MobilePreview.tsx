@@ -158,6 +158,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
         return (
           <Heading key={component.id}>
             {component.properties?.text || 'Heading'}
+            
           </Heading>
         );
 
@@ -165,6 +166,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
         return (
           <SubHeading key={component.id}>
             {component.properties?.text || 'Sub Heading'}
+            
           </SubHeading>
         );
 
@@ -172,6 +174,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
         return (
           <TextBody key={component.id}>
             {component.properties?.text || 'Text content goes here'}
+           
           </TextBody>
         );
 
@@ -190,7 +193,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             variant="outlined"
             fullWidth
             size="small"
-            required={component.properties?.required === 'true'}
+            required={component.properties?.required || 'false'}
             placeholder={component.properties?.placeholder}
             type={component.properties?.inputType || 'text'}
           />
