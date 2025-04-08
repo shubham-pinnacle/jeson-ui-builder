@@ -1,15 +1,39 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Component } from '../types';
-import { TextField, FormControl, FormLabel, FormGroup, FormControlLabel, Radio, RadioGroup, Checkbox, Button, Select, MenuItem, InputLabel, Typography } from '@mui/material';
+import { TextField, FormControl, FormLabel, FormGroup, FormControlLabel, Radio, RadioGroup, Checkbox, Button, Select, MenuItem, InputLabel, Typography, Box } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+
+const MobileContainer = styled(Box)(({ theme }) => ({
+  width: '100%',
+  height: '100%',
+  backgroundColor: '#ffffff',
+  borderRadius: '40px',
+  overflow: 'hidden',
+  position: 'relative',
+  boxShadow: '0 0 20px rgba(0,0,0,0.1)',
+  display: 'flex',
+  flexDirection: 'column',
+}));
+
+const ScreenContent = styled(Box)({
+  flex: 1,
+  overflow: 'auto',
+  padding: '20px',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '16px',
+});
+
+const ComponentWrapper = styled(Box)({
+  width: '100%',
+});
 
 const PreviewContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Full viewport height for vertical centering */
-  // background: #ffff; /* Optional: background color for contrast */
+  height: 100vh;
   margin-bottom: 15px;
 `;
 
@@ -25,15 +49,12 @@ const PreviewFrame = styled.div`
   border: 3px solid #333;
   margin: auto;
   
-  /* Hide scrollbar for Chrome, Safari and Opera */
   &::-webkit-scrollbar {
     display: none;
   }
 
-  /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   
   &:before {
     content: '';
@@ -136,11 +157,6 @@ interface MobilePreviewProps {
   screenTitle: string;
 }
 
-interface MobilePreviewProps {
-  components: Component[];
-  screenTitle: string;
-}
-
 const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }) => {
   const renderComponent = (component: Component) => {
     const getOptions = (options: any): string[] => {
@@ -161,93 +177,60 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
     switch (component.type) {
       case 'text-heading':
         return (
-          <Typography
-            key={`${component.id}_heading`}
-            variant="h5"
-            style={{
-              color: component.properties.color || '#333333',
-              fontSize: component.properties.fontSize || '24px',
-              marginBottom: '16px'
-            }}
-          >
-            {component.properties.text || 'Heading Text'}
+          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+            {component.properties.text}
           </Typography>
         );
-
       case 'sub-heading':
         return (
-          <Typography
-            key={`${component.id}_subheading`}
-            variant="h6"
-            style={{
-              color: component.properties.color || '#666666',
-              fontSize: component.properties.fontSize || '18px',
-              marginBottom: '12px'
-            }}
-          >
-            {component.properties.text || 'Sub Heading Text'}
+          <Typography variant="h6" sx={{ color: '#666' }}>
+            {component.properties.text}
           </Typography>
         );
-
       case 'text-body':
         return (
-          <TextBody key={component.id}>
-            {component.properties?.text || 'Text content goes here'}
-          </TextBody>
-        );
-
-      case 'text-caption':
-        return (
-          <Typography
-            key={`${component.id}_caption`}
-            variant="body2"
-            style={{
-              color: component.properties.color || '#999999',
-              fontSize: component.properties.fontSize || '12px',
-              marginBottom: '8px'
-            }}
-          >
-            {component.properties.text || 'Caption Text'}
+          <Typography variant="body1" sx={{ color: '#333' }}>
+            {component.properties.text}
           </Typography>
         );
-
+      case 'text-caption':
+        return (
+          <Typography variant="caption" sx={{ color: '#999' }}>
+            {component.properties.text}
+          </Typography>
+        );
       case 'text-input':
         return (
-          <TextField
-            key={`${component.id}_input`}
-            label={component.properties.label || 'Label'}
-            placeholder={component.properties.placeholder || 'Enter text...'}
-            variant="outlined"
-            margin="normal"
-            required={component.properties.required || false}
-            InputLabelProps={{
-              style: {
-                fontSize: '14px',
-                color: '#666666'
-              }
-            }}
-            InputProps={{
-              style: {
-                fontSize: '14px'
-              }
-            }}
-          />
+          <Box sx={{ width: '100%' }}>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              {component.properties.label}
+            </Typography>
+            <Box
+              sx={{
+                border: '1px solid #ccc',
+                borderRadius: 1,
+                p: 1,
+                minHeight: '40px',
+              }}
+            />
+          </Box>
         );
-
       case 'text-area':
         return (
-          <StyledTextField
-            key={`${component.id}_textarea`}
-            label={component.properties?.label || 'Label'}
-            variant="outlined"
-            fullWidth
-            multiline
-            rows={4}
-            required={component.properties?.required === 'true'}
-            placeholder={component.properties?.placeholder}
-          />
+          <Box sx={{ width: '100%' }}>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              {component.properties.label}
+            </Typography>
+            <Box
+              sx={{
+                border: '1px solid #ccc',
+                borderRadius: 1,
+                p: 1,
+                minHeight: '100px',
+              }}
+            />
+          </Box>
         );
-
       case 'drop-down':
         return (
           <StyledFormControl key={component.id}>
@@ -264,7 +247,6 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             </Select>
           </StyledFormControl>
         );
-
       case 'radio-button':
         return (
           <StyledFormControl key={`${component.id}_radio`}>
@@ -281,7 +263,6 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             </RadioGroup>
           </StyledFormControl>
         );
-
       case 'check-box':
         return (
           <StyledFormControl key={`${component.id}_checkbox`}>
@@ -297,7 +278,6 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             </FormGroup>
           </StyledFormControl>
         );
-
       case 'footer-button':
       case 'embedded-link':
         return (
@@ -310,7 +290,6 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             {component.properties?.buttonText || 'Submit'}
           </StyledButton>
         );
-
       case 'opt-in':
         return (
           <FormControlLabel
@@ -319,7 +298,6 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             label={component.properties?.label || 'I agree'}
           />
         );
-
       case 'photo':
       case 'document':
         return (
@@ -338,7 +316,23 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             />
           </StyledFormControl>
         );
-
+      case 'image':
+        return (
+          <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <img
+              src={component.properties.base64Data 
+                ? `data:image/png;base64,${component.properties.base64Data}`
+                : component.properties.src || ''}
+              alt={component.properties.altText || ''}
+              style={{
+                width: component.properties.width || 200,
+                height: component.properties.height || 200,
+                objectFit: component.properties.scaleType || 'contain',
+                maxWidth: '100%'
+              }}
+            />
+          </Box>
+        );
       default:
         return null;
     }
@@ -351,7 +345,11 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
           <PreviewTitle>{screenTitle}</PreviewTitle>
         </PreviewHeader>
         <PreviewContent>
-          {components.map(component => renderComponent(component))}
+          {components.map((component) => (
+            <div key={component.id}>
+              {renderComponent(component)}
+            </div>
+          ))}
         </PreviewContent>
       </PreviewFrame>
     </PreviewContainer>
