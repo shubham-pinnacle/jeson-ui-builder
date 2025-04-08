@@ -689,6 +689,14 @@ function App() {
                     // color: component.properties.color || '#666666',
                     // fontSize: component.properties.fontSize || '18px'
                   };
+                case 'text-body':
+                    return {
+                      type: "TextBody",
+                      text: component.properties.text || '',
+                      color: component.properties.color || '#666666',
+                      fontSize: component.properties.fontSize || '14px',
+                      visible: component.properties.visible || true
+                    };
                 case 'text-caption':
                   return {
                     type: "TextCaption",
@@ -709,17 +717,26 @@ function App() {
                     name: component.properties.name || `textarea_${Date.now()}`,
                     label: component.properties.label || ''
                   };
-                case 'check-box':
-                  return {
-                    type: "CheckboxGroup",
-                    name: component.properties.name || `checkbox_${Date.now()}`,
-                    'data-source': component.properties.options ? 
-                      JSON.parse(component.properties.options).map((option: string) => ({
-                        id: option.toLowerCase().replace(/\s+/g, '_'),
-                        title: option
-                      })) : 
-                      [{ id: 'default_option', title: 'Default Option' }]
-                  };
+                  case 'check-box':
+                    return {
+                      type: "CheckboxGroup",
+                      name: component.properties.name || `checkbox_${Date.now()}`,
+                      label: component.properties.label || '',
+                      required: component.properties.required || false,
+                      visible: component.properties.visible || true,
+                      minSelectedItems: component.properties.minSelectedItems || '',
+                      maxSelectedItems: component.properties.maxSelectedItems || '',
+                      'data-source': component.properties.options ? 
+                        JSON.parse(component.properties.options).map((option: string) => ({
+                          id: option.toLowerCase().replace(/\s+/g, '_'),
+                          title: option
+                        })) : 
+                        [
+                          { id: 'option_1', title: 'Option 1' },
+                          { id: 'option_2', title: 'Option 2' },
+                          { id: 'option_3', title: 'Option 3' }
+                        ]
+                    };
                 case 'radio-button':
                   return {
                     type: "RadioButtonsGroup",
@@ -732,6 +749,25 @@ function App() {
                       })) : 
                       [{ id: 'default_option', title: 'Default Option' }]
                   };
+                  case 'drop-down':
+                    return {
+                      type: "Dropdown",
+                      name: component.properties.name || `dropdown_${Date.now()}`,
+                      label: component.properties.label || '',
+                      required: component.properties.required || false,
+                      visible: component.properties.visible || true,
+                      placeholder: component.properties.placeholder || 'Select an option',
+                      'data-source': component.properties.options ? 
+                        JSON.parse(component.properties.options).map((option: string) => ({
+                          id: option.toLowerCase().replace(/\s+/g, '_'),
+                          title: option
+                        })) : 
+                        [
+                          { id: 'option_1', title: 'Option 1' },
+                          { id: 'option_2', title: 'Option 2' },
+                          { id: 'option_3', title: 'Option 3' }
+                        ]
+                    };
                 case 'footer-button':
                   return {
                     type: "Footer",
