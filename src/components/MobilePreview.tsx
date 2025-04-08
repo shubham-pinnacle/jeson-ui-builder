@@ -24,6 +24,8 @@ const PreviewFrame = styled.div`
   overflow-y: auto;
   border: 3px solid #333;
   margin: auto;
+  display: flex;
+  flex-direction: column;
   
   /* Hide scrollbar for Chrome, Safari and Opera */
   &::-webkit-scrollbar {
@@ -34,7 +36,6 @@ const PreviewFrame = styled.div`
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 
-  
   &:before {
     content: '';
     position: absolute;
@@ -66,10 +67,28 @@ const PreviewTitle = styled.h1`
   text-align: center;
 `;
 
-const PreviewContent = styled.div`
+interface PreviewContentProps {
+  $hasFooter: boolean;
+}
+
+const PreviewContent = styled.div<PreviewContentProps>`
   display: flex;
   flex-direction: column;
   gap: 16px;
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: ${props => props.$hasFooter ? '60px' : '0'};
+  position: relative;
+`;
+
+const FooterContainer = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+  background: white;
+  border-top: 1px solid #eee;
 `;
 
 const StyledFormControl = styled(FormControl)`
@@ -136,12 +155,10 @@ interface MobilePreviewProps {
   screenTitle: string;
 }
 
-interface MobilePreviewProps {
-  components: Component[];
-  screenTitle: string;
-}
-
 const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }) => {
+  const footerComponent = components.find(comp => comp.type === 'footer-button');
+  const nonFooterComponents = components.filter(comp => comp.type !== 'footer-button');
+
   const renderComponent = (component: Component) => {
     const getOptions = (options: any): string[] => {
       if (Array.isArray(options)) {
@@ -299,16 +316,19 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
         );
 
       case 'footer-button':
-      case 'embedded-link':
         return (
-          <StyledButton
-            key={`${component.id}_button`}
-            variant="contained"
+          <Button
+            key={component.id}
+            variant={component.properties?.variant || 'contained'}
             color="primary"
-            onClick={() => {}}
+            fullWidth
+            style={{
+              textTransform: 'none',
+              marginTop: '8px'
+            }}
           >
-            {component.properties?.label || ''}
-          </StyledButton>
+            {component.properties?.label || 'Button'}
+          </Button>
         );
 
       case 'opt-in':
@@ -350,8 +370,13 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
         <PreviewHeader>
           <PreviewTitle>{screenTitle}</PreviewTitle>
         </PreviewHeader>
-        <PreviewContent>
-          {components.map(component => renderComponent(component))}
+        <PreviewContent $hasFooter={!!footerComponent}>
+          {nonFooterComponents.map(component => renderComponent(component))}
+          {footerComponent && (
+            <FooterContainer>
+              {renderComponent(footerComponent)}
+            </FooterContainer>
+          )}
         </PreviewContent>
       </PreviewFrame>
     </PreviewContainer>
