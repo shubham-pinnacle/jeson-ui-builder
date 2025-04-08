@@ -9,8 +9,6 @@ const Container = styled(Box)({
   backgroundColor: '#ffffff',
   height: '100%',
   gap: '16px',
-
-  // Let this container scroll if content exceeds its height
   overflow: 'auto',
 
   /* Custom scrollbar styling for WebKit browsers */

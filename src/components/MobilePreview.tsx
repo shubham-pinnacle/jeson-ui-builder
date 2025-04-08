@@ -14,11 +14,11 @@ const PreviewContainer = styled.div`
 `;
 
 const PreviewFrame = styled.div`
-  width: 320px;
+  width: 300px;
   height: 70vh;
   background: white;
   border-radius: 32px;
-  padding: 20px;
+  padding: 10px;
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
   position: relative;
   overflow-y: auto;
@@ -130,6 +130,11 @@ const Caption = styled.p`
   line-height: 1.5;
   margin: 0;
 `;
+
+interface MobilePreviewProps {
+  components: Component[];
+  screenTitle: string;
+}
 
 interface MobilePreviewProps {
   components: Component[];
