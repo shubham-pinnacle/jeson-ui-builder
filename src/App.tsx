@@ -473,8 +473,6 @@ function App() {
                 type = 'text-heading';
                 properties = {
                   text: child.text || '',
-                  color: child.color || '#333333',
-                  fontSize: child.fontSize || '24px',
                   visible: child.visible || true
                 };
                 break;
@@ -666,6 +664,8 @@ function App() {
         const nextScreen = !isLastScreen ? screens[index + 1] : null;
         const nextScreenId = nextScreen?.id || '';
 
+        
+
         return {
           id: screen.id,
           title: screen.title,
@@ -673,14 +673,17 @@ function App() {
           layout: {
             type: "SingleColumnLayout",
             children: screen.components.map(component => {
+              const visible =
+        component.properties?.visible === "false" ||
+        component.properties?.visible === false
+                      ? false
+                      : true;
               switch (component.type) {
                 case 'text-heading':
                   return {
                     type: "TextHeading",
                     text: component.properties.text || '',
-                    // color: component.properties.color || '#333333',
-                    // fontSize: component.properties.fontSize || '24px',
-                    visible: component.properties.visible || true
+                    visible
                   };
                 case 'sub-heading':
                   return {

@@ -170,7 +170,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
   const renderTextHeading = () => (
     <Stack spacing={2}>
       <TextField
-        label='text-heading' 
+        label='Text-heading' 
         required
         fullWidth
         value={component.properties?.text || ''}
