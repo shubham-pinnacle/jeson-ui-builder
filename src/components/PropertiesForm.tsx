@@ -139,6 +139,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         >
           <MenuItem value="normal">Normal</MenuItem>
           <MenuItem value="bold">Bold</MenuItem>
+          <MenuItem value="italic">Italic</MenuItem>
+          <MenuItem value="bold_italic">Bold_Italic</MenuItem>
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">
@@ -148,8 +150,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           onChange={(e) => handleChange('strikeThrough', e.target.value)}
           label="Strike Through (Optional)"
         >
-          <MenuItem value="false">False</MenuItem>
           <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">

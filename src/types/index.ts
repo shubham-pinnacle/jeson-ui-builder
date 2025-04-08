@@ -4,6 +4,8 @@ export interface ComponentType {
   label?: string;
   name?: string;
   required?: boolean;
+  fontWeight?: string;
+  strikethrough?: boolean;
   children?: ComponentType[];
   data?: {
     extraDetails?: {

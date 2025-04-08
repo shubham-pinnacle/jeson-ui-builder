@@ -224,16 +224,16 @@ function App() {
           newComponent.properties = { text: '',  visible: true  };
           break;
         case 'text-body':
-          newComponent.properties = { text: 'Body Text Content', visible: true };
+          newComponent.properties = { text: '', fontWeight: 'normal', visible : true,strikethrough:false };
           break;
         case 'text-caption':
-          newComponent.properties = { text: 'Caption Text' };
+          newComponent.properties = { text: '' ,fontWeight: 'normal',strikethrough:false, visible : true };
           break;
         case 'text-input':
           newComponent.properties = { 
             label: '', 
             name: `input_field_${Date.now()}`,
-            required: true
+            required: false
           };
           break;
         case 'text-area':
@@ -313,10 +313,10 @@ function App() {
         newComponent.properties = { text: '' ,  visible: true };
         break;
       case 'text-body':
-        newComponent.properties = { text: ''};
+        newComponent.properties = { text: '',fontWeight: 'normal',strikethrough:false, visible : true};
         break;
       case 'text-caption':
-        newComponent.properties = { text: '' };
+        newComponent.properties = { text: '',fontWeight: 'normal',strikethrough:false, visible : true };
         break;
       case 'text-input':
         newComponent.properties = { 
@@ -487,9 +487,9 @@ function App() {
                 type = 'text-body';
                 properties = {
                   text: child.text || '',
-                  color: child.color || '#666666',
-                  fontSize: child.fontSize || '14px',
-                  visible: child.visible || true
+                    visible: child.visible || true,
+                    fontWeight: child.fontWeight || 'normal',
+                    strikethrough:child.strikethrough || false
                 };
                 break;
               case 'TextCaption':
@@ -672,10 +672,22 @@ function App() {
             type: "SingleColumnLayout",
             children: screen.components.map(component => {
               const visible =
-        component.properties?.visible === "false" ||
-        component.properties?.visible === false
+              component.properties?.visible === "false" ||
+              component.properties?.visible === false
                       ? false
                       : true;
+  
+                  const required =
+                  component.properties?.required === "false" ||
+                  component.properties?.required === false
+                      ? false
+                      : true;
+
+                  const strikethrough= 
+                  component.properties?.strikethrough === "false" ||
+                  component.properties?.strikethrough === false
+                    ? false
+                    : true;
               switch (component.type) {
                 case 'text-heading':
                   return {
@@ -687,25 +699,25 @@ function App() {
                   return {
                     type: "TextSubheading",
                     text: component.properties.text || '',
-                    visible: component.properties?.visible === "false" ||
-                    component.properties?.visible === false
-                                  ? false
-                                  : true
+                    visible
                   };
                 case 'text-body':
                     return {
                       type: "TextBody",
-                      text: component.properties.text || '',
-                      color: component.properties.color || '#666666',
-                      fontSize: component.properties.fontSize || '14px',
-                      visible: component.properties.visible || true
+                        text: component.properties?.text || '',
+                        visible,
+                        ['font-weight']: component.properties.fontWeight,
+                        strikethrough
+                        
                     };
                 case 'text-caption':
                   return {
                     type: "TextCaption",
-                    text: component.properties.text || '',
-                    // color: component.properties.color || '#999999',
-                    // fontSize: component.properties.fontSize || '12px'
+                        text: component.properties?.text || '',
+                        visible,
+                        ['font-weight']: component.properties.fontWeight,
+                        strikethrough
+                   
                   };
                 case 'text-input':
                   return {
