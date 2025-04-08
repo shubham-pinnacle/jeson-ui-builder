@@ -221,7 +221,7 @@ function App() {
           newComponent.properties = { text: '', visible: true };
           break;
         case 'sub-heading':
-          newComponent.properties = { text: 'Sub Heading Text' };
+          newComponent.properties = { text: '',  visible: true  };
           break;
         case 'text-body':
           newComponent.properties = { text: 'Body Text Content', visible: true };
@@ -310,7 +310,7 @@ function App() {
         newComponent.properties = { text: '' ,visible : true};
         break;
       case 'sub-heading':
-        newComponent.properties = { text: '' };
+        newComponent.properties = { text: '' ,  visible: true };
         break;
       case 'text-body':
         newComponent.properties = { text: ''};
@@ -482,8 +482,6 @@ function App() {
                 type = 'sub-heading';
                 properties = {
                   text: child.text || '',
-                  color: child.color || '#666666',
-                  fontSize: child.fontSize || '18px',
                   visible: child.visible || true
                 };
                 break;
@@ -686,8 +684,10 @@ function App() {
                   return {
                     type: "TextSubheading",
                     text: component.properties.text || '',
-                    // color: component.properties.color || '#666666',
-                    // fontSize: component.properties.fontSize || '18px'
+                    visible: component.properties?.visible === "false" ||
+                    component.properties?.visible === false
+                                  ? false
+                                  : true
                   };
                 case 'text-body':
                     return {
