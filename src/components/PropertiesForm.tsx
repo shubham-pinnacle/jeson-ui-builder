@@ -86,7 +86,26 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
   onClose
 }) => {
   const handleChange = (property: string, value: any) => {
-    onPropertyChange(property, value);
+    // Special handling for helper text
+    if (property === 'helperText') {
+      // If the value is empty or undefined, remove the property completely
+      if (value === null || value === undefined || value.trim() === '') {
+        const updatedProperties = { ...component.properties };
+        delete updatedProperties.helperText;
+        onPropertyChange('properties', updatedProperties);
+      } else {
+        // If there's a value, update it
+        onPropertyChange(property, value);
+      }
+      return;
+    }
+
+    // For other properties, handle empty values appropriately
+    if (value === '' && property !== 'label' && property !== 'name' && property !== 'text') {
+      onPropertyChange(property, undefined);
+    } else {
+      onPropertyChange(property, value);
+    }
   };
 
   const handleOptionAdd = (field: string) => {
@@ -208,14 +227,14 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         label="Output Variable"
         required
         fullWidth
-        value={component.properties?.outputVariable || ''}
-        onChange={(e) => handleChange('outputVariable', e.target.value)}
+        value={component.properties?.name || ''}
+        onChange={(e) => handleChange('name', e.target.value)}
         size="small"
       />
       <TextField
         label="Init Value (Optional)"
         fullWidth
-        value={component.properties?.initValue || ''}
+        value={component.properties?.initValue}
         onChange={(e) => handleChange('initValue', e.target.value)}
         size="small"
       />
@@ -374,7 +393,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
       <FormControl fullWidth size="small">
         <InputLabel>Init Value (Optional)</InputLabel>
         <Select
-          value={component.properties?.initValue || ''}
+          value={component.properties?.initValue || ""}
           onChange={(e) => handleChange('initValue', e.target.value)}
           label="Init Value (Optional)"
         >
@@ -696,4 +715,4 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
   );
 };
 
-export default PropertiesForm; 
+export default PropertiesForm;

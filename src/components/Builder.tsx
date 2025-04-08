@@ -171,7 +171,8 @@ const Builder: React.FC<BuilderProps> = ({
           properties: component.properties,
           label: component.properties.label,
           placeholder: component.properties.placeholder,
-          value: component.properties.value
+          value: component.properties.value,
+          helperText: component.properties.helperText,
         });
         return (
           <ComponentContent $type="text-input">

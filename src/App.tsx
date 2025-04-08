@@ -232,8 +232,10 @@ function App() {
         case 'text-input':
           newComponent.properties = { 
             label: '', 
-            name: `input_field_${Date.now()}`,
-            required: false
+            name: `input_field`,
+            required: false,
+            visbile: true,
+            initValue:""
           };
           break;
         case 'text-area':
@@ -245,7 +247,7 @@ function App() {
         case 'check-box':
           newComponent.properties = { 
             label: 'Checkbox Group', 
-            name: `checkbox_group_${Date.now()}`,
+            name: `checkbox_group`,
             options: JSON.stringify(['Option 1', 'Option 2', 'Option 3']),
             visible: true,
             required: false,
@@ -321,7 +323,7 @@ function App() {
       case 'text-input':
         newComponent.properties = { 
           label: '', 
-          name: `input_field_${Date.now()}`,
+          name: `input_field`,
           required: true
         };
         break;
@@ -334,7 +336,7 @@ function App() {
       case 'check-box':
         newComponent.properties = { 
           label: 'Checkbox Group', 
-          name: `checkbox_group_${Date.now()}`,
+          name: `checkbox_group`,
           options: JSON.stringify(['Option 1', 'Option 2', 'Option 3']),
           visible: true,
           required: false,
@@ -504,14 +506,12 @@ function App() {
               case 'TextInput':
                 type = 'text-input';
                 properties = {
-                  label: child.label || '',
-                  name: child.name || `field_${Date.now()}`,
-                  required: child.required || false,
-                  visible: child.visible || true,
-                  inputType: child.inputType || 'text',
-                  minChars: child.minChars || '',
-                  maxChars: child.maxChars || '',
-                  helperText: child.helperText || ''
+                   label: child.label || '',
+                    name: child.name || `input_field`,
+                    initValue: child.initValue,
+                    required: child.required ,
+                    visible: child.visible || true,
+                    
                 };
                 break;
               case 'TextArea':
@@ -722,9 +722,17 @@ function App() {
                 case 'text-input':
                   return {
                     type: "TextInput",
-                    name: component.properties.name || `field_${Date.now()}`,
-                    label: component.properties.label || '',
-                    required: component.properties.required || false,
+                    label: component.properties.label || "",
+                    name: component.properties.name || "input_field",
+                    required,
+                    visible,
+                    [`init-value`]: component.properties.initValue,
+                    [`input-type`]: component.properties.inputType || 'text',
+                    [`min-chars`]: component.properties.minChars ? Number(component.properties.minChars) : undefined,
+                    [`max-chars`]: component.properties.maxChars ? Number(component.properties.maxChars) : undefined,
+                    ...((component.properties.helperText && component.properties.helperText.trim() !== '') 
+                      ? { [`helper-text`]: component.properties.helperText }
+                      : {})
                   };
                 case 'text-area':
                   return {
