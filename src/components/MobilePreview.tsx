@@ -307,7 +307,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             color="primary"
             onClick={() => {}}
           >
-            {component.properties?.buttonText || 'Submit'}
+            {component.properties?.label || ''}
           </StyledButton>
         );
 
