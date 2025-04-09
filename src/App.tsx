@@ -18,7 +18,6 @@ import ScreenDialog from './components/ScreenDialog';
 import { Component } from './types';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
-import { Description } from '@mui/icons-material';
 
 const AppContainer = styled('div')({
   display: 'flex',
@@ -164,6 +163,13 @@ const DialogTextField = styled(TextField)({
     },
   },
 });
+
+interface DataSourceOption {
+  id: string;
+  title: string;
+  description?: string;
+  metadata?: string;
+}
 
 interface Screen {
   id: string;
@@ -858,10 +864,24 @@ function App() {
                       minSelectedItems: component.properties.minSelectedItems || '',
                       maxSelectedItems: component.properties.maxSelectedItems || '',
                       'data-source': component.properties.options ? 
-                        JSON.parse(component.properties.options).map((option: string) => ({
-                          id: option.toLowerCase().replace(/\s+/g, '_'),
-                          title: option
-                        })) : 
+                        JSON.parse(component.properties.options).map((option: string, index: number) => {
+                          const baseOption: DataSourceOption = {
+                            id: component.properties.propertyOptions?.includes('id') && component.properties.optionIds?.[index] 
+                              ? component.properties.optionIds[index] 
+                              : option.toLowerCase().replace(/\s+/g, '_'),
+                            title: option
+                          };
+                          
+                          if (component.properties.propertyOptions?.includes('description') && component.properties.optionDescriptions?.[index]) {
+                            baseOption.description = component.properties.optionDescriptions[index];
+                          }
+                          
+                          if (component.properties.propertyOptions?.includes('metadata') && component.properties.optionMetadata?.[index]) {
+                            baseOption.metadata = component.properties.optionMetadata[index];
+                          }
+                          
+                          return baseOption;
+                        }) : 
                         [
                           { id: 'option_1', title: 'Option 1' },
                           { id: 'option_2', title: 'Option 2' },
@@ -875,15 +895,28 @@ function App() {
                     description: component.properties.description || '',
                     label: component.properties.label || '',
                     'data-source': component.properties.options ? 
-                      JSON.parse(component.properties.options).map((option: string) => ({
-                        id: option.toLowerCase().replace(/\s+/g, '_'),
-                        title: option
-                      })) : 
+                      JSON.parse(component.properties.options).map((option: string, index: number) => {
+                        const baseOption: DataSourceOption = {
+                          id: component.properties.propertyOptions?.includes('id') && component.properties.optionIds?.[index] 
+                            ? component.properties.optionIds[index] 
+                            : option.toLowerCase().replace(/\s+/g, '_'),
+                          title: option
+                        };
+                        
+                        if (component.properties.propertyOptions?.includes('description') && component.properties.optionDescriptions?.[index]) {
+                          baseOption.description = component.properties.optionDescriptions[index];
+                        }
+                        
+                        if (component.properties.propertyOptions?.includes('metadata') && component.properties.optionMetadata?.[index]) {
+                          baseOption.metadata = component.properties.optionMetadata[index];
+                        }
+                        
+                        return baseOption;
+                      }) : 
                       [{ id: 'default_option', title: 'Default Option' }],
                     visible,
                     required,
                     enabled
-
                   };
                   case 'drop-down':
                     return {
@@ -894,10 +927,24 @@ function App() {
                       visible: component.properties.visible || true,
                       placeholder: component.properties.placeholder || 'Select an option',
                       'data-source': component.properties.options ? 
-                        JSON.parse(component.properties.options).map((option: string) => ({
-                          id: option.toLowerCase().replace(/\s+/g, '_'),
-                          title: option
-                        })) : 
+                        JSON.parse(component.properties.options).map((option: string, index: number) => {
+                          const baseOption: DataSourceOption = {
+                            id: component.properties.propertyOptions?.includes('id') && component.properties.optionIds?.[index] 
+                              ? component.properties.optionIds[index] 
+                              : option.toLowerCase().replace(/\s+/g, '_'),
+                            title: option
+                          };
+                          
+                          if (component.properties.propertyOptions?.includes('description') && component.properties.optionDescriptions?.[index]) {
+                            baseOption.description = component.properties.optionDescriptions[index];
+                          }
+                          
+                          if (component.properties.propertyOptions?.includes('metadata') && component.properties.optionMetadata?.[index]) {
+                            baseOption.metadata = component.properties.optionMetadata[index];
+                          }
+                          
+                          return baseOption;
+                        }) : 
                         [
                           { id: 'option_1', title: 'Option 1' },
                           { id: 'option_2', title: 'Option 2' },
