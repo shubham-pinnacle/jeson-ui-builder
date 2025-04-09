@@ -164,6 +164,24 @@ const DialogTextField = styled(TextField)({
     },
   },
 });
+const MetaJsonGeneratorContainer = styled(Box)(({ theme }) => ({
+  flex: 1,
+  overflow: 'auto',
+  padding: theme.spacing(2),
+  backgroundColor: theme.palette.background.paper,
+  '& .monaco-editor': {
+    '& .view-lines': {
+      '& .view-line': {
+        '& .mtk1': {
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-all',
+          maxWidth: '100%',
+          overflowWrap: 'break-word'
+        }
+      }
+    }
+  }
+}));
 
 interface Screen {
   id: string;
@@ -278,14 +296,84 @@ function App() {
             enabled:true
           };
           break;
-        case 'drop-down':
-          newComponent.properties = { 
-            label: 'Dropdown', 
-            name: `dropdown_field_${Date.now()}`,
-            options: JSON.stringify(['Option 1', 'Option 2', 'Option 3']),
+        case 'photo':
+          newComponent.properties = {
+            label: '',
+            description: '',
+            outputVariable: '',
+            photoSource: 'Camera Gallery',
+            minPhotos: '',
+            maxPhotos: '',
+            maxFileSize: '25',
             visible: true,
+            enabled: true,
             required: false,
-            placeholder: 'Select an option'
+            accept: 'image/*'
+          };
+          break;
+        case 'document':
+          newComponent.properties = {
+            label: '',
+            description: '',
+            outputVariable: '',
+            allowedMimeTypes: '',
+            minDocuments: '',
+            maxDocuments: '',
+            maxFileSize: '25',
+            visible: true,
+            enabled: true,
+            required: false
+          };
+          break;
+        case 'if-else':
+          newComponent.properties = {
+            conditionName: '',
+            condition1: '',
+            compareToVariable: '',
+            compareWithValue: '',
+            success: true,
+            failure: false
+          };
+          break;
+        case 'switch':
+          newComponent.properties = {
+            switchOn: '',
+            cases: ['default'],
+            compareToVariable: ''
+          };
+          break;
+        case 'image':
+          newComponent.properties = {
+            name: `input_field_${Date.now()}`,
+            src: '',
+            width: 200,
+            height: 200,
+            scaleType: 'contain',
+            altText: '',
+            aspectRatio: '',
+            base64Data: ''
+          };
+          break;
+        case 'date-picker':
+          newComponent.properties = {
+            label: '',
+            outputVariable: '',
+            initValue: '',
+            required: false,
+            visible: false,
+            enabled: false,
+            minDate: '',
+            maxDate: '',
+            unavailableDates: '',
+            helperText: ''
+          };
+          break;
+        case 'user-details':
+          newComponent.properties = {
+            name: '',
+            email: '',
+            address: '',
+            dateOfBirth: ''
           };
           break;
         case 'footer-button':
@@ -634,6 +722,20 @@ function App() {
                   screenName: child['on-click-action']?.next?.name || ''
                 };
                 break;
+                case 'Image':
+                  type = 'image';
+                  properties = {
+                    src: child.src || '',
+                    base64Data: child.base64Data || '',
+                    scaleType: child.scaleType || 'contain',
+                    width: child.width || '200',
+                    height: child.height || '200',
+                    aspectRatio: child.aspectRatio || '1',
+                    altText: child.altText || '',
+                    visible: child.visible ?? true
+                  };
+                  break;
+
               default:
                 return null;
             }
@@ -922,26 +1024,138 @@ function App() {
                       name: component.properties?.onClickAction || 'complete'
                     }
                   };
-                // case 'photo':
+                // case 'image':
+                //   const imageSrc = component.properties.base64Data 
+                //     ? component.properties.base64Data
+                //     : component.properties.src || '';
                 //   return {
-                //     type: "Photo",
-                //     label: component.properties.label || '',
-                //     required: component.properties.required || false,
-                //     accept: component.properties.accept || 'image/*'
+                //     type: "Image",
+                //     src: imageSrc,
+                //     width: parseInt(component.properties.width) || 200,
+                //     height: parseInt(component.properties.height) || 200,
+                //     'scale-type': component.properties.scaleType || 'contain',
+                //     'alt-text': component.properties.altText || 'image'
                 //   };
+                case 'image':
+                  let rawSrc = component.properties.base64Data || component.properties.src || '';
+                  // Remove 'data:image/...;base64,' prefix if present
+                  const imageSrc = rawSrc.replace(/^data:image\/[a-zA-Z]+;base64,/, '');
+                
+                  return {
+                    type: 'Image',
+                    src: imageSrc,
+                    width: parseInt(component.properties.width) || 200,
+                    height: parseInt(component.properties.height) || 200,
+                    aspectRatio: parseFloat(component.properties.aspectRatio) || 1,
+                    scaleType: component.properties.scaleType || 'contain',
+                    altText: component.properties.altText || 'image',
+                  };
+                
+
+                case 'photo':
+                  return {
+                    type: "Photo",
+                    label: component.properties.label || '',
+                    description: component.properties.description || '',
+                    required: component.properties.required || false,
+                    accept: component.properties.accept || 'image/*',
+                    visible: component.properties.visible || true,
+                    enabled: component.properties.enabled || true,
+                    'output-variable': component.properties.outputVariable || '',
+                    'photo-source': component.properties.photoSource || 'Camera Gallery',
+                    'min-photos': component.properties.minPhotos || '',
+                    'max-photos': component.properties.maxPhotos || '',
+                    'max-file-size': component.properties.maxFileSize || '25'
+                  };
+                  // case 'photo-picker':
+                  //   return {
+                  //     type: 'PhotoPicker',
+                  //     name: component.name || 'photo_picker',
+                  //     label: component.properties.label || '',
+                  //     description: component.properties.description || '',
+                  //     'output-variable': component.properties.outputVariable || '',
+                  //     'photo-source': mapPhotoSource(component.properties.photoSource), // camera_gallery, gallery_only, camera_only
+                  //     'min-uploaded-photos': parseInt(component.properties.minPhotos) || 0,
+                  //     'max-uploaded-photos': parseInt(component.properties.maxPhotos) || 1,
+                  //     'max-file-size-kb': parseInt(component.properties.maxFileSize) * 1024 || 10240,
+                  //     visible: component.properties.visible === 'false' ? false : true,
+                  //     enabled: component.properties.enabled === 'false' ? false : true
+                  //   };
+
                 case 'document':
                   return {
                     type: "Document",
-                    label: component.properties.label || 'Upload Document',
+                    label: component.properties.label || '',
+                    description: component.properties.description || '',
                     required: component.properties.required || false,
-                    accept: component.properties.accept || '.pdf,.doc,.docx'
+                    visible: component.properties.visible || true,
+                    enabled: component.properties.enabled || true,
+                    'output-variable': component.properties.outputVariable || '',
+                    'allowed-mime-types': component.properties.allowedMimeTypes || '',
+                    'min-documents': component.properties.minDocuments || '',
+                    'max-documents': component.properties.maxDocuments || '',
+                    'max-file-size': component.properties.maxFileSize || '25'
                   };
-                case 'photo':
+                case 'if-else':
                   return {
-                    type: "Image",
-                    src: component.properties.src || '',
-                    width: component.properties.width || 200,
-                    height: component.properties.height || 200
+                    type: "If-Else",
+                    'condition-name': component.properties.conditionName || '',
+                    condition: {
+                      compare: component.properties.compareToVariable || '',
+                      operator: component.properties.condition1 || '',
+                      value: component.properties.compareWithValue || ''
+                    },
+                    success: component.properties.success || true,
+                    failure: component.properties.failure || false
+                  };
+                case 'switch':
+                  return {
+                    type: "Switch",
+                    'switch-on': component.properties.switchOn || '',
+                    'compare-to-variable': component.properties.compareToVariable || '',
+                    cases: component.properties.cases || ['default']
+                  };
+                case 'date-picker':
+                  return {
+                    type: "DatePicker",
+                    label: component.properties.label || '',
+                    'output-variable': component.properties.outputVariable || '',
+                    'init-value': component.properties.initValue || '',
+                    required: component.properties.required || false,
+                    visible: component.properties.visible || false,
+                    enabled: component.properties.enabled || false,
+                    'min-date': component.properties.minDate || '',
+                    'max-date': component.properties.maxDate || '',
+                    'unavailable-dates': component.properties.unavailableDates || '',
+                    'helper-text': component.properties.helperText || ''
+                  };
+                case 'user-details':
+                  return {
+                    type: "UserDetails",
+                    fields: [
+                      {
+                        type: "TextInput",
+                        label: "Name",
+                        name: "name",
+                        required: true
+                      },
+                      {
+                        type: "TextInput",
+                        label: "Email",
+                        name: "email",
+                        required: true
+                      },
+                      {
+                        type: "TextArea",
+                        label: "Address",
+                        name: "address"
+                      },
+                      {
+                        type: "DatePicker",
+                        label: "Date Of Birth",
+                        name: "dateOfBirth"
+                      }
+                    ]
                   };
                 default:
                   return null;
@@ -1163,15 +1377,17 @@ function App() {
                 Copy JSON
               </StyledButton>
             </ButtonGroupContainer>
-            <MetaJsonGenerator
-              jsonInput={editValue}
-              onJsonChange={handleJsonChange}
-              onMetaGenerate={handleMetaGenerate}
-            />
+            <MetaJsonGeneratorContainer>
+              <MetaJsonGenerator
+                jsonInput={editValue}
+                onJsonChange={handleJsonChange}
+                onMetaGenerate={handleMetaGenerate}
+              />
+            </MetaJsonGeneratorContainer>
           </JsonEditorContainer>
           <PreviewContainer isVisible={showPreview}>
             <MobilePreview 
-              components={screens[activeScreenIndex].components} 
+              components={screens[activeScreenIndex].components}
               screenTitle={screens[activeScreenIndex].title}
             />
           </PreviewContainer>
