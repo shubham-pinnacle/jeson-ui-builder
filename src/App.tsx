@@ -287,7 +287,7 @@ function App() {
           newComponent.properties = { text: '', visible: true };
           break;
         case 'sub-heading':
-          newComponent.properties = { text: 'Sub Heading Text' };
+          newComponent.properties = { text: '',  visible: true  };
           break;
         case 'text-body':
           newComponent.properties = { text: 'Body Text Content', visible: true };
@@ -407,9 +407,14 @@ function App() {
           };
           break;
         case 'footer-button':
-          newComponent.properties = { 
-            buttonText: '',
-            variant: 'contained'
+          newComponent.properties = {
+            label: '',
+            leftCaption: '',
+            centerCaption: '',
+            rightCaption: '',
+            enabled: 'true',
+            onClickAction: 'complete',
+            screenName: ''
           };
           break;
       }
@@ -444,7 +449,7 @@ function App() {
         newComponent.properties = { text: '' ,visible : true};
         break;
       case 'sub-heading':
-        newComponent.properties = { text: '' };
+        newComponent.properties = { text: '' ,  visible: true };
         break;
       case 'text-body':
         newComponent.properties = { text: ''};
@@ -496,9 +501,14 @@ function App() {
         };
         break;
       case 'footer-button':
-        newComponent.properties = { 
-          buttonText: '',
-          variant: 'contained'
+        newComponent.properties = {
+          label: '',
+          leftCaption: '',
+          centerCaption: '',
+          rightCaption: '',
+          enabled: 'true',
+          onClickAction: 'complete',
+          screenName: ''
         };
         break;
     }
@@ -607,8 +617,6 @@ function App() {
                 type = 'text-heading';
                 properties = {
                   text: child.text || '',
-                  color: child.color || '#333333',
-                  fontSize: child.fontSize || '24px',
                   visible: child.visible || true
                 };
                 break;
@@ -616,8 +624,6 @@ function App() {
                 type = 'sub-heading';
                 properties = {
                   text: child.text || '',
-                  color: child.color || '#666666',
-                  fontSize: child.fontSize || '18px',
                   visible: child.visible || true
                 };
                 break;
@@ -693,12 +699,16 @@ function App() {
                   placeholder: child.placeholder || 'Select an option'
                 };
                 break;
-              case 'FooterButton':
+              case "Footer":
                 type = 'footer-button';
                 properties = {
-                  buttonText: child.buttonText || '',
-                  variant: child.variant || 'contained',
-                  visible: child.visible || true
+                  label: child.label || '',
+                  leftCaption: child['left-caption'] || '',
+                  centerCaption: child['center-caption'] || '',
+                  rightCaption: child['right-caption'] || '',
+                  enabled: child.enabled || true,
+                  onClickAction: child['on-click-action']?.name || 'complete',
+                  screenName: child['on-click-action']?.next?.name || ''
                 };
                 break;
               default:
@@ -744,6 +754,12 @@ function App() {
             updatedSelectedComponent = newScreens[activeScreenIndex].components.find(
               (comp: Component) => comp.type === selectedComponent.type && 
                      comp.properties.name === selectedComponent.properties.name
+            );
+          }
+          // For footer-button components, find by type and buttonText
+          else if (selectedComponent.type === 'footer-button') {
+            updatedSelectedComponent = newScreens[activeScreenIndex].components.find(
+              (comp: Component) => comp.type === selectedComponent.type
             );
           }
           // For other components, find by type and name
@@ -800,6 +816,8 @@ function App() {
         const nextScreen = !isLastScreen ? screens[index + 1] : null;
         const nextScreenId = nextScreen?.id || '';
 
+        
+
         return {
           id: screen.id,
           title: screen.title,
@@ -807,21 +825,26 @@ function App() {
           layout: {
             type: "SingleColumnLayout",
             children: screen.components.map(component => {
+              const visible =
+        component.properties?.visible === "false" ||
+        component.properties?.visible === false
+                      ? false
+                      : true;
               switch (component.type) {
                 case 'text-heading':
                   return {
                     type: "TextHeading",
                     text: component.properties.text || '',
-                    // color: component.properties.color || '#333333',
-                    // fontSize: component.properties.fontSize || '24px',
-                    visible: component.properties.visible || true
+                    visible
                   };
                 case 'sub-heading':
                   return {
                     type: "TextSubheading",
                     text: component.properties.text || '',
-                    // color: component.properties.color || '#666666',
-                    // fontSize: component.properties.fontSize || '18px'
+                    visible: component.properties?.visible === "false" ||
+                    component.properties?.visible === false
+                                  ? false
+                                  : true
                   };
                 case 'text-body':
                     return {
@@ -905,25 +928,19 @@ function App() {
                 case 'footer-button':
                   return {
                     type: "Footer",
-                    label: component.properties.buttonText || 'Submit',
-                    'on-click-action': {
-                      name: isLastScreen ? "complete" : "navigate",
-                      ...(isLastScreen ? {
-                        payload: {
-                          ...screen.components.reduce((acc: Record<string, string>, comp) => {
-                            if (comp.type === 'text-input' || comp.type === 'radio-button' || comp.type === 'check-box') {
-                              acc[comp.properties.name] = `\${screen.${screen.id}.form.${comp.properties.name}}`;
-                            }
-                            return acc;
-                          }, {})
-                        }
-                      } : {
-                        next: {
-                          type: "screen",
-                          name: nextScreen?.id
-                        },
-                        payload: {}
-                      })
+                    label: component.properties.label || '',
+                    'left-caption': component.properties.leftCaption || '',
+                    'center-caption': component.properties.centerCaption || '',
+                    'right-caption': component.properties.rightCaption || '',
+                    enabled: component.properties.enabled || true,
+                    'on-click-action': component.properties.onClickAction === 'navigate' ? {
+                      name: 'navigate',
+                      next: {
+                        type: 'screen',
+                        name: component.properties.screenName || ''
+                      }
+                    } : {
+                      name: component.properties.onClickAction || 'complete'
                     }
                   };
                 // case 'image':
@@ -1247,6 +1264,7 @@ function App() {
               onDeleteComponent={handleDeleteComponent}
               onDragEnd={handleDragEnd}
               onAddComponent={(type: string) => handleAddComponent(type)}
+              screens={screens}
             />
           </BuilderContainer>
 

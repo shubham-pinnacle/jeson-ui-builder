@@ -1,11 +1,11 @@
 import React from 'react';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { Component } from '../types';
+import PropertiesForm from './PropertiesForm';
+import { DropResult } from 'react-beautiful-dnd';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
-import { Component, BuilderProps } from '../types';
-import PropertiesForm from './PropertiesForm';
-import DroppedComponent from './DroppedComponent';
 import { Box, Typography, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -14,77 +14,76 @@ interface StyledProps {
   $type?: string;
 }
 
-const BuilderContainer = styled.div`
-  display: flex;
-  height: 100%;
-  overflow: hidden;
-`;
+const BuilderContainer = styled('div')({
+  display: 'flex',
+  height: '100%',
+  overflow: 'hidden',
+});
 
-const BuildArea = styled.div`
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
+const BuildArea = styled('div')({
+  flex: 1,
+  padding: '20px',
+  overflowY: 'auto',
+  '&::-webkit-scrollbar': {
+    width: '8px',
+  },
+  '&::-webkit-scrollbar-track': {
+    background: '#ffffff',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: 'lightgrey',
+    borderRadius: '4px',
+  },
+  scrollbarWidth: 'thin',
+  scrollbarColor: 'lightgrey #ffffff',
+});
 
-  /* Custom scrollbar styling for WebKit browsers */
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  &::-webkit-scrollbar-track {
-    background: #ffffff; /* white track */
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: lightgrey; /* light grey thumb */
-    border-radius: 4px;
-  }
+const ComponentsList = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '10px',
+  minHeight: '100%',
+});
 
-  /* Firefox scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: lightgrey #ffffff;
-`;
+const ComponentWrapper = styled('div', {
+  shouldForwardProp: (prop) => !['$isSelected', '$type'].includes(prop as string),
+})<StyledProps>(({ theme, $isSelected, $type }) => ({
+  background: 'white',
+  border: `2px solid ${$isSelected ? '#2196f3' : '#e0e0e0'}`,
+  borderRadius: '4px',
+  padding: '10px',
+  cursor: 'pointer',
+  transition: 'all 0.2s ease',
+  '&:hover': {
+    borderColor: '#2196f3',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+  },
+}));
 
-const ComponentsList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-height: 100%;
-`;
+const ComponentHeader = styled('div')({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: '8px',
+});
 
-const ComponentWrapper = styled.div<StyledProps>`
-  background: white;
-  border: 2px solid ${props => props.$isSelected ? '#2196f3' : '#e0e0e0'};
-  border-radius: 4px;
-  padding: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    border-color: #2196f3;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-`;
+const ComponentTitle = styled('div')({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  fontWeight: 500,
+  color: '#333',
+});
 
-const ComponentHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-`;
-
-const ComponentTitle = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 500;
-  color: #333;
-`;
-
-const ComponentContent = styled('div')<{ $type?: string; color?: string; fontSize?: string }>`
-  padding: 8px;
-  border-radius: 4px;
-  background-color: ${props => props.$type === 'text-heading' ? '#f5f5f5' : 'transparent'};
-  color: ${props => props.color || '#333333'};
-  font-size: ${props => {
-    switch (props.$type) {
+const ComponentContent = styled('div', {
+  shouldForwardProp: (prop) => !['$type', 'color', 'fontSize'].includes(prop as string),
+})<{ $type?: string; color?: string; fontSize?: string }>(({ theme, $type, color, fontSize }) => ({
+  padding: $type === 'text-input' ? '8px 12px' : '8px',
+  borderRadius: $type === 'text-input' ? '4px' : '0',
+  backgroundColor: $type === 'text-input' ? '#ffffff' : 'transparent',
+  color: color || '#333333',
+  fontSize: (() => {
+    switch ($type) {
       case 'text-heading':
         return '24px';
       case 'sub-heading':
@@ -96,18 +95,26 @@ const ComponentContent = styled('div')<{ $type?: string; color?: string; fontSiz
       default:
         return '14px';
     }
-  }};
-  font-weight: ${props => props.$type === 'text-heading' ? 'bold' : 'normal'};
-  width: 100%;
-  min-height: ${props => props.$type === 'text-input' ? '40px' : 'auto'};
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  border: ${props => props.$type === 'text-input' ? '1px solid #e0e0e0' : 'none'};
-  border-radius: ${props => props.$type === 'text-input' ? '4px' : '0'};
-  padding: ${props => props.$type === 'text-input' ? '8px 12px' : '8px'};
-  background-color: ${props => props.$type === 'text-input' ? '#ffffff' : 'transparent'};
-`;
+  })(),
+  fontWeight: $type === 'text-heading' ? 'bold' : 'normal',
+  width: '100%',
+  minHeight: $type === 'text-input' ? '40px' : 'auto',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  border: $type === 'text-input' ? '1px solid #e0e0e0' : 'none'
+}));
+
+interface BuilderProps {
+  components: Component[];
+  selectedComponent: Component | null;
+  onComponentSelect: (component: Component | null) => void;
+  onPropertyChange: (componentId: string, property: string, value: any) => void;
+  onDeleteComponent: (componentId: string) => void;
+  onDragEnd: (result: DropResult) => void;
+  onAddComponent: (type: string) => void;
+  screens: { id: string; title: string }[];
+}
 
 const Builder: React.FC<BuilderProps> = ({
   components,
@@ -117,6 +124,7 @@ const Builder: React.FC<BuilderProps> = ({
   onDeleteComponent,
   onDragEnd,
   onAddComponent,
+  screens
 }) => {
   const handleComponentClick = (component: Component) => {
     onComponentSelect(component);
@@ -201,7 +209,7 @@ const Builder: React.FC<BuilderProps> = ({
       case 'radio-button':
         return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
       case 'footer-button':
-        return <ComponentContent>{component.properties?.buttonText || 'Submit'}</ComponentContent>;
+        return <ComponentContent>{component.properties?.label || ''}</ComponentContent>;
       default:
         return null;
     }
@@ -268,8 +276,9 @@ const Builder: React.FC<BuilderProps> = ({
       {selectedComponent && (
         <PropertiesForm
           component={selectedComponent}
-          onPropertyChange={(property, value) => onPropertyChange(selectedComponent.id, property, value)}
+          onPropertyChange={onPropertyChange}
           onClose={() => onComponentSelect(null)}
+          screens={screens}
         />
       )}
     </BuilderContainer>

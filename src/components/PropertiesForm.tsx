@@ -18,7 +18,8 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
-  Checkbox
+  Checkbox,
+  FormHelperText
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { FaTimes } from 'react-icons/fa';
@@ -77,17 +78,19 @@ const OptionItem = styled(ListItem)(({ theme }) => ({
 
 interface PropertiesFormProps {
   component: Component;
-  onPropertyChange: (property: string, value: any) => void;
+  onPropertyChange: (componentId: string, property: string, value: any) => void;
+  screens: { id: string; title: string }[];
   onClose: () => void;
 }
 
 const PropertiesForm: React.FC<PropertiesFormProps> = ({
   component,
   onPropertyChange,
+  screens,
   onClose
 }) => {
   const handleChange = (property: string, value: any) => {
-    onPropertyChange(property, value);
+    onPropertyChange(component.id, property, value);
   };
 
   const handleOptionAdd = (field: string) => {
@@ -171,7 +174,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
   const renderTextHeading = () => (
     <Stack spacing={2}>
       <TextField
-        label='text-heading' 
+        label='Text-heading' 
         required
         fullWidth
         value={component.properties?.text || ''}
@@ -442,7 +445,6 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
 
   const renderButtonFields = () => (
     <Stack spacing={2}>
-      {component.type !== 'embedded-link' && (
       <TextField
         label="Label"
         required
@@ -450,79 +452,68 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         value={component.properties?.label || ''}
         onChange={(e) => handleChange('label', e.target.value)}
         size="small"
-      />)}
-      {component.type === 'footer-button' && (
-        <>
-          <TextField
-            label="Left-Caption (Optional)"
-            fullWidth
-            value={component.properties?.leftCaption || ''}
-            onChange={(e) => handleChange('leftCaption', e.target.value)}
-            size="small"
-          />
-          <TextField
-            label="Center-Caption (Optional)"
-            fullWidth
-            value={component.properties?.centerCaption || ''}
-            onChange={(e) => handleChange('centerCaption', e.target.value)}
-            size="small"
-          />
-          <TextField
-            label="Right-Caption (Optional)"
-            fullWidth
-            value={component.properties?.rightCaption || ''}
-            onChange={(e) => handleChange('rightCaption', e.target.value)}
-            size="small"
-          />
-          <FormControl fullWidth size="small">
+      />
+      <FormControl fullWidth size="small">
         <InputLabel>Enabled (Optional)</InputLabel>
         <Select
-          value={component.properties?.visible || 'true'}
-          onChange={(e) => handleChange('visible', e.target.value)}
-          label="Visible (Optional)"
+          value={component.properties?.enabled || 'true'}
+          onChange={(e) => handleChange('enabled', e.target.value)}
+          label="Enabled (Optional)"
         >
           <MenuItem value="true">True</MenuItem>
           <MenuItem value="false">False</MenuItem>
         </Select>
       </FormControl>
-        </>
-      )}
-      {component.type === 'embedded-link' && (
-        <>
-          <TextField
-            label="Text"
-            required
-            fullWidth
-            value={component.properties?.text || ''}
-            onChange={(e) => handleChange('text', e.target.value)}
-            size="small"
-          />
-          <FormControl fullWidth size="small">
-            <InputLabel>Visible (Optional)</InputLabel>
-            <Select
-              value={component.properties?.visible || 'true'}
-              onChange={(e) => handleChange('visible', e.target.value)}
-              label="Visible (Optional)"
-            >
-              <MenuItem value="true">True</MenuItem>
-              <MenuItem value="false">False</MenuItem>
-            </Select>
-          </FormControl>
-        </>
-      )}
+      <TextField
+        label="Left Caption (Optional)"
+        fullWidth
+        value={component.properties?.leftCaption || ''}
+        onChange={(e) => handleChange('leftCaption', e.target.value)}
+        size="small"
+      />
+      <TextField
+        label="Center Caption (Optional)"
+        fullWidth
+        value={component.properties?.centerCaption || ''}
+        onChange={(e) => handleChange('centerCaption', e.target.value)}
+        size="small"
+      />
+      <TextField
+        label="Right Caption (Optional)"
+        fullWidth
+        value={component.properties?.rightCaption || ''}
+        onChange={(e) => handleChange('rightCaption', e.target.value)}
+        size="small"
+      />
       <FormControl fullWidth size="small">
-        <InputLabel>On Click Action</InputLabel>
+        <InputLabel>On Click Action (Optional)</InputLabel>
         <Select
-          value={component.properties?.onClickAction || ''}
+          value={component.properties?.onClickAction || 'complete'}
           onChange={(e) => handleChange('onClickAction', e.target.value)}
-          label="On Click Action"
+          label="On Click Action (Optional)"
         >
-          
           <MenuItem value="complete">Complete</MenuItem>
           <MenuItem value="navigate">Navigate</MenuItem>
           <MenuItem value="data_exchange">Data Exchange</MenuItem>
         </Select>
       </FormControl>
+      {component.properties?.onClickAction === 'navigate' && (
+        <FormControl fullWidth size="small">
+          <InputLabel>Screen Name</InputLabel>
+          <Select
+            value={component.properties?.screenName || ''}
+            onChange={(e) => handleChange('screenName', e.target.value)}
+            label="Screen Name"
+          >
+            {screens.map((screen) => (
+              <MenuItem key={screen.id} value={screen.id}>
+                {screen.title || screen.id}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      )}
+      
     </Stack>
   );
 
