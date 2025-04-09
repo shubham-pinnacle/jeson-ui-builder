@@ -290,7 +290,7 @@ function App() {
             leftCaption: '',
             centerCaption: '',
             rightCaption: '',
-            enabled: 'true',
+            enabled: false,
             onClickAction: 'complete',
             screenName: ''
           };
@@ -396,7 +396,7 @@ function App() {
           leftCaption: '',
           centerCaption: '',
           rightCaption: '',
-          enabled: 'true',
+          enabled: false,
           onClickAction: 'complete',
           screenName: ''
         };
@@ -610,11 +610,11 @@ function App() {
               case "Footer":
                 type = 'footer-button';
                 properties = {
-                  label: child.label || '',
+                  buttonText: child.label || '',
                   leftCaption: child['left-caption'] || '',
                   centerCaption: child['center-caption'] || '',
                   rightCaption: child['right-caption'] || '',
-                  enabled: child.enabled || true,
+                  enabled: child.enabled || false,
                   onClickAction: child['on-click-action']?.name || 'complete',
                   screenName: child['on-click-action']?.next?.name || ''
                 };
@@ -887,19 +887,19 @@ function App() {
                 case 'footer-button':
                   return {
                     type: "Footer",
-                    label: component.properties.label || '',
-                    'left-caption': component.properties.leftCaption || '',
-                    'center-caption': component.properties.centerCaption || '',
-                    'right-caption': component.properties.rightCaption || '',
-                    enabled: component.properties.enabled || true,
-                    'on-click-action': component.properties.onClickAction === 'navigate' ? {
+                    label: component.properties?.buttonText || '',
+                    ...(component.properties?.leftCaption ? { 'left-caption': component.properties.leftCaption } : {}),
+                    ...(component.properties?.centerCaption ? { 'center-caption': component.properties.centerCaption } : {}),
+                    ...(component.properties?.rightCaption ? { 'right-caption': component.properties.rightCaption } : {}),
+                    enabled,
+                    'on-click-action': component.properties?.onClickAction === 'navigate' ? {
                       name: 'navigate',
                       next: {
                         type: 'screen',
-                        name: component.properties.screenName || ''
+                        name: component.properties?.screenName || ''
                       }
                     } : {
-                      name: component.properties.onClickAction || 'complete'
+                      name: component.properties?.onClickAction || 'complete'
                     }
                   };
                 // case 'photo':
