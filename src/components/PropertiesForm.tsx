@@ -76,6 +76,8 @@ const OptionItem = styled(ListItem)(({ theme }) => ({
   marginBottom: theme.spacing(1),
 }));
 
+
+
 interface PropertiesFormProps {
   component: Component;
   onPropertyChange: (componentId: string, property: string, value: any) => void;
@@ -255,6 +257,17 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           value={component.properties?.visible || 'true'}
           onChange={(e) => handleChange('visible', e.target.value)}
           label="Visible (Optional)"
+        >
+          <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
+        </Select>
+      </FormControl>  
+      <FormControl fullWidth size="small">
+        <InputLabel>Enabled (Optional)</InputLabel>
+        <Select
+          value={component.properties?.enabled || 'true'}
+          onChange={(e) => handleChange('enabled', e.target.value)}
+          label="Enabled (Optional)"
         >
           <MenuItem value="true">True</MenuItem>
           <MenuItem value="false">False</MenuItem>

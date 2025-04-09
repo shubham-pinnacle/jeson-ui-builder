@@ -47,10 +47,6 @@ const MainContent = styled('div')({
   flex: 1,
   height: '100vh',
   overflow: 'hidden',
-  position: 'relative',
-  '@media (max-width: 900px)': {
-    flexDirection: 'column',
-  }
 });
 
 const BuilderContainer = styled('div')<{ isPreviewVisible: boolean }>(({ isPreviewVisible }) => ({
@@ -59,19 +55,10 @@ const BuilderContainer = styled('div')<{ isPreviewVisible: boolean }>(({ isPrevi
   height: '98vh',
   backgroundColor: '#ffffff',
   borderRight: '1px solid #e0e0e0',
-  overflow: 'auto',
+  overflow: 'hidden',
+  flexDirection: 'column',
   transition: 'all 0.3s ease',
   borderRadius: '15px',
-  display: 'flex',
-  flexDirection: 'column',
-  '@media (max-width: 1200px)': {
-    width: isPreviewVisible ? 'calc(100% - 700px)' : 'calc(100% - 400px)',
-    minWidth: isPreviewVisible ? 'calc(100% - 700px)' : 'calc(100% - 400px)',
-  },
-  '@media (max-width: 900px)': {
-    width: '100%',
-    minWidth: '100%',
-  }
 }));
 
 const PreviewContainer = styled('div')<{ isVisible: boolean }>(({ isVisible }) => ({
@@ -79,24 +66,10 @@ const PreviewContainer = styled('div')<{ isVisible: boolean }>(({ isVisible }) =
   minWidth: '375px',
   height: '100%',
   borderRight: '1px solid #e0e0e0',
-  overflow: 'auto',
+  overflow: 'hidden',
   display: isVisible ? 'flex' : 'none',
   flexDirection: 'column',
   transition: 'all 0.3s ease',
-  '@media (max-width: 1200px)': {
-    width: '300px',
-    minWidth: '300px',
-  },
-  '@media (max-width: 900px)': {
-    width: '100%',
-    minWidth: '100%',
-    display: isVisible ? 'flex' : 'none',
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    zIndex: 1000,
-    backgroundColor: '#ffffff',
-  }
 }));
 
 const JsonEditorContainer = styled('div')({
@@ -104,21 +77,11 @@ const JsonEditorContainer = styled('div')({
   minWidth: '500px',
   height: '98vh',
   backgroundColor: '#ffffff',
-  overflow: 'auto',
+  overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
   marginLeft: '10px',
   borderRadius: '15px',
-  '@media (max-width: 1200px)': {
-    width: '400px',
-    minWidth: '400px',
-  },
-  '@media (max-width: 900px)': {
-    width: '100%',
-    minWidth: '100%',
-    marginLeft: 0,
-    marginTop: '10px',
-  }
 });
 
 const ButtonGroupContainer = styled('div')({
@@ -128,9 +91,6 @@ const ButtonGroupContainer = styled('div')({
   borderBottom: '1px solid #e0e0e0',
   backgroundColor: '#f8f9fa',
   justifyContent: 'flex-end',
-  position: 'sticky',
-  top: 0,
-  zIndex: 1,
 });
 
 const StyledButton = styled(Button)({
@@ -152,13 +112,7 @@ const ScreenTabsContainer = styled(Box)({
   padding: '8px 16px',
   borderBottom: '1px solid #e0e0e0',
   backgroundColor: '#f8f9fa',
-  position: 'sticky',
-  top: '57px',
-  zIndex: 1,
-  overflowX: 'auto',
-  '& .MuiTabs-root': {
-    minWidth: 'fit-content',
-  }
+  
 });
 
 const ScreenTab = styled(Tab)({
@@ -209,7 +163,6 @@ const DialogTextField = styled(TextField)({
     },
   },
 });
-
 const MetaJsonGeneratorContainer = styled(Box)(({ theme }) => ({
   flex: 1,
   overflow: 'auto',
