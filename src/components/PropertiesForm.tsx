@@ -142,17 +142,19 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         >
           <MenuItem value="normal">Normal</MenuItem>
           <MenuItem value="bold">Bold</MenuItem>
+          <MenuItem value="italic">Italic</MenuItem>
+          <MenuItem value="bold_italic">Bold Italic</MenuItem>
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">
         <InputLabel>Strike Through (Optional)</InputLabel>
         <Select
-          value={component.properties?.strikeThrough || 'false'}
-          onChange={(e) => handleChange('strikeThrough', e.target.value)}
+          value={component.properties?.strikethrough || 'false'}
+          onChange={(e) => handleChange('strikethrough', e.target.value)}
           label="Strike Through (Optional)"
         >
-          <MenuItem value="false">False</MenuItem>
           <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">
@@ -162,8 +164,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           onChange={(e) => handleChange('markdown', e.target.value)}
           label="Markdown (Optional)"
         >
-          <MenuItem value="false">False</MenuItem>
           <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
         </Select>
       </FormControl>
     </Stack>
@@ -263,7 +265,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             label="Min-Chars (Optional)"
             type="number"
             fullWidth
-            value={component.properties?.minChars || ''}
+            value={component.properties?.minChars || 0}
             onChange={(e) => handleChange('minChars', e.target.value)}
             size="small"
           />
@@ -271,7 +273,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             label="Max-Chars (Optional)"
             type="number"
             fullWidth
-            value={component.properties?.maxChars || ''}
+            value={component.properties?.maxChars || 0}
             onChange={(e) => handleChange('maxChars', e.target.value)}
             size="small"
           />

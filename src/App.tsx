@@ -224,22 +224,34 @@ function App() {
           newComponent.properties = { text: '',  visible: true  };
           break;
         case 'text-body':
-          newComponent.properties = { text: 'Body Text Content', visible: true };
+          newComponent.properties = { text: '', visible: true, fontWeight: 'normal', strikethrough: false, markdown: false };
           break;
         case 'text-caption':
-          newComponent.properties = { text: 'Caption Text' };
+          newComponent.properties = { text: '', visible: true, fontWeight: 'normal', strikethrough: false, markdown: false };
           break;
         case 'text-input':
-          newComponent.properties = { 
-            label: '', 
-            name: `input_field_${Date.now()}`,
-            required: true
+          newComponent.properties = {
+            label: '',
+            name: `field_${Date.now()}`,
+            required: false,
+            inputType: 'text',
+            initValue: '',
+            helperText: '',
+            visible: true,
+            minChars: 0,
+            maxChars: 0
           };
           break;
         case 'text-area':
           newComponent.properties = { 
             label: '', 
-            name: `textarea_field_${Date.now()}`
+            name: `textarea_field_${Date.now()}`,
+            required: false,
+            initValue: '',
+            helperText: '',
+            visible: true,
+            maxLength: 0,
+            enabled: false
           };
           break;
         case 'check-box':
@@ -318,22 +330,34 @@ function App() {
         newComponent.properties = { text: '' ,  visible: true };
         break;
       case 'text-body':
-        newComponent.properties = { text: ''};
+        newComponent.properties = { text: '', visible: true, strikethrough: false, fontWeight: 'normal', markdown: false};
         break;
       case 'text-caption':
-        newComponent.properties = { text: '' };
+        newComponent.properties = { text: '', visible: true, strikethrough: false, fontWeight: 'normal', markdown: false};
         break;
       case 'text-input':
-        newComponent.properties = { 
-          label: '', 
-          name: `input_field_${Date.now()}`,
-          required: true
+        newComponent.properties = {
+          label: '',
+          name: `field_${Date.now()}`,
+          required: false,
+          inputType: 'text',
+          initValue: '',
+          helperText: '',
+          visible: true,
+          minChars: 0,
+          maxChars: 0
         };
         break;
       case 'text-area':
         newComponent.properties = { 
           label: '', 
-          name: `textarea_field_${Date.now()}`
+          name: `textarea_field_${Date.now()}`,
+          required: false,
+          initValue: '',
+          helperText: '',
+          visible: true,  
+          maxLength: 0,
+          enabled: false
         };
         break;
       case 'check-box':
@@ -497,31 +521,42 @@ function App() {
                 type = 'text-body';
                 properties = {
                   text: child.text || '',
-                  color: child.color || '#666666',
-                  fontSize: child.fontSize || '14px',
-                  visible: child.visible || true
+                  //color: child.color || '#666666',
+                  //fontSize: child.fontSize || '14px',
+                  visible: child.visible || true,
+                  fontWeight: child.fontWeight || 'normal',
+                  strikethrough: child.strikethrough ||  false,
+                  markdown: child.markdown || false
                 };
                 break;
               case 'TextCaption':
                 type = 'text-caption';
                 properties = {
                   text: child.text || '',
-                  color: child.color || '#999999',
-                  fontSize: child.fontSize || '12px',
-                  visible: child.visible || true
+                  //color: child.color || '#999999',
+                  //fontSize: child.fontSize || '12px',
+                  visible: child.visible || true,
+                  fontWeight: child.fontWeight || 'normal',
+                  strikethrough: child.strikethrough ||  false,
+                  markdown: child.markdown || false
                 };
                 break;
               case 'TextInput':
                 type = 'text-input';
                 properties = {
                   label: child.label || '',
-                  name: child.name || `field_${Date.now()}`,
+                  name: child.name || '',
                   required: child.required || false,
+                  inputType: child['input-type'] || 'text',
+                  initValue: child['init-value'] || '',
+                  helperText: child['helper-text'] || '',
                   visible: child.visible || true,
-                  inputType: child.inputType || 'text',
-                  minChars: child.minChars || '',
-                  maxChars: child.maxChars || '',
-                  helperText: child.helperText || ''
+                  'min-chars': child['min-chars'] !== undefined
+                    ? Number(child['min-chars'])
+                    : 0,
+                  'max-chars': child['max-chars'] !== undefined
+                    ? Number(child['max-chars'])
+                    : 0
                 };
                 break;
               case 'TextArea':
@@ -529,7 +564,14 @@ function App() {
                 properties = {
                   label: child.label || '',
                   name: child.name || `textarea_field_${Date.now()}`,
-                  visible: child.visible || true
+                  visible: child.visible || true,
+                  required: child.required || false,
+                  initValue: child['init-value'] || '',
+                  helperText: child['helper-text'] || '',
+                  'max-length': child['max-length'] !== undefined
+                    ? Number(child['max-length'])
+                    : 0,
+                  enabled: child.enabled || false  
                 };
                 break;
               case 'CheckboxGroup':
@@ -696,6 +738,31 @@ function App() {
         component.properties?.visible === false
                       ? false
                       : true;
+
+              const required =
+        component.properties?.required === "false" ||
+        component.properties?.required === false
+                          ? false
+                          : true;
+    
+              const strikethrough= 
+        component.properties?.strikethrough === "false" ||
+        component.properties?.strikethrough === false
+                        ? false
+                        : true;
+
+          const markdown = 
+        component.properties?.markdown === "false" ||
+        component.properties?.markdown === false
+                        ? false
+                        : true;
+
+          const enabled =
+        component.properties?.enabled === "false" ||
+        component.properties?.enabled === false
+                        ? false
+                        : true;
+
               switch (component.type) {
                 case 'text-heading':
                   return {
@@ -716,29 +783,55 @@ function App() {
                     return {
                       type: "TextBody",
                       text: component.properties.text || '',
-                      color: component.properties.color || '#666666',
-                      fontSize: component.properties.fontSize || '14px',
-                      visible: component.properties.visible || true
+                      visible,
+                      ['font-weight']: component.properties.fontWeight,
+                      strikethrough,
+                      markdown
+
                     };
                 case 'text-caption':
                   return {
                     type: "TextCaption",
                     text: component.properties.text || '',
+                    visible,
+                    ['font-weight']: component.properties.fontWeight,
+                    strikethrough,
+                    markdown
                     // color: component.properties.color || '#999999',
                     // fontSize: component.properties.fontSize || '12px'
                   };
-                case 'text-input':
-                  return {
-                    type: "TextInput",
-                    name: component.properties.name || `field_${Date.now()}`,
-                    label: component.properties.label || '',
-                    required: component.properties.required || false,
-                  };
+                  case 'text-input':
+                    return {
+                      type: "TextInput",
+                      label: component.properties.label || '',
+                      name: component.properties.name || '',
+                      required,
+                      'input-type': component.properties.inputType || 'text',
+                      'init-value': component.properties.initValue || '',
+                      'helper-text': component.properties.helperText || '',
+                      visible,
+                      'min-chars': component.properties.minChars !== undefined
+                        ? Number(component.properties.minChars)
+                        : 0,
+                      'max-chars': component.properties.maxChars !== undefined
+                        ? Number(component.properties.maxChars)
+                        : 0
+                    };
+                  
                 case 'text-area':
                   return {
                     type: "TextArea",
                     name: component.properties.name || `textarea_${Date.now()}`,
-                    label: component.properties.label || ''
+                    label: component.properties.label || '',
+                    'init-value': component.properties.initValue || '',
+                    'helper-text': component.properties.helperText || '',
+                    visible,
+                    required,
+                    'max-length': component.properties.maxLength !== undefined
+                        ? Number(component.properties.maxLength)
+                        : 0,
+                    enabled
+                    
                   };
                   case 'check-box':
                     return {
