@@ -143,17 +143,19 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         >
           <MenuItem value="normal">Normal</MenuItem>
           <MenuItem value="bold">Bold</MenuItem>
+          <MenuItem value="italic">Italic</MenuItem>
+          <MenuItem value="bold_italic">Bold Italic</MenuItem>
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">
         <InputLabel>Strike Through (Optional)</InputLabel>
         <Select
-          value={component.properties?.strikeThrough || 'false'}
-          onChange={(e) => handleChange('strikeThrough', e.target.value)}
+          value={component.properties?.strikethrough || 'false'}
+          onChange={(e) => handleChange('strikethrough', e.target.value)}
           label="Strike Through (Optional)"
         >
-          <MenuItem value="false">False</MenuItem>
           <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">
@@ -163,8 +165,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           onChange={(e) => handleChange('markdown', e.target.value)}
           label="Markdown (Optional)"
         >
-          <MenuItem value="false">False</MenuItem>
           <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
         </Select>
       </FormControl>
     </Stack>
@@ -264,7 +266,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             label="Min-Chars (Optional)"
             type="number"
             fullWidth
-            value={component.properties?.minChars || ''}
+            value={component.properties?.minChars || 0}
             onChange={(e) => handleChange('minChars', e.target.value)}
             size="small"
           />
@@ -272,7 +274,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             label="Max-Chars (Optional)"
             type="number"
             fullWidth
-            value={component.properties?.maxChars || ''}
+            value={component.properties?.maxChars || 0}
             onChange={(e) => handleChange('maxChars', e.target.value)}
             size="small"
           />
@@ -449,8 +451,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         label="Label"
         required
         fullWidth
-        value={component.properties?.label || ''}
-        onChange={(e) => handleChange('label', e.target.value)}
+        value={component.properties?.buttonText || ''}
+        onChange={(e) => handleChange('buttonText', e.target.value)}
         size="small"
       />
       <FormControl fullWidth size="small">
@@ -465,32 +467,54 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         </Select>
       </FormControl>
       <TextField
-        label="Left Caption (Optional)"
+        label="Left Caption"
         fullWidth
         value={component.properties?.leftCaption || ''}
-        onChange={(e) => handleChange('leftCaption', e.target.value)}
+        onChange={(e) => {
+          handleChange('leftCaption', e.target.value);
+          // If left caption is filled, clear center caption
+          if (e.target.value && component.properties?.centerCaption) {
+            handleChange('centerCaption', '');
+          }
+        }}
+        disabled={!!component.properties?.centerCaption}
         size="small"
       />
       <TextField
-        label="Center Caption (Optional)"
+        label="Center Caption"
         fullWidth
         value={component.properties?.centerCaption || ''}
-        onChange={(e) => handleChange('centerCaption', e.target.value)}
+        onChange={(e) => {
+          handleChange('centerCaption', e.target.value);
+          // If center caption is filled, clear left and right captions
+          if (e.target.value) {
+            handleChange('leftCaption', '');
+            handleChange('rightCaption', '');
+          }
+        }}
+        disabled={!!component.properties?.leftCaption || !!component.properties?.rightCaption}
         size="small"
       />
       <TextField
-        label="Right Caption (Optional)"
+        label="Right Caption"
         fullWidth
         value={component.properties?.rightCaption || ''}
-        onChange={(e) => handleChange('rightCaption', e.target.value)}
+        onChange={(e) => {
+          handleChange('rightCaption', e.target.value);
+          // If right caption is filled, clear center caption
+          if (e.target.value && component.properties?.centerCaption) {
+            handleChange('centerCaption', '');
+          }
+        }}
+        disabled={!!component.properties?.centerCaption}
         size="small"
       />
       <FormControl fullWidth size="small">
-        <InputLabel>On Click Action (Optional)</InputLabel>
+        <InputLabel>On Click Action</InputLabel>
         <Select
           value={component.properties?.onClickAction || 'complete'}
           onChange={(e) => handleChange('onClickAction', e.target.value)}
-          label="On Click Action (Optional)"
+          label="On Click Action"
         >
           <MenuItem value="complete">Complete</MenuItem>
           <MenuItem value="navigate">Navigate</MenuItem>
@@ -507,13 +531,12 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           >
             {screens.map((screen) => (
               <MenuItem key={screen.id} value={screen.id}>
-                {screen.title || screen.id}
+                {screen.title}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
       )}
-      
     </Stack>
   );
 
