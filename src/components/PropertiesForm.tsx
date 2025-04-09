@@ -321,15 +321,15 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         label="Output Variable"
         required
         fullWidth
-        value={component.properties?.outputVariable || ''}
-        onChange={(e) => handleChange('outputVariable', e.target.value)}
+        value={component.properties?.name || ''}
+        onChange={(e) => handleChange('name', e.target.value)}
         size="small"
       />
       <FormControl fullWidth size="small">
         <InputLabel>Property (Optional)</InputLabel>
         <Select
-          value={component.properties?.property || ''}
-          onChange={(e) => handleChange('property', e.target.value)}
+          value={component.properties?.options || ''}
+          onChange={(e) => handleChange('options', e.target.value)}
           label="Property (Optional)"
         >
           <MenuItem value="">Select property</MenuItem>
