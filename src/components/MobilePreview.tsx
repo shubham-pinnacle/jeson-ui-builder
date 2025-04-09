@@ -353,6 +353,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
               style={{
                 width: component.properties.width || 200,
                 height: component.properties.height || 200,
+                aspectRatio: component.properties.aspectRatio || 1,
                 objectFit: component.properties.scaleType || 'contain',
                 maxWidth: '100%'
               }}

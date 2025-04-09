@@ -723,6 +723,14 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         size="small"
         inputProps={{ min: 0 }}
       />
+       <TextField
+        label="Aspect-ratio (Optional) "
+        fullWidth
+        type="number"
+        value={component.properties?.aspectRatio || '1'}
+        onChange={(e) => handleChange('aspectRatio', e.target.value)}
+        size="small"
+      />
       <TextField
         label="Alt Text"
         fullWidth

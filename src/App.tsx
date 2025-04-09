@@ -60,7 +60,6 @@ const BuilderContainer = styled('div')<{ isPreviewVisible: boolean }>(({ isPrevi
   backgroundColor: '#ffffff',
   borderRight: '1px solid #e0e0e0',
   overflow: 'auto',
-  flexDirection: 'column',
   transition: 'all 0.3s ease',
   borderRadius: '15px',
   display: 'flex',
@@ -376,11 +375,13 @@ function App() {
           break;
         case 'image':
           newComponent.properties = {
+            name: `input_field_${Date.now()}`,
             src: '',
             width: 200,
             height: 200,
             scaleType: 'contain',
             altText: '',
+            aspectRatio: '',
             base64Data: ''
           };
           break;
@@ -711,6 +712,20 @@ function App() {
                   screenName: child['on-click-action']?.next?.name || ''
                 };
                 break;
+                case 'Image':
+                  type = 'image';
+                  properties = {
+                    src: child.src || '',
+                    base64Data: child.base64Data || '',
+                    scaleType: child.scaleType || 'contain',
+                    width: child.width || '200',
+                    height: child.height || '200',
+                    aspectRatio: child.aspectRatio || '1',
+                    altText: child.altText || '',
+                    visible: child.visible ?? true
+                  };
+                  break;
+
               default:
                 return null;
             }
@@ -956,18 +971,20 @@ function App() {
                 //     'alt-text': component.properties.altText || 'image'
                 //   };
                 case 'image':
-                    let rawSrc = component.properties.base64Data || component.properties.src || '';
-                    // Remove 'data:image/...;base64,' prefix if present
-                    const imageSrc = rawSrc.replace(/^data:image\/[a-zA-Z]+;base64,/, '');
-
-                    return {
-                      type: 'Image',
-                      src: imageSrc,
-                      width: parseInt(component.properties.width) || 200,
-                      height: parseInt(component.properties.height) || 200,
-                      'scale-type': component.properties.scaleType || 'contain',
-                      'alt-text': component.properties.altText || 'image'
-                    };
+                  let rawSrc = component.properties.base64Data || component.properties.src || '';
+                  // Remove 'data:image/...;base64,' prefix if present
+                  const imageSrc = rawSrc.replace(/^data:image\/[a-zA-Z]+;base64,/, '');
+                
+                  return {
+                    type: 'Image',
+                    src: imageSrc,
+                    width: parseInt(component.properties.width) || 200,
+                    height: parseInt(component.properties.height) || 200,
+                    aspectRatio: parseFloat(component.properties.aspectRatio) || 1,
+                    scaleType: component.properties.scaleType || 'contain',
+                    altText: component.properties.altText || 'image',
+                  };
+                
 
                 case 'photo':
                   return {
@@ -984,6 +1001,21 @@ function App() {
                     'max-photos': component.properties.maxPhotos || '',
                     'max-file-size': component.properties.maxFileSize || '25'
                   };
+                  // case 'photo-picker':
+                  //   return {
+                  //     type: 'PhotoPicker',
+                  //     name: component.name || 'photo_picker',
+                  //     label: component.properties.label || '',
+                  //     description: component.properties.description || '',
+                  //     'output-variable': component.properties.outputVariable || '',
+                  //     'photo-source': mapPhotoSource(component.properties.photoSource), // camera_gallery, gallery_only, camera_only
+                  //     'min-uploaded-photos': parseInt(component.properties.minPhotos) || 0,
+                  //     'max-uploaded-photos': parseInt(component.properties.maxPhotos) || 1,
+                  //     'max-file-size-kb': parseInt(component.properties.maxFileSize) * 1024 || 10240,
+                  //     visible: component.properties.visible === 'false' ? false : true,
+                  //     enabled: component.properties.enabled === 'false' ? false : true
+                  //   };
+
                 case 'document':
                   return {
                     type: "Document",
