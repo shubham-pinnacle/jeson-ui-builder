@@ -25,6 +25,7 @@ import { styled } from '@mui/material/styles';
 import { FaTimes } from 'react-icons/fa';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
 import { Component } from '../types';
+import { BiImageAlt } from 'react-icons/bi';
 
 const PropertiesPanel = styled(Paper)(({ theme }) => ({
   width: 300,
@@ -74,6 +75,8 @@ const OptionItem = styled(ListItem)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   marginBottom: theme.spacing(1),
 }));
+
+
 
 interface PropertiesFormProps {
   component: Component;
@@ -254,6 +257,17 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           value={component.properties?.visible || 'true'}
           onChange={(e) => handleChange('visible', e.target.value)}
           label="Visible (Optional)"
+        >
+          <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
+        </Select>
+      </FormControl>  
+      <FormControl fullWidth size="small">
+        <InputLabel>Enabled (Optional)</InputLabel>
+        <Select
+          value={component.properties?.enabled || 'true'}
+          onChange={(e) => handleChange('enabled', e.target.value)}
+          label="Enabled (Optional)"
         >
           <MenuItem value="true">True</MenuItem>
           <MenuItem value="false">False</MenuItem>
@@ -626,21 +640,346 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
     </Stack>
   );
 
+  const renderImageFields = () => (
+    <Stack spacing={2}>
+      <Button
+        variant="outlined"
+        fullWidth
+        startIcon={<BiImageAlt />}
+        component="label"
+        sx={{ 
+          height: '100px', 
+          border: '2px dashed #ccc',
+          '&:hover': {
+            border: '2px dashed #2196f3'
+          }
+        }}
+      >
+        Upload Image
+        <input
+          type="file"
+          hidden
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                alert('File size should not exceed 5MB');
+                return;
+              }
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                const base64String = event.target?.result as string;
+                if (base64String) {
+                  // Set default scale-type when image is uploaded
+                  handleChange('scaleType', 'contain');
+                  
+                  // Store the base64 data
+                  handleChange('base64Data', base64String.split(',')[1] || '');
+                  
+                  // Store the complete data URL for preview
+                  handleChange('src', base64String);
+                }
+              };
+              reader.readAsDataURL(file);
+            }
+          }}
+        />
+      </Button>
+      {component.properties?.src && (
+        <Box 
+          sx={{ 
+            width: '100%', 
+            height: '200px', 
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'relative',
+            border: '1px solid #eee',
+            borderRadius: 1,
+            overflow: 'hidden'
+          }}
+        >
+          <img 
+            src={component.properties.src} 
+            alt="Preview" 
+            style={{ 
+              maxWidth: '100%', 
+              maxHeight: '100%', 
+              objectFit: component.properties.scaleType || 'contain'
+            }} 
+          />
+          <IconButton
+            size="small"
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.9)'
+              }
+            }}
+            onClick={() => {
+              handleChange('src', '');
+              handleChange('base64Data', '');
+              handleChange('scaleType', 'contain');
+            }}
+          >
+            <FaTimes />
+          </IconButton>
+        </Box>
+      )}
+      <FormControl fullWidth size="small" required>
+        <InputLabel>Scale Type</InputLabel>
+        <Select
+          value={component.properties?.scaleType || 'contain'}
+          onChange={(e) => handleChange('scaleType', e.target.value)}
+          label="Scale Type *"
+        >
+          <MenuItem value="contain">Contain</MenuItem>
+          <MenuItem value="cover">Cover</MenuItem>
+        </Select>
+      </FormControl>
+      <TextField
+        label="Width (px)"
+        fullWidth
+        type="number"
+        value={component.properties?.width || '200'}
+        onChange={(e) => handleChange('width', e.target.value)}
+        size="small"
+        inputProps={{ min: 0 }}
+      />
+      <TextField
+        label="Height (px)"
+        fullWidth
+        type="number"
+        value={component.properties?.height || '200'}
+        onChange={(e) => handleChange('height', e.target.value)}
+        size="small"
+        inputProps={{ min: 0 }}
+      />
+       <TextField
+        label="Aspect-ratio (Optional) "
+        fullWidth
+        type="number"
+        value={component.properties?.aspectRatio || '1'}
+        onChange={(e) => handleChange('aspectRatio', e.target.value)}
+        size="small"
+      />
+      <TextField
+        label="Alt Text"
+        fullWidth
+        value={component.properties?.altText || ''}
+        onChange={(e) => handleChange('altText', e.target.value)}
+        size="small"
+      />
+    </Stack>
+  );
+
+  const renderDatePickerFields = () => (
+    <Stack spacing={2}>
+      <TextField
+        label="Label"
+        required
+        fullWidth
+        value={component.properties?.label || ''}
+        onChange={(e) => handleChange('label', e.target.value)}
+        size="small"
+      />
+      <TextField
+        label="Output Variable"
+        required
+        fullWidth
+        value={component.properties?.outputVariable || ''}
+        onChange={(e) => handleChange('outputVariable', e.target.value)}
+        size="small"
+      />
+      <TextField
+        label="Initial Value"
+        fullWidth
+        value={component.properties?.initValue || ''}
+        onChange={(e) => handleChange('initValue', e.target.value)}
+        size="small"
+      />
+      <TextField
+        label="Min Date"
+        fullWidth
+        type="date"
+        value={component.properties?.minDate || ''}
+        onChange={(e) => handleChange('minDate', e.target.value)}
+        size="small"
+        InputLabelProps={{ shrink: true }}
+      />
+      <TextField
+        label="Max Date"
+        fullWidth
+        type="date"
+        value={component.properties?.maxDate || ''}
+        onChange={(e) => handleChange('maxDate', e.target.value)}
+        size="small"
+        InputLabelProps={{ shrink: true }}
+      />
+      <TextField
+        label="Helper Text"
+        fullWidth
+        value={component.properties?.helperText || ''}
+        onChange={(e) => handleChange('helperText', e.target.value)}
+        size="small"
+      />
+      <FormControl fullWidth size="small">
+        <InputLabel>Required</InputLabel>
+        <Select
+          value={component.properties?.required || 'false'}
+          onChange={(e) => handleChange('required', e.target.value)}
+          label="Required"
+        >
+          <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
+        </Select>
+      </FormControl>
+    </Stack>
+  );
+
+  const renderIfElseFields = () => (
+    <Stack spacing={2}>
+      <TextField
+        label="Condition Name"
+        required
+        fullWidth
+        value={component.properties?.conditionName || ''}
+        onChange={(e) => handleChange('conditionName', e.target.value)}
+        size="small"
+      />
+      <TextField
+        label="Compare To Variable"
+        required
+        fullWidth
+        value={component.properties?.compareToVariable || ''}
+        onChange={(e) => handleChange('compareToVariable', e.target.value)}
+        size="small"
+      />
+      <FormControl fullWidth size="small">
+        <InputLabel>Condition</InputLabel>
+        <Select
+          value={component.properties?.condition1 || 'equals'}
+          onChange={(e) => handleChange('condition1', e.target.value)}
+          label="Condition"
+        >
+          <MenuItem value="equals">Equals</MenuItem>
+          <MenuItem value="not_equals">Not Equals</MenuItem>
+          <MenuItem value="greater_than">Greater Than</MenuItem>
+          <MenuItem value="less_than">Less Than</MenuItem>
+        </Select>
+      </FormControl>
+      <TextField
+        label="Compare With Value"
+        required
+        fullWidth
+        value={component.properties?.compareWithValue || ''}
+        onChange={(e) => handleChange('compareWithValue', e.target.value)}
+        size="small"
+      />
+    </Stack>
+  );
+
+  const renderSwitchFields = () => (
+    <Stack spacing={2}>
+      <TextField
+        label="Switch On"
+        required
+        fullWidth
+        value={component.properties?.switchOn || ''}
+        onChange={(e) => handleChange('switchOn', e.target.value)}
+        size="small"
+      />
+      <TextField
+        label="Compare To Variable"
+        required
+        fullWidth
+        value={component.properties?.compareToVariable || ''}
+        onChange={(e) => handleChange('compareToVariable', e.target.value)}
+        size="small"
+      />
+      <Box>
+        <TextField
+          label="Add Case"
+          fullWidth
+          value={component.properties?.newOption || ''}
+          onChange={(e) => handleChange('newOption', e.target.value)}
+          size="small"
+        />
+        <Button
+          variant="outlined"
+          onClick={() => handleOptionAdd('cases')}
+          sx={{ mt: 1 }}
+          fullWidth
+        >
+          Add Case
+        </Button>
+      </Box>
+      <List>
+        {(component.properties?.cases || []).map((caseValue: string) => (
+          <OptionItem key={caseValue}>
+            <ListItemText primary={caseValue} />
+            <ListItemSecondaryAction>
+              <IconButton
+                edge="end"
+                onClick={() => handleOptionDelete('cases', caseValue)}
+                size="small"
+              >
+                <FaTimes />
+              </IconButton>
+            </ListItemSecondaryAction>
+          </OptionItem>
+        ))}
+      </List>
+    </Stack>
+  );
+
+  const renderUserDetailsFields = () => (
+    <Stack spacing={2}>
+      <FormControl fullWidth size="small">
+        <InputLabel>Required Fields</InputLabel>
+        <Select
+          multiple
+          value={component.properties?.requiredFields || []}
+          onChange={(e) => handleChange('requiredFields', e.target.value)}
+          label="Required Fields"
+          renderValue={(selected) => (selected as string[]).join(', ')}
+        >
+          <MenuItem value="name">Name</MenuItem>
+          <MenuItem value="email">Email</MenuItem>
+          <MenuItem value="address">Address</MenuItem>
+          <MenuItem value="dateOfBirth">Date of Birth</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl fullWidth size="small">
+        <InputLabel>Optional Fields</InputLabel>
+        <Select
+          multiple
+          value={component.properties?.optionalFields || []}
+          onChange={(e) => handleChange('optionalFields', e.target.value)}
+          label="Optional Fields"
+          renderValue={(selected) => (selected as string[]).join(', ')}
+        >
+          <MenuItem value="phone">Phone</MenuItem>
+          <MenuItem value="gender">Gender</MenuItem>
+          <MenuItem value="occupation">Occupation</MenuItem>
+        </Select>
+      </FormControl>
+    </Stack>
+  );
+
   const renderFields = () => {
     switch (component.type) {
-      
-      
       case 'text-body':
       case 'text-caption':
-      
         return renderTextFields();
-
       case 'text-heading':
       case 'sub-heading':
-       return renderTextHeading();
-
-       case 'rich-text':
-        
+        return renderTextHeading();
+      case 'rich-text':
       case 'text-input':
       case 'text-area':
         return renderInputFields();
@@ -656,10 +995,20 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
       case 'photo':
       case 'document':
         return renderPhotoFields();
+      case 'image':
+        return renderImageFields();
+      case 'date-picker':
+        return renderDatePickerFields();
+      case 'if-else':
+        return renderIfElseFields();
+      case 'switch':
+        return renderSwitchFields();
+      case 'user-details':
+        return renderUserDetailsFields();
       default:
         return null;
     }
-  }; 
+  };
 
   return (
     <PropertiesPanel elevation={0} >

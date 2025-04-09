@@ -4,8 +4,10 @@ import { FaHeading, FaAlignLeft, FaParagraph, FaFont } from 'react-icons/fa';
 import { BsTextareaResize, BsInputCursorText } from 'react-icons/bs';
 import { MdRadioButtonChecked, MdCheckBox } from 'react-icons/md';
 import { IoMdArrowDropdown } from 'react-icons/io';
-import { BiImageAlt } from 'react-icons/bi';
-import { AiOutlineLink } from 'react-icons/ai';
+import { BiImageAlt, BiImage } from 'react-icons/bi';
+import { AiOutlineLink, AiOutlineCalendar } from 'react-icons/ai';
+import { VscSymbolClass } from 'react-icons/vsc';
+import { RiUserLine, RiSwitchLine } from 'react-icons/ri';
 import { Component } from '../types';
 import { Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -117,6 +119,13 @@ const components = {
   MediaInput: [
     { id: 'photo', name: 'Photo', icon: BiImageAlt },
     { id: 'document', name: 'Document', icon: BiImageAlt },
+    { id: 'image', name: 'Image', icon: BiImage },
+  ],
+  AdvancedControls: [
+    { id: 'if-else', name: 'If-Else', icon: VscSymbolClass },
+    { id: 'switch', name: 'Switch', icon: RiSwitchLine },
+    { id: 'date-picker', name: 'Date Picker', icon: AiOutlineCalendar },
+    { id: 'user-details', name: 'User Details', icon: RiUserLine },
   ],
 };
 
