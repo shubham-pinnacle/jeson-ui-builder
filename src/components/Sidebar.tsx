@@ -117,8 +117,8 @@ const components = {
     { id: 'opt-in', name: 'Opt In', icon: MdCheckBox },
   ],
   MediaInput: [
-    { id: 'photo', name: 'Photo', icon: BiImageAlt },
-    { id: 'document', name: 'Document', icon: BiImageAlt },
+    { id: 'PhotoPicker', name: 'Photo', icon: BiImageAlt },
+    { id: 'DocumentPicker', name: 'Document', icon: BiImageAlt },
     { id: 'image', name: 'Image', icon: BiImage },
   ],
   AdvancedControls: [

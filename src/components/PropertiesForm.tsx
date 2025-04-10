@@ -586,8 +586,94 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           label="Photo Source (Optional)"
         >
           <MenuItem value="camera">Camera Gallery</MenuItem>
-          <MenuItem value="gallery">Gallery Only</MenuItem>
-          <MenuItem value="camera_only">Camera Only</MenuItem>
+          <MenuItem value="gallery">Gallery</MenuItem>
+          <MenuItem value="camera">Camera</MenuItem>
+        </Select>
+      </FormControl>
+      <TextField
+        label="Minimum Photos (Optional)"
+        type="number"
+        fullWidth
+        value={component.properties?.minPhotos || ''}
+        onChange={(e) => handleChange('minPhotos', e.target.value)}
+        size="small"
+      />
+      <TextField
+        label="Maximum Photos"
+        required
+        type="number"
+        fullWidth
+        value={component.properties?.maxPhotos || ''}
+        onChange={(e) => handleChange('maxPhotos', e.target.value)}
+        size="small"
+      />
+      <TextField
+        label="Maximum file size in MB"
+        type="number"
+        fullWidth
+        value={component.properties?.maxFileSize || '25'}
+        onChange={(e) => handleChange('maxFileSize', e.target.value)}
+        size="small"
+      />
+      <FormControl fullWidth size="small">
+        <InputLabel>Visible (Optional)</InputLabel>
+        <Select
+          value={component.properties?.visible || 'true'}
+          onChange={(e) => handleChange('visible', e.target.value)}
+          label="Visible (Optional)"
+        >
+          <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl fullWidth size="small">
+        <InputLabel>Enabled (Optional)</InputLabel>
+        <Select
+          value={component.properties?.enabled || 'true'}
+          onChange={(e) => handleChange('enabled', e.target.value)}
+          label="Enabled (Optional)"
+        >
+          <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
+        </Select>
+      </FormControl>
+    </Stack>
+  );
+  const renderDocumentFields = () => (
+    <Stack spacing={2}>
+      <TextField
+        label="Label"
+        required
+        fullWidth
+        value={component.properties?.label || ''}
+        onChange={(e) => handleChange('label', e.target.value)}
+        size="small"
+      />
+      <TextField
+        label="Description (Optional)"
+        fullWidth
+        value={component.properties?.description || ''}
+        onChange={(e) => handleChange('description', e.target.value)}
+        size="small"
+      />
+      <TextField
+        label="Output Variable"
+        required
+        fullWidth
+        value={component.properties?.outputVariable || ''}
+        onChange={(e) => handleChange('outputVariable', e.target.value)}
+        size="small"
+      />
+      <FormControl fullWidth size="small">
+        <InputLabel>Photo Source (Optional)</InputLabel>
+        <Select
+          value={component.properties?.photoSource || 'camera'}
+          onChange={(e) => handleChange('photoSource', e.target.value)}
+          label="Photo Source (Optional)"
+        >
+          <MenuItem value="camera">Camera Gallery</MenuItem>
+          <MenuItem value="gallery">Gallery</MenuItem>
+          <MenuItem value="camera">Camera</MenuItem>
         </Select>
       </FormControl>
       <TextField
@@ -992,9 +1078,10 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         return renderButtonFields();
       case 'opt-in':
         return renderSelectFields();
-      case 'photo':
-      case 'document':
+      case 'PhotoPicker':
         return renderPhotoFields();
+      case 'DocumentPicker':
+          return renderDocumentFields();
       case 'image':
         return renderImageFields();
       case 'date-picker':
