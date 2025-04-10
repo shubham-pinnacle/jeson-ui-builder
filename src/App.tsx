@@ -285,18 +285,11 @@ function App() {
           break;
         case 'radio-button':
           newComponent.properties = { 
-            label: '', 
-            description:'',
-            name: `radio_group`,
+            label: 'Radio Group', 
+            name: `radio_group_${Date.now()}`,
             options: JSON.stringify(['Option 1', 'Option 2', 'Option 3']),
-            required: false,
-            initValue:'',
             visible: true,
-            enabled:true
-            
-            
-            
-            
+            required: false
           };
           break;
         case 'photo':
@@ -468,14 +461,11 @@ function App() {
         break;
       case 'radio-button':
         newComponent.properties = { 
-          label: '', 
-          description:'',
-          name: `radio_group`,
+          label: 'Radio Group', 
+          name: `radio_group_${Date.now()}`,
           options: JSON.stringify(['Option 1', 'Option 2', 'Option 3']),
-          initValue:'',
-          required: false,
           visible: true,
-          enabled:true
+          required: false
         };
         break;
       case 'drop-down':
@@ -677,7 +667,6 @@ function App() {
                 properties = {
                   label: child.label || '',
                   name: child.name || `checkbox_group_${Date.now()}`,
-                  description: child.description || '',
                   options: JSON.stringify(child['data-source']?.map((opt: any) => opt.title) || ['Option 1', 'Option 2', 'Option 3']),
                   visible: child.visible || true,
                   required: child.required || false,
@@ -689,13 +678,10 @@ function App() {
                 type = 'radio-button';
                 properties = {
                   label: child.label || '',
-                  description: child.name || '',
                   name: child.name || `radio_group_${Date.now()}`,
                   options: JSON.stringify(child['data-source']?.map((opt: any) => opt.title) || ['Option 1', 'Option 2', 'Option 3']),
-                  initValue:child.initValue ,             
                   visible: child.visible || true,
-                  required: child.required || false,
-                  enabled:child.enabled || true
+                  required: child.required || false
                 };
                 break;
               case 'Dropdown':
@@ -974,18 +960,12 @@ function App() {
                     type: "RadioButtonsGroup",
                     name: component.properties.name || `radio_${Date.now()}`,
                     label: component.properties.label || '',
-                    description: component.properties.description || '',
-                    
-                    'init-value': component.properties.initValue || '',
                     'data-source': component.properties.options ? 
-                    JSON.parse(component.properties.options).map((option: string) => ({
-                      id: option.toLowerCase().replace(/\s+/g, '_'),
-                      title: option
-                    })) : 
-                    [{ id: 'default_option', title: 'Default Option' }],
-                    required,
-                    visible,
-                    enabled
+                      JSON.parse(component.properties.options).map((option: string) => ({
+                        id: option.toLowerCase().replace(/\s+/g, '_'),
+                        title: option
+                      })) : 
+                      [{ id: 'default_option', title: 'Default Option' }]
                   };
                   case 'drop-down':
                     return {
