@@ -94,35 +94,52 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
   onClose
 }) => {
   const handleChange = (property: string, value: any) => {
+    console.log('handleChange called:', { 
+      property, 
+      value,
+      currentProperties: component.properties 
+    });
     onPropertyChange(component.id, property, value);
   };
 
   const handlePropertyOptionChange = (option: string, checked: boolean) => {
+    console.log('Property option change:', { 
+      option, 
+      checked,
+      currentProperties: component.properties 
+    });
     const currentOptions = [...(component.properties?.propertyOptions || [])];
     const newOptions = checked 
       ? [...currentOptions, option]
       : currentOptions.filter(opt => opt !== option);
     
+    console.log('New property options:', newOptions);
     handleChange('propertyOptions', newOptions);
 
     // Initialize arrays if they don't exist when checkbox is checked
     if (checked) {
       switch (option) {
         case 'id':
+          console.log('Initializing ID array with current options:', component.properties?.options);
           if (!component.properties?.optionIds) {
-            const ids = new Array(component.properties?.options?.length || 0).fill('');
+            const ids = new Array(JSON.parse(component.properties?.options || '[]').length).fill('');
+            console.log('Created initial IDs array:', ids);
             handleChange('optionIds', ids);
           }
           break;
         case 'description':
+          console.log('Initializing description array with current options:', component.properties?.options);
           if (!component.properties?.optionDescriptions) {
-            const descriptions = new Array(component.properties?.options?.length || 0).fill('');
+            const descriptions = new Array(JSON.parse(component.properties?.options || '[]').length).fill('');
+            console.log('Created initial descriptions array:', descriptions);
             handleChange('optionDescriptions', descriptions);
           }
           break;
         case 'metadata':
+          console.log('Initializing metadata array with current options:', component.properties?.options);
           if (!component.properties?.optionMetadata) {
-            const metadata = new Array(component.properties?.options?.length || 0).fill('');
+            const metadata = new Array(JSON.parse(component.properties?.options || '[]').length).fill('');
+            console.log('Created initial metadata array:', metadata);
             handleChange('optionMetadata', metadata);
           }
           break;
@@ -131,32 +148,83 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
   };
 
   const handleOptionAdd = (field: string) => {
-    const currentOptions = Array.isArray(component.properties?.[field]) 
-      ? component.properties[field] 
-      : [];
+    console.log('1. handleOptionAdd called with field:', field);
+    console.log('2. Current component properties:', component.properties);
+    
     const newOption = component.properties?.['newOption'] || '';
+    console.log('3. New option value:', newOption);
+    
     if (newOption) {
-      const updatedOptions = [...currentOptions, newOption];
-      handleChange(field, updatedOptions);
-      handleChange('newOption', '');
+      try {
+        // Parse existing options array or create new one
+        const optionsArray = JSON.parse(component.properties?.options || '[]');
+        console.log('4. Current options array:', optionsArray);
 
-      // Initialize arrays for id, description, and metadata if they don't exist
-      if (component.properties?.propertyOptions?.includes('id')) {
-        const currentIds = [...(component.properties?.optionIds || [])];
-        currentIds.push('');
-        handleChange('optionIds', currentIds);
-      }
-      
-      if (component.properties?.propertyOptions?.includes('description')) {
-        const currentDescs = [...(component.properties?.optionDescriptions || [])];
-        currentDescs.push('');
-        handleChange('optionDescriptions', currentDescs);
-      }
-      
-      if (component.properties?.propertyOptions?.includes('metadata')) {
-        const currentMeta = [...(component.properties?.optionMetadata || [])];
-        currentMeta.push('');
-        handleChange('optionMetadata', currentMeta);
+        // Add new option to array
+        optionsArray.push(newOption);
+        console.log('5. Updated options array:', optionsArray);
+
+        // Initialize property arrays if they don't exist
+        const currentIds = Array.isArray(component.properties?.optionIds) ? component.properties.optionIds : [];
+        const currentDescs = Array.isArray(component.properties?.optionDescriptions) ? component.properties.optionDescriptions : [];
+        const currentMeta = Array.isArray(component.properties?.optionMetadata) ? component.properties.optionMetadata : [];
+
+        // Create new arrays with the updated values
+        const newIds = [...currentIds];
+        const newDescs = [...currentDescs];
+        const newMeta = [...currentMeta];
+
+        // Add new values to respective arrays
+        if (component.properties?.propertyOptions?.includes('id')) {
+          const newId = component.properties?.newOptionId || newOption.toLowerCase().replace(/\s+/g, '_');
+          newIds.push(newId);
+          console.log('6. Updated IDs array:', newIds);
+        }
+        
+        if (component.properties?.propertyOptions?.includes('description')) {
+          const newDesc = component.properties?.newOptionDescription || '';
+          newDescs.push(newDesc);
+          console.log('7. Updated descriptions array:', newDescs);
+        }
+        
+        if (component.properties?.propertyOptions?.includes('metadata')) {
+          const newMetaValue = component.properties?.newOptionMetadata || '';
+          newMeta.push(newMetaValue);
+          console.log('8. Updated metadata array:', newMeta);
+        }
+
+        // Update all properties at once to ensure consistency
+        const updates: Record<string, any> = {
+          options: JSON.stringify(optionsArray)
+        };
+
+        if (component.properties?.propertyOptions?.includes('id')) {
+          updates.optionIds = newIds;
+        }
+        if (component.properties?.propertyOptions?.includes('description')) {
+          updates.optionDescriptions = newDescs;
+        }
+        if (component.properties?.propertyOptions?.includes('metadata')) {
+          updates.optionMetadata = newMeta;
+        }
+
+        // Apply all updates
+        Object.entries(updates).forEach(([key, value]) => {
+          handleChange(key, value);
+        });
+
+        console.log('9. All updates to be applied:', updates);
+
+        // Clear input fields
+        console.log('10. Clearing input fields');
+        handleChange('newOption', '');
+        handleChange('newOptionId', '');
+        handleChange('newOptionDescription', '');
+        handleChange('newOptionMetadata', '');
+        
+      } catch (error) {
+        console.error('Error in handleOptionAdd:', error);
+        console.log('Current options value:', component.properties?.options);
       }
     }
   };
@@ -416,51 +484,79 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         size="small"
       />
      
-      <FormControl component="fieldset" fullWidth size="small">
-        <FormLabel component="legend">Property (Optional)</FormLabel>
-        <FormGroup row>
-          <FormControlLabel
-            control={
-              <Checkbox
+<FormControl component="fieldset" fullWidth size="small">
+  <FormLabel component="legend">Property (Optional)</FormLabel>
+  <FormGroup row>
+    <FormControlLabel
+      control={
+        <Checkbox
                 checked={Boolean(component.properties?.propertyOptions?.includes('id'))}
                 onChange={(e) => handlePropertyOptionChange('id', e.target.checked)}
-              />
-            }
-            label="id"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
+        />
+      }
+      label="id"
+    />
+    <FormControlLabel
+      control={
+        <Checkbox
                 checked={Boolean(component.properties?.propertyOptions?.includes('description'))}
                 onChange={(e) => handlePropertyOptionChange('description', e.target.checked)}
-              />
-            }
-            label="description"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
+        />
+      }
+      label="description"
+    />
+    <FormControlLabel
+      control={
+        <Checkbox
                 checked={Boolean(component.properties?.propertyOptions?.includes('metadata'))}
                 onChange={(e) => handlePropertyOptionChange('metadata', e.target.checked)}
-              />
-            }
-            label="metadata"
-          />
-        </FormGroup>
-      </FormControl>
+        />
+      }
+      label="metadata"
+    />
+  </FormGroup>
+        
+</FormControl>
 
       <Box sx={{ mt: 2 }}>
         <Typography variant="subtitle2" gutterBottom>
           Options
         </Typography>
-        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+        <Stack spacing={1} sx={{ mb: 2 }}>
           <TextField
             size="small"
             fullWidth
             value={component.properties?.newOption || ''}
             onChange={(e) => handleChange('newOption', e.target.value)}
-            placeholder="Add new option"
+            placeholder="Title"
           />
+          {component.properties?.propertyOptions?.includes('id') && (
+            <TextField
+              size="small"
+              fullWidth
+              value={component.properties?.newOptionId || ''}
+              onChange={(e) => handleChange('newOptionId', e.target.value)}
+              placeholder="Id (Optional)"
+            />
+          )}
+          {component.properties?.propertyOptions?.includes('description') && (
+            <TextField
+              size="small"
+              fullWidth
+              value={component.properties?.newOptionDescription || ''}
+              onChange={(e) => handleChange('newOptionDescription', e.target.value)}
+              placeholder="Description (Optional)"
+            />
+          )}
+          {component.properties?.propertyOptions?.includes('metadata') && (
+            <TextField
+              size="small"
+              fullWidth
+              value={component.properties?.newOptionMetadata || ''}
+              onChange={(e) => handleChange('newOptionMetadata', e.target.value)}
+              placeholder="Metadata (Optional)"
+            />
+          )}
           <Button
             variant="outlined"
             onClick={() => handleOptionAdd('options')}
@@ -470,7 +566,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           </Button>
         </Stack>
         <List>
-          {Array.isArray(component.properties?.options) && component.properties.options.map((option: string, index: number) => (
+          {Array.isArray(JSON.parse(component.properties?.options || '[]')) && 
+           JSON.parse(component.properties?.options || '[]').map((option: string, index: number) => (
             <OptionItem key={index}>
               <ListItemText 
                 primary={
@@ -522,7 +619,29 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
                 <IconButton
                   edge="end"
                   size="small"
-                  onClick={() => handleOptionDelete('options', option)}
+                  onClick={() => {
+                    const options = JSON.parse(component.properties?.options || '[]');
+                    const updatedOptions = options.filter((_: any, i: number) => i !== index);
+                    handleChange('options', JSON.stringify(updatedOptions));
+                    
+                    if (component.properties?.optionIds) {
+                      const updatedIds = [...component.properties.optionIds];
+                      updatedIds.splice(index, 1);
+                      handleChange('optionIds', updatedIds);
+                    }
+                    
+                    if (component.properties?.optionDescriptions) {
+                      const updatedDescs = [...component.properties.optionDescriptions];
+                      updatedDescs.splice(index, 1);
+                      handleChange('optionDescriptions', updatedDescs);
+                    }
+                    
+                    if (component.properties?.optionMetadata) {
+                      const updatedMeta = [...component.properties.optionMetadata];
+                      updatedMeta.splice(index, 1);
+                      handleChange('optionMetadata', updatedMeta);
+                    }
+                  }}
                 >
                   <FaTimes />
                 </IconButton>
@@ -1121,8 +1240,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         return renderTextFields();
       case 'text-heading':
       case 'sub-heading':
-        return renderTextHeading();
-      case 'rich-text':
+       return renderTextHeading();
+       case 'rich-text':
       case 'text-input':
       case 'text-area':
         return renderInputFields();
@@ -1151,7 +1270,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
       default:
         return null;
     }
-  };
+  }; 
 
   return (
     <PropertiesPanel elevation={0} >

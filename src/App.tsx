@@ -283,7 +283,7 @@ function App() {
           newComponent.properties = { 
             label: 'Checkbox Group', 
             name: `checkbox_group_${Date.now()}`,
-            options: JSON.stringify(['Option 1', 'Option 2', 'Option 3']),
+            options: JSON.stringify([]),
             visible: true,
             required: false,
             minSelectedItems: '',
@@ -295,7 +295,7 @@ function App() {
             label: '', 
             description:'',
             name: `radio_group`,
-            options: JSON.stringify(['Option 1', 'Option 2', 'Option 3']),
+            options: JSON.stringify([]),
             initValue:'',
             required: false,
             visible: true,
@@ -462,7 +462,7 @@ function App() {
         newComponent.properties = { 
           label: 'Checkbox Group', 
           name: `checkbox_group_${Date.now()}`,
-          options: JSON.stringify(['Option 1', 'Option 2', 'Option 3']),
+          options: JSON.stringify([]),
           visible: true,
           required: false,
           minSelectedItems: '',
@@ -474,20 +474,18 @@ function App() {
           label: '', 
           description:'',
           name: `radio_group`,
-          options: JSON.stringify(['Option 1', 'Option 2', 'Option 3']),
+          options: JSON.stringify([]),
           initValue:'',
           required: false,
           visible: true,
           enabled:true
-
-         
         };
         break;
       case 'drop-down':
         newComponent.properties = { 
           label: 'Dropdown', 
           name: `dropdown_field_${Date.now()}`,
-          options: JSON.stringify(['Option 1', 'Option 2', 'Option 3']),
+          options: JSON.stringify([]),
           visible: true,
           required: false,
           placeholder: 'Select an option'
@@ -701,8 +699,6 @@ function App() {
                   visible: child.visible || true,
                   required: child.required || false,
                   enabled:child.enabled || true
-
-                 
                 };
                 break;
               case 'Dropdown':
@@ -967,28 +963,25 @@ function App() {
                       maxSelectedItems: component.properties.maxSelectedItems || '',
                       'data-source': component.properties.options ? 
                         JSON.parse(component.properties.options).map((option: string, index: number) => {
-                          const baseOption: DataSourceOption = {
-                            id: component.properties.propertyOptions?.includes('id') && component.properties.optionIds?.[index] 
-                              ? component.properties.optionIds[index] 
-                              : option.toLowerCase().replace(/\s+/g, '_'),
+                          const baseOption: any = {
                             title: option
                           };
-                          
-                          if (component.properties.propertyOptions?.includes('description') && component.properties.optionDescriptions?.[index]) {
-                            baseOption.description = component.properties.optionDescriptions[index];
+
+                          if (component.properties.propertyOptions?.includes('id')) {
+                            baseOption.id = component.properties.optionIds?.[index] || option.toLowerCase().replace(/\s+/g, '_');
                           }
                           
-                          if (component.properties.propertyOptions?.includes('metadata') && component.properties.optionMetadata?.[index]) {
-                            baseOption.metadata = component.properties.optionMetadata[index];
+                          if (component.properties.propertyOptions?.includes('description')) {
+                            baseOption.description = component.properties.optionDescriptions?.[index] || '';
+                          }
+                          
+                          if (component.properties.propertyOptions?.includes('metadata')) {
+                            baseOption.metadata = component.properties.optionMetadata?.[index] || '';
                           }
                           
                           return baseOption;
                         }) : 
-                        [
-                          { id: 'option_1', title: 'Option 1' },
-                          { id: 'option_2', title: 'Option 2' },
-                          { id: 'option_3', title: 'Option 3' }
-                        ]
+                        []
                     };
                 case 'radio-button':
                   return {
@@ -996,29 +989,61 @@ function App() {
                     name: component.properties.name || `radio_${Date.now()}`,
                     description: component.properties.description || '',
                     label: component.properties.label || '',
-                    'data-source': component.properties.options ? 
-                      JSON.parse(component.properties.options).map((option: string, index: number) => {
-                        const baseOption: DataSourceOption = {
-                          id: component.properties.propertyOptions?.includes('id') && component.properties.optionIds?.[index] 
-                            ? component.properties.optionIds[index] 
-                            : option.toLowerCase().replace(/\s+/g, '_'),
-                          title: option
-                        };
-                        
-                        if (component.properties.propertyOptions?.includes('description') && component.properties.optionDescriptions?.[index]) {
-                          baseOption.description = component.properties.optionDescriptions[index];
+                    'data-source': (() => {
+                      try {
+                        console.log('Generating data-source from:', {
+                          options: component.properties.options,
+                          propertyOptions: component.properties.propertyOptions,
+                          optionIds: component.properties.optionIds,
+                          optionDescriptions: component.properties.optionDescriptions,
+                          optionMetadata: component.properties.optionMetadata
+                        });
+
+                        if (!component.properties.options) {
+                          console.log('No options found, returning empty array');
+                          return [];
                         }
-                        
-                        if (component.properties.propertyOptions?.includes('metadata') && component.properties.optionMetadata?.[index]) {
-                          baseOption.metadata = component.properties.optionMetadata[index];
+
+                        const options = JSON.parse(component.properties.options);
+                        if (!Array.isArray(options)) {
+                          console.error('Options is not an array:', options);
+                          return [];
                         }
-                        
-                        return baseOption;
-                      }) : 
-                      [{ id: 'default_option', title: 'Default Option' }],
-                    visible,
-                    required,
-                    enabled
+
+                        const result = options.map((option: string, index: number) => {
+                          const baseOption: any = {
+                            title: option
+                          };
+
+                          if (component.properties.propertyOptions?.includes('id') && 
+                              Array.isArray(component.properties.optionIds)) {
+                            baseOption.id = component.properties.optionIds[index] || option.toLowerCase().replace(/\s+/g, '_');
+                          }
+
+                          if (component.properties.propertyOptions?.includes('description') && 
+                              Array.isArray(component.properties.optionDescriptions)) {
+                            baseOption.description = component.properties.optionDescriptions[index] || '';
+                          }
+
+                          if (component.properties.propertyOptions?.includes('metadata') && 
+                              Array.isArray(component.properties.optionMetadata)) {
+                            baseOption.metadata = component.properties.optionMetadata[index] || '';
+                          }
+
+                          console.log(`Generated option ${index}:`, baseOption);
+                          return baseOption;
+                        });
+
+                        console.log('Final data-source array:', result);
+                        return result;
+                      } catch (error) {
+                        console.error('Error generating data-source:', error);
+                        return [];
+                      }
+                    })(),
+                    visible: component.properties.visible || true,
+                    required: component.properties.required || false,
+                    enabled: component.properties.enabled || true
                   };
                   case 'drop-down':
                     return {
@@ -1030,28 +1055,25 @@ function App() {
                       placeholder: component.properties.placeholder || 'Select an option',
                       'data-source': component.properties.options ? 
                         JSON.parse(component.properties.options).map((option: string, index: number) => {
-                          const baseOption: DataSourceOption = {
-                            id: component.properties.propertyOptions?.includes('id') && component.properties.optionIds?.[index] 
-                              ? component.properties.optionIds[index] 
-                              : option.toLowerCase().replace(/\s+/g, '_'),
+                          const baseOption: any = {
                             title: option
                           };
-                          
-                          if (component.properties.propertyOptions?.includes('description') && component.properties.optionDescriptions?.[index]) {
-                            baseOption.description = component.properties.optionDescriptions[index];
+
+                          if (component.properties.propertyOptions?.includes('id')) {
+                            baseOption.id = component.properties.optionIds?.[index] || option.toLowerCase().replace(/\s+/g, '_');
                           }
                           
-                          if (component.properties.propertyOptions?.includes('metadata') && component.properties.optionMetadata?.[index]) {
-                            baseOption.metadata = component.properties.optionMetadata[index];
+                          if (component.properties.propertyOptions?.includes('description')) {
+                            baseOption.description = component.properties.optionDescriptions?.[index] || '';
+                          }
+                          
+                          if (component.properties.propertyOptions?.includes('metadata')) {
+                            baseOption.metadata = component.properties.optionMetadata?.[index] || '';
                           }
                           
                           return baseOption;
                         }) : 
-                        [
-                          { id: 'option_1', title: 'Option 1' },
-                          { id: 'option_2', title: 'Option 2' },
-                          { id: 'option_3', title: 'Option 3' }
-                        ]
+                        []
                     };
                 case 'footer-button':
                   return {
