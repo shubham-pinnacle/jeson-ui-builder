@@ -722,17 +722,16 @@ function App() {
                 case "TextArea":
                   type = "text-area";
                   properties = {
-                    label: child.label || "",
-                    name: child.name || `textarea_field_${Date.now()}`,
-                    visible: child.visible || true,
+                    label: child.label || '',
+                    name: child.name || '',
                     required: child.required || false,
-                    initValue: child["init-value"] || "",
-                    helperText: child["helper-text"] || "",
-                    "max-length":
-                      child["max-length"] !== undefined
-                        ? Number(child["max-length"])
-                        : 0,
-                    enabled: child.enabled || false,
+                    initValue: child['init-value'] || '',
+                    helperText: child['helper-text'] || '',
+                    visible: child.visible || true,
+                    maxLength: child['max-length'] !== undefined
+                      ? Number(child['max-length'])
+                      : 0,
+                    enabled: child.enabled || false
                   };
                   break;
                 case "CheckboxGroup":
@@ -811,24 +810,6 @@ function App() {
                     visible: child.visible ?? true,
                   };
                   break;
-                // case "DocumentPicker":
-                //   type = "DocumentPicker";
-                //   properties = {
-                //     label: child.label || "",
-                //     description: child.description || "",
-                //     visible: child.visible || true,
-                //     enabled: child.enabled || true,
-                //     allowedMimeTypes: Array.isArray(child["allowed-mime-types"])
-                //       ? child["allowed-mime-types"]
-                //       : ["image/jpeg", "application/pdf"],
-                //     minPhotos:
-                //       child["min-uploaded-documents"]?.toString() || "1",
-                //     maxPhotos:
-                //       child["max-uploaded-documents"]?.toString() || "1",
-                //     maxFileSize:
-                //       (child["max-file-size-kb"] / 1024)?.toString() || "10", // Convert back to MB
-                //   };
-                //   break;
                 case "DocumentPicker":
                   type = "DocumentPicker";
                   properties = {
