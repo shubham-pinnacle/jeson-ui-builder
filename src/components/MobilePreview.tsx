@@ -324,8 +324,8 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             label={component.properties?.label || 'I agree'}
           />
         );
-      case 'photo':
-      case 'document':
+      case 'PhotoPicker':
+      case 'DocumentPicker':
         return (
           <StyledFormControl key={component.id}>
             <FormLabel>{component.properties?.label || 'Upload File'}</FormLabel>
