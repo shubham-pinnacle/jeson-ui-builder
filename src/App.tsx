@@ -352,7 +352,7 @@ function App() {
             label: "",
             description: "",
             outputVariable: "",
-            allowedMimeTypes: "",
+            allowedMimeTypes: [], 
             minDocuments: "",
             maxDocuments: "",
             maxFileSize: "25",
@@ -811,6 +811,24 @@ function App() {
                     visible: child.visible ?? true,
                   };
                   break;
+                // case "DocumentPicker":
+                //   type = "DocumentPicker";
+                //   properties = {
+                //     label: child.label || "",
+                //     description: child.description || "",
+                //     visible: child.visible || true,
+                //     enabled: child.enabled || true,
+                //     allowedMimeTypes: Array.isArray(child["allowed-mime-types"])
+                //       ? child["allowed-mime-types"]
+                //       : ["image/jpeg", "application/pdf"],
+                //     minPhotos:
+                //       child["min-uploaded-documents"]?.toString() || "1",
+                //     maxPhotos:
+                //       child["max-uploaded-documents"]?.toString() || "1",
+                //     maxFileSize:
+                //       (child["max-file-size-kb"] / 1024)?.toString() || "10", // Convert back to MB
+                //   };
+                //   break;
                 case "DocumentPicker":
                   type = "DocumentPicker";
                   properties = {
@@ -820,15 +838,15 @@ function App() {
                     enabled: child.enabled ?? true,
                     allowedMimeTypes: Array.isArray(child["allowed-mime-types"])
                       ? child["allowed-mime-types"]
-                      : ["image/jpeg", "application/pdf"],
-                    minPhotos:
-                      child["min-uploaded-documents"]?.toString() || "1",
-                    maxPhotos:
-                      child["max-uploaded-documents"]?.toString() || "1",
-                    maxFileSize:
-                      (child["max-file-size-kb"] / 1024)?.toString() || "10", // Convert back to MB
+                      : ["image/jpeg", "application/pdf"], // default fallback
+                    minPhotos: child["min-uploaded-documents"]?.toString() || "1",
+                    maxPhotos: child["max-uploaded-documents"]?.toString() || "1",
+                    maxFileSize: child["max-file-size-kb"]
+                      ? (child["max-file-size-kb"] / 1024).toString()
+                      : "10", // in MB
                   };
                   break;
+
                 case "PhotoPicker":
                   type = "PhotoPicker";
                   properties = {
@@ -1235,8 +1253,8 @@ function App() {
                       description: component.properties.description || "",
                       // required: component.properties.required || false,
                       // accept: component.properties.accept || 'image/*',
-                      visible: component.properties.visible || true,
-                      enabled: component.properties.enabled || true,
+                      visible,
+                      enabled,
                       // 'output-variable': component.properties.outputVariable || '',
                       "photo-source":
                         component.properties.photoSource || "camera_gallery",
@@ -1248,62 +1266,46 @@ function App() {
                         parseInt(component.properties.maxFileSize) * 1024 ||
                         10240,
                     };
-                  // case 'photo-picker':
-                  //   return {
-                  //     type: 'PhotoPicker',
-                  //     name: component.name || 'photo_picker',
-                  //     label: component.properties.label || '',
-                  //     description: component.properties.description || '',
-                  //     'output-variable': component.properties.outputVariable || '',
-                  //     'photo-source': mapPhotoSource(component.properties.photoSource), // camera_gallery, gallery_only, camera_only
-                  //     'min-uploaded-photos': parseInt(component.properties.minPhotos) || 0,
-                  //     'max-uploaded-photos': parseInt(component.properties.maxPhotos) || 1,
-                  //     'max-file-size-kb': parseInt(component.properties.maxFileSize) * 1024 || 10240,
-                  //     visible: component.properties.visible === 'false' ? false : true,
-                  //     enabled: component.properties.enabled === 'false' ? false : true
-                  //   };
 
-                  // case 'DocumentPicker':
+                 
+                  // case "DocumentPicker":
                   //   return {
                   //     type: "DocumentPicker",
-                  //     label: component.properties.label || '',
-                  //     name:'document_picker',
-                  //     description: component.properties.description || '',
-                  //     // required: component.properties.required || false,
-                  //     visible: component.properties.visible || true,
-                  //     enabled: component.properties.enabled || true,
-                  //     // 'output-variable': component.properties.outputVariable || '',
-                  //    'allowed-mime-types': Array.isArray(component.properties.allowedMimeTypes)
-                  //     ? component.properties.allowedMimeTypes
-                  //     : [
-                  //         "image/jpeg",
-                  //         "application/pdf"
-                  //       ],
-                  //     'min-uploaded-documents': parseInt(component.properties.minPhotos) || 1,
-                  //     'max-uploaded-documents': parseInt(component.properties.maxPhotos) || 1,
-                  //     'max-file-size-kb': parseInt(component.properties.maxFileSize) || 10240
+                  //     label: component.properties.label || "",
+                  //     name: "document_picker",
+                  //     description: component.properties.description || "",
+                  //     visible,
+                  //     enabled,
+                  //     "allowed-mime-types": Array.isArray(
+                  //       component.properties.allowedMimeTypes
+                  //     )
+                  //       ? component.properties.allowedMimeTypes
+                  //       : ["image/jpeg", "application/pdf"],
+                  //     "min-uploaded-documents":
+                  //       parseInt(component.properties.minPhotos) || 1,
+                  //     "max-uploaded-documents":
+                  //       parseInt(component.properties.maxPhotos) || 1,
+                  //     "max-file-size-kb":
+                  //       parseInt(component.properties.maxFileSize) * 1024 ||
+                  //       10240,
                   //   };
+
                   case "DocumentPicker":
                     return {
                       type: "DocumentPicker",
                       label: component.properties.label || "",
                       name: "document_picker",
                       description: component.properties.description || "",
-                      visible: component.properties.visible ?? true,
-                      enabled: component.properties.enabled ?? true,
-                      "allowed-mime-types": Array.isArray(
-                        component.properties.allowedMimeTypes
-                      )
-                        ? component.properties.allowedMimeTypes
-                        : ["image/jpeg", "application/pdf"],
-                      "min-uploaded-documents":
-                        parseInt(component.properties.minPhotos) || 1,
-                      "max-uploaded-documents":
-                        parseInt(component.properties.maxPhotos) || 1,
+                      visible: component.properties.visible,
+                      enabled: component.properties.enabled,
+                      "allowed-mime-types": component.properties.allowedMimeTypes || [],
+                      "min-uploaded-documents": parseInt(component.properties.minPhotos) || 1,
+                      "max-uploaded-documents": parseInt(component.properties.maxPhotos) || 1,
                       "max-file-size-kb":
-                        parseInt(component.properties.maxFileSize) * 1024 ||
-                        10240,
+                        parseInt(component.properties.maxFileSize) * 1024 || 10240,
                     };
+                  
+
 
                   case "if-else":
                     return {
