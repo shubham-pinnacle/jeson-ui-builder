@@ -502,12 +502,29 @@ function App() {
   };
 
   const handlePropertyChange = (componentId: string, property: string, value: any) => {
+    console.log('State Update in App:', {
+      componentId,
+      property,
+      value,
+      activeScreenIndex,
+      currentScreen: screens[activeScreenIndex],
+      allScreens: screens
+    });
+
     const updatedScreens = screens.map((screen, index) => {
       if (index === activeScreenIndex) {
         return {
           ...screen,
           components: screen.components.map(component => {
             if (component.id === componentId) {
+              console.log('Component Update:', {
+                oldComponent: component,
+                newProperty: { [property]: value },
+                updatedProperties: {
+                  ...component.properties,
+                  [property]: value
+                }
+              });
               return {
                 ...component,
                 properties: {
@@ -529,6 +546,10 @@ function App() {
     if (selectedComponent?.id === componentId) {
       const updatedSelectedComponent = updatedScreens[activeScreenIndex].components.find(comp => comp.id === componentId);
       if (updatedSelectedComponent) {
+        console.log('Selected Component Updated:', {
+          oldComponent: selectedComponent,
+          newComponent: updatedSelectedComponent
+        });
         setSelectedComponent(updatedSelectedComponent);
       }
     }
@@ -935,37 +956,57 @@ function App() {
                     enabled
                     
                   };
-                  case 'check-box':
-                    return {
-                      type: "CheckboxGroup",
-                      name: component.properties.name || `checkbox_${Date.now()}`,
-                      label: component.properties.label || '',
-                      required: component.properties.required || false,
-                      visible: component.properties.visible || true,
-                      minSelectedItems: component.properties.minSelectedItems || '',
-                      maxSelectedItems: component.properties.maxSelectedItems || '',
-                      'data-source': component.properties.options ? 
-                        JSON.parse(component.properties.options).map((option: string) => ({
-                          id: option.toLowerCase().replace(/\s+/g, '_'),
-                          title: option
-                        })) : 
-                        [
-                          { id: 'option_1', title: 'Option 1' },
-                          { id: 'option_2', title: 'Option 2' },
-                          { id: 'option_3', title: 'Option 3' }
-                        ]
-                    };
+  //                 case 'check-box':
+  //                   return {
+  //                     type: "CheckboxGroup",
+  //                     name: component.properties.name || `checkbox_${Date.now()}`,
+  //                     label: component.properties.label || '',
+  //                     required: component.properties.required || false,
+  //                     visible: component.properties.visible || true,
+  //                     minSelectedItems: component.properties.minSelectedItems || '',
+  //                     maxSelectedItems: component.properties.maxSelectedItems || '',
+  //                     // 'data-source': component.properties.options ? 
+  //                     //   JSON.parse(component.properties.options).map((option: string) => ({
+  //                     //     id: option.toLowerCase().replace(/\s+/g, '_'),
+  //                     //     title: option
+  //                     //   })) : 
+  //                     //   [
+  //                     //     { id: 'option_1', title: 'Option 1' },
+  //                     //     { id: 'option_2', title: 'Option 2' },
+  //                     //     { id: 'option_3', title: 'Option 3' }
+  //                     //   ]
+  // //                      'data-source' :Array.isArray(component.properties?.options) &&
+  // // component.properties.options.length > 0
+  // // ? component.properties.options.map((option) => ({
+  // //    "id": component.properties.id, // or fallback: option.title.toLowerCase().replace(/\s+/g, '_')
+  // //   "title": component.properties.title,
+  // //   "description": component.properties.description,
+  // //   "metadata": component.properties.metadata,
+  // //   }))
+  // // : [
+  // 'data-source' [{
+
+  //   id: component.properties.id, // or fallback: option.title.toLowerCase().replace(/\s+/g, '_')
+  //   title: component.properties.title,
+  //   description: component.properties.description,
+  //   "metadata": component.properties.metadata
+  // }
+  // ]
+    
+  //   // ]
+  //                   };
                 case 'radio-button':
                   return {
                     type: "RadioButtonsGroup",
                     name: component.properties.name || `radio_${Date.now()}`,
                     label: component.properties.label || '',
-                    'data-source': component.properties.options ? 
-                      JSON.parse(component.properties.options).map((option: string) => ({
-                        id: option.toLowerCase().replace(/\s+/g, '_'),
-                        title: option
-                      })) : 
-                      [{ id: 'default_option', title: 'Default Option' }]
+                   'data-source': Array.isArray(component.properties.options)
+  ? component.properties.options.map((option: string) => ({
+      id: option.toLowerCase().replace(/\s+/g, '_'),
+      title: option
+    }))
+  : [{ id: 'default_option', title: 'Default Option' }]
+
                   };
                   case 'drop-down':
                     return {

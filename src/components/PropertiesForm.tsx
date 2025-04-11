@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -26,14 +26,25 @@ import { FaTimes } from 'react-icons/fa';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
 import { Component } from '../types';
 import { BiImageAlt } from 'react-icons/bi';
+import Autocomplete from '@mui/material/Autocomplete';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
+
+
+
+  
+  
 const PropertiesPanel = styled(Paper)(({ theme }) => ({
   width: 300,
-  height: '100%',
-  borderLeft: `1px solid ${theme.palette.divider}`,
-  padding: theme.spacing(3),
-  overflowY: 'auto',
-  display: 'flex',
+    height: '100%',
+    borderLeft: `1px solid ${theme.palette.divider}`,
+    padding: theme.spacing(3),
+    overflowY: 'auto',
+    display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(2),
   backgroundColor: theme.palette.background.paper,
@@ -91,14 +102,21 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
   screens,
   onClose
 }) => {
+  const [selectedTitles, setSelectedTitles] = useState<string[]>([]);
+  
+  const propertyOptions = [
+    { title: 'id' },
+    { title: 'description'},
+    { title: 'metadata' }];
+  useEffect(() => {console.log(selectedTitles)}, [selectedTitles]); // for testing properties selected options
   const handleChange = (property: string, value: any) => {
     onPropertyChange(component.id, property, value);
   };
 
   const handleOptionAdd = (field: string) => {
     const currentOptions = Array.isArray(component.properties?.[field]) 
-      ? component.properties[field] 
-      : [];
+    ? component.properties[field] 
+    : [];
     const newOption = component.properties?.['newOption'] || '';
     if (newOption) {
       const updatedOptions = [...currentOptions, newOption];
@@ -106,15 +124,15 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
       handleChange('newOption', '');
     }
   };
-
+  
   const handleOptionDelete = (field: string, optionToDelete: string) => {
     const currentOptions = Array.isArray(component.properties?.[field])
-      ? component.properties[field]
-      : [];
+    ? component.properties[field]
+    : [];
     const updatedOptions = currentOptions.filter((option: string) => option !== optionToDelete);
     handleChange(field, updatedOptions);
   };
-
+  
   const renderTextFields = () => (
     <Stack spacing={2}>
       <TextField
@@ -124,7 +142,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         value={component.properties?.text || ''}
         onChange={(e) => handleChange('text', e.target.value)}
         size="small"
-      />
+        />
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>
         <Select
@@ -203,7 +221,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
   const renderInputFields = () => (
     <Stack spacing={2}>
       <TextField
-        label="Labeld"
+        label="Label"
         required
         fullWidth
         value={component.properties?.label || ''}
@@ -339,7 +357,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         onChange={(e) => handleChange('outputVariable', e.target.value)}
         size="small"
       />
-      <FormControl fullWidth size="small">
+      {/* <FormControl fullWidth size="small">
         <InputLabel>Property (Optional)</InputLabel>
         <Select
           value={component.properties?.property || ''}
@@ -350,8 +368,62 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           <MenuItem value="value1">Value 1</MenuItem>
           <MenuItem value="value2">Value 2</MenuItem>
         </Select>
-      </FormControl>
-      <Box sx={{ mt: 2 }}>
+      </FormControl> */}
+
+<Autocomplete
+  multiple
+  options={propertyOptions}
+  disableCloseOnSelect
+  getOptionLabel={(option) => option.title}
+  value={propertyOptions.filter(option =>
+    selectedTitles.includes(option.title)
+  )}
+  onChange={(event, newValue) => {
+    const titles = newValue.map((item) => item.title);
+    setSelectedTitles(titles); // ✅ Now this works
+    handleChange('property', titles); // optional sync to form schema
+  }}
+  renderOption={(props, option, { selected }) => {
+    const { key, ...optionProps } = props;
+    return (
+      <li key={key} {...optionProps}>
+        <Checkbox
+          icon={icon}
+          checkedIcon={checkedIcon}
+          style={{ marginRight: 8 }}
+          checked={selected}
+        />
+        {option.title}
+      </li>
+    );
+  }}
+  fullWidth
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Property (Optional)"
+      placeholder="Favorites"
+      size="small"
+    />
+  )}
+/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      {/* <Box sx={{ mt: 2 }}>
         <Typography variant="subtitle2" gutterBottom>
           Options
         </Typography>
@@ -387,7 +459,104 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             </OptionItem>
           ))}
         </List>
-      </Box>
+      </Box> */}
+
+<Box sx={{ mt: 2 }}>
+  <Typography variant="subtitle2" gutterBottom>
+    Options
+  </Typography>
+  <Stack direction="column" spacing={1} sx={{ mb: 2 }}>
+    {/* Dynamically create a TextField for each additional field */}
+    <TextField
+      size="small"
+      fullWidth
+      value={component.properties?.newOption || ''}
+      onChange={(e) => handleChange('newOption', e.target.value)}
+      placeholder="Add new option"
+    />
+    {selectedTitles.map((field) => (
+      <TextField
+        key={field}
+        size="small"
+        value={component.properties?.[field] || ''}
+        onChange={(e) => handleChange(field, e.target.value)}
+        placeholder={`Enter ${field}`}
+      />
+    ))}
+    {/* New option input */}
+    <Button
+      variant="outlined"
+      onClick={() => handleOptionAdd('options')}
+      size="small"
+    >
+      Add
+    </Button>
+  </Stack>
+  <List>
+    {Array.isArray(component.properties?.options) &&
+      component.properties.options.map((option: string) => (
+        <OptionItem key={option}>
+          <ListItemText primary={option} />
+          <ListItemSecondaryAction>
+            <IconButton
+              edge="end"
+              size="small"
+              onClick={() => handleOptionDelete('options', option)}
+            >
+              <FaTimes />
+            </IconButton>
+          </ListItemSecondaryAction>
+        </OptionItem>
+      ))}
+  </List>
+</Box>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <FormControl fullWidth size="small">
         <InputLabel>Init Value (Optional)</InputLabel>
         <Select
