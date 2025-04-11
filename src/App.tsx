@@ -1239,10 +1239,10 @@ function App() {
                       src: imageSrc,
                       width: parseInt(component.properties.width) || 200,
                       height: parseInt(component.properties.height) || 200,
-                      aspectRatio:
+                      "aspect-ratio":
                         parseFloat(component.properties.aspectRatio) || 1,
-                      scaleType: component.properties.scaleType || "contain",
-                      altText: component.properties.altText || "image",
+                      "scale-type": component.properties.scaleType || "contain",
+                      "alt-text": component.properties.altText || "image",
                     };
 
                   case "PhotoPicker":
@@ -1296,8 +1296,8 @@ function App() {
                       label: component.properties.label || "",
                       name: "document_picker",
                       description: component.properties.description || "",
-                      visible: component.properties.visible,
-                      enabled: component.properties.enabled,
+                      visible,
+                      enabled,
                       "allowed-mime-types": component.properties.allowedMimeTypes || [],
                       "min-uploaded-documents": parseInt(component.properties.minPhotos) || 1,
                       "max-uploaded-documents": parseInt(component.properties.maxPhotos) || 1,
