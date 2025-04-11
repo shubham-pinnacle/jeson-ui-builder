@@ -203,7 +203,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
   const renderInputFields = () => (
     <Stack spacing={2}>
       <TextField
-        label="Label"
+        label="Labeld"
         required
         fullWidth
         value={component.properties?.label || ''}
