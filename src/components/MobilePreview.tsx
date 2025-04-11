@@ -54,7 +54,7 @@ const PreviewFrame = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
-
+  
   -ms-overflow-style: none;
   scrollbar-width: none;
   
@@ -101,6 +101,13 @@ const PreviewContent = styled.div<PreviewContentProps>`
   overflow-y: auto;
   padding-bottom: ${props => props.$hasFooter ? '60px' : '0'};
   position: relative;
+  
+  /* Hide scrollbars */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 `;
 
 const FooterContainer = styled.div`
@@ -178,6 +185,7 @@ interface MobilePreviewProps {
 }
 
 const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }) => {
+  // Extract footer component and others separately
   const footerComponent = components.find(comp => comp.type === 'footer-button');
   const nonFooterComponents = components.filter(comp => comp.type !== 'footer-button');
 
@@ -313,7 +321,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
               marginTop: '8px'
             }}
           >
-            {component.properties?.label || 'Button'}
+            {component.properties?.buttonText || 'Submit'}
           </Button>
         );
       case 'opt-in':
@@ -373,12 +381,12 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
         </PreviewHeader>
         <PreviewContent $hasFooter={!!footerComponent}>
           {nonFooterComponents.map(component => renderComponent(component))}
-          {footerComponent && (
-            <FooterContainer>
-              {renderComponent(footerComponent)}
-            </FooterContainer>
-          )}
         </PreviewContent>
+        {footerComponent && (
+          <FooterContainer>
+            {renderComponent(footerComponent)}
+          </FooterContainer>
+        )}
       </PreviewFrame>
     </PreviewContainer>
   );
