@@ -167,8 +167,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>
         <Select
-          value={component.properties?.visible || "true"}
-          onChange={(e) => handleChange("visible", e.target.value)}
+          value={component.properties?.visible || true}
+          onChange={(e) => handleChange('visible', e.target.value)}
           label="Visible (Optional)"
         >
           <MenuItem value="true">True</MenuItem>

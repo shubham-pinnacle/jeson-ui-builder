@@ -291,6 +291,8 @@ function App() {
           newComponent.properties = {
             label: "",
             name: `field_${Date.now()}`,
+            label: '',
+            name: '',
             required: false,
             inputType: "text",
             initValue: "",
@@ -485,6 +487,8 @@ function App() {
         newComponent.properties = {
           label: "",
           name: `field_${Date.now()}`,
+          label: '',
+          name: '',
           required: false,
           inputType: "text",
           initValue: "",
@@ -1084,8 +1088,8 @@ function App() {
                   case "text-input":
                     return {
                       type: "TextInput",
-                      label: component.properties.label || "",
-                      name: component.properties.name || "",
+                      label: component.properties.label || '',
+                      name: component.properties.outputVariable || '',
                       required,
                       "input-type": component.properties.inputType || "text",
                       "init-value": component.properties.initValue || "",
