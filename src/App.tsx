@@ -291,8 +291,6 @@ function App() {
           newComponent.properties = {
             label: "",
             name: `field_${Date.now()}`,
-            label: '',
-            name: '',
             required: false,
             inputType: "text",
             initValue: "",
@@ -487,8 +485,6 @@ function App() {
         newComponent.properties = {
           label: "",
           name: `field_${Date.now()}`,
-          label: '',
-          name: '',
           required: false,
           inputType: "text",
           initValue: "",
