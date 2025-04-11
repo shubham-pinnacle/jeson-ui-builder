@@ -512,7 +512,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
       <FormControl fullWidth size="small">
         <InputLabel>Enabled (Optional)</InputLabel>
         <Select
-          value={component.properties?.enabled || "true"}
+          value={component.properties?.enabled || false}
           onChange={(e) => handleChange("enabled", e.target.value)}
           label="Enabled (Optional)"
         >
