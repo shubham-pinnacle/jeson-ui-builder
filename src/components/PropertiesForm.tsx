@@ -372,8 +372,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         label="Output Variable"
         required
         fullWidth
-        value={component.properties?.outputVariable || ""}
-        onChange={(e) => handleChange("outputVariable", e.target.value)}
+        value={component.properties?.name}
+        onChange={(e) => handleChange("name", e.target.value)}
         size="small"
       />
       <FormControl fullWidth size="small">
@@ -468,9 +468,9 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
       <FormControl fullWidth size="small">
         <InputLabel>Enabled (Optional)</InputLabel>
         <Select
-          value={component.properties?.visible || "true"}
-          onChange={(e) => handleChange("visible", e.target.value)}
-          label="Visible (Optional)"
+          value={component.properties?.enabled || "true"}
+          onChange={(e) => handleChange("enabled", e.target.value)}
+          label="Enabled (Optional)"
         >
           <MenuItem value="true">True</MenuItem>
           <MenuItem value="false">False</MenuItem>
