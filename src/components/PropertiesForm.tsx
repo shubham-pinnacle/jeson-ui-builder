@@ -299,17 +299,6 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           <MenuItem value="false">False</MenuItem>
         </Select>
       </FormControl>
-      <FormControl fullWidth size="small">
-        <InputLabel>Enabled (Optional)</InputLabel>
-        <Select
-          value={component.properties?.enabled || "true"}
-          onChange={(e) => handleChange("enabled", e.target.value)}
-          label="Enabled (Optional)"
-        >
-          <MenuItem value="true">True</MenuItem>
-          <MenuItem value="false">False</MenuItem>
-        </Select>
-      </FormControl>
       {component.type === "text-input" ? (
         <>
           <TextField
