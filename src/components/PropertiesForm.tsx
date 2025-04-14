@@ -368,14 +368,16 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           size="small"
         />
       )}
-      <TextField
+
+<TextField
         label="Output Variable"
         required
         fullWidth
-        value={component.properties?.name}
-        onChange={(e) => handleChange("name", e.target.value)}
+        value={component.properties?.outputVarible || ""}
+        onChange={(e) => handleChange("outputVarible", e.target.value)}
         size="small"
       />
+     
       <FormControl fullWidth size="small">
         <InputLabel>Property (Optional)</InputLabel>
         <Select

@@ -317,6 +317,7 @@ function App() {
           newComponent.properties = {
             label: "Checkbox Group",
             description:"",
+            
             name: `checkbox_group_${Date.now()}`,
             options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
             visible: true,
@@ -329,7 +330,7 @@ function App() {
           newComponent.properties = {
             label: "Radio Group",
             description: "",
-            name: `radio_group_${Date.now()}`,
+            outputVarible: "",
             options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
             visible: true,
             required: false,
@@ -525,7 +526,7 @@ function App() {
         newComponent.properties = {
           label: "Radio Group",
           description:"",
-          name: `radio_group_${Date.now()}`,
+          outputVarible: "",
           options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
           visible: true,
           required: false,
@@ -761,11 +762,11 @@ function App() {
                   break;
                   case "RadioButtonsGroup":
                     type = "radio-button";
-                    description: child.description || "",
+                    
                   properties = {
                     label: child.label || "",
                     description: child.description || "",
-                    name: child.name || `radio_group_${Date.now()}`,
+                    outputVarible: child.outputVarible || "",
                     options: JSON.stringify(
                       child["data-source"]?.map((opt: any) => opt.title) || [
                         "Option 1",
@@ -1136,9 +1137,9 @@ function App() {
                   case "radio-button":
                     return {
                       type: "RadioButtonsGroup",
-                      description:component.properties.description || "",
-                      name: component.properties.name || `radio_${Date.now()}`,
                       label: component.properties.label || "",
+                      description:component.properties.description || "",
+                      outputVarible: component.properties.outputVarible || "",
                       enabled,
                       required,
                       visible,
