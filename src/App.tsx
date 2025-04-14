@@ -29,6 +29,7 @@ import ScreenDialog from "./components/ScreenDialog";
 import { Component } from "./types";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
+import { Description } from "@mui/icons-material";
 
 const AppContainer = styled("div")({
   display: "flex",
@@ -315,6 +316,8 @@ function App() {
         case "check-box":
           newComponent.properties = {
             label: "Checkbox Group",
+            description:"",
+            
             name: `checkbox_group_${Date.now()}`,
             options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
             visible: true,
@@ -326,10 +329,12 @@ function App() {
         case "radio-button":
           newComponent.properties = {
             label: "Radio Group",
-            name: `radio_group_${Date.now()}`,
+            description: "",
+            outputVarible: "",
             options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
             visible: true,
             required: false,
+            enabled: true,
           };
           break;
         case "PhotoPicker":
@@ -520,15 +525,18 @@ function App() {
       case "radio-button":
         newComponent.properties = {
           label: "Radio Group",
-          name: `radio_group_${Date.now()}`,
+          description:"",
+          outputVarible: "",
           options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
           visible: true,
           required: false,
+          enabled: true,
         };
         break;
       case "drop-down":
         newComponent.properties = {
           label: "Dropdown",
+          description:"",
           name: `dropdown_field_${Date.now()}`,
           options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
           visible: true,
@@ -752,11 +760,13 @@ function App() {
                     maxSelectedItems: child.maxSelectedItems || "",
                   };
                   break;
-                case "RadioButtonsGroup":
-                  type = "radio-button";
+                  case "RadioButtonsGroup":
+                    type = "radio-button";
+                    
                   properties = {
                     label: child.label || "",
-                    name: child.name || `radio_group_${Date.now()}`,
+                    description: child.description || "",
+                    outputVarible: child.outputVarible || "",
                     options: JSON.stringify(
                       child["data-source"]?.map((opt: any) => opt.title) || [
                         "Option 1",
@@ -766,6 +776,7 @@ function App() {
                     ),
                     visible: child.visible || true,
                     required: child.required || false,
+                    enabled: child.enabled || true,
                   };
                   break;
                 case "Dropdown":
@@ -1126,8 +1137,12 @@ function App() {
                   case "radio-button":
                     return {
                       type: "RadioButtonsGroup",
-                      name: component.properties.name || `radio_${Date.now()}`,
                       label: component.properties.label || "",
+                      description:component.properties.description || "",
+                      outputVarible: component.properties.outputVarible || "",
+                      enabled,
+                      required,
+                      visible,
                       "data-source": component.properties.options
                         ? JSON.parse(component.properties.options).map(
                             (option: string) => ({
