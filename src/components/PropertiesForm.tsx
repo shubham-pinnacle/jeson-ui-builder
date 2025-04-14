@@ -30,6 +30,14 @@ import Autocomplete from "@mui/material/Autocomplete";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { format } from "date-fns";
+import { parseISO } from "date-fns";
+
+
+
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
@@ -941,69 +949,175 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
     </Stack>
   );
 
+ 
   const renderDatePickerFields = () => (
-    <Stack spacing={2}>
-      <TextField
-        label="Label"
-        required
-        fullWidth
-        value={component.properties?.label || ""}
-        onChange={(e) => handleChange("label", e.target.value)}
-        size="small"
-      />
-      <TextField
-        label="Output Variable"
-        required
-        fullWidth
-        value={component.properties?.outputVariable || ""}
-        onChange={(e) => handleChange("outputVariable", e.target.value)}
-        size="small"
-      />
-      <TextField
-        label="Initial Value"
-        fullWidth
-        value={component.properties?.initValue || ""}
-        onChange={(e) => handleChange("initValue", e.target.value)}
-        size="small"
-      />
-      <TextField
-        label="Min Date"
-        fullWidth
-        type="date"
-        value={component.properties?.minDate || ""}
-        onChange={(e) => handleChange("minDate", e.target.value)}
-        size="small"
-        InputLabelProps={{ shrink: true }}
-      />
-      <TextField
-        label="Max Date"
-        fullWidth
-        type="date"
-        value={component.properties?.maxDate || ""}
-        onChange={(e) => handleChange("maxDate", e.target.value)}
-        size="small"
-        InputLabelProps={{ shrink: true }}
-      />
-      <TextField
-        label="Helper Text"
-        fullWidth
-        value={component.properties?.helperText || ""}
-        onChange={(e) => handleChange("helperText", e.target.value)}
-        size="small"
-      />
-      <FormControl fullWidth size="small">
-        <InputLabel>Required</InputLabel>
-        <Select
-          value={component.properties?.required || "false"}
-          onChange={(e) => handleChange("required", e.target.value)}
-          label="Required"
-        >
-          <MenuItem value="true">True</MenuItem>
-          <MenuItem value="false">False</MenuItem>
-        </Select>
-      </FormControl>
-    </Stack>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Stack spacing={2}>
+        <TextField
+          label="Label"
+          required
+          fullWidth
+          value={component.properties?.label || ""}
+          onChange={(e) => handleChange("label", e.target.value)}
+          size="small"
+        />
+        <TextField
+          label="Output Variable"
+          required
+          fullWidth
+          value={component.properties?.outputVariable || ""}
+          onChange={(e) => handleChange("outputVariable", e.target.value)}
+          size="small"
+        />
+        <DatePicker
+          label="Initial Value"
+          // value={component.properties?.initValue || null}
+          value={
+            component.properties?.initValue
+              ? parseISO(component.properties.initValue)
+              : null
+          }
+          onChange={(newValue) => handleChange("initValue", newValue ? format(newValue, "yyyy-MM-dd") : "")}
+          slotProps={{ textField: { fullWidth: true, size: "small" } }}
+        />
+        <FormControl fullWidth size="small">
+          <InputLabel>Required</InputLabel>
+          <Select
+            value={component.properties?.required || "false"}
+            onChange={(e) => handleChange("required", e.target.value)}
+            label="Required"
+          >
+            <MenuItem value="true">True</MenuItem>
+            <MenuItem value="false">False</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl fullWidth size="small">
+          <InputLabel>Visible</InputLabel>
+          <Select
+            value={component.properties?.visible || "true"}
+            onChange={(e) => handleChange("visible", e.target.value)}
+            label="Visible"
+          >
+            <MenuItem value="true">True</MenuItem>
+            <MenuItem value="false">False</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl fullWidth size="small">
+          <InputLabel>Enabled</InputLabel>
+          <Select
+            value={component.properties?.enabled || "true"}
+            onChange={(e) => handleChange("enabled", e.target.value)}
+            label="Enabled"
+          >
+            <MenuItem value="true">True</MenuItem>
+            <MenuItem value="false">False</MenuItem>
+          </Select>
+        </FormControl>
+        <DatePicker
+          label="Min Date"
+          // value={component.properties?.minDate || null}
+          value={
+            component.properties?.minDate
+              ? parseISO(component.properties.minDate)
+              : null
+          }
+          onChange={(newValue) => handleChange("minDate", newValue ? format(newValue, "yyyy-MM-dd") : "")}
+          slotProps={{ textField: { fullWidth: true, size: "small" } }}
+        />
+        <DatePicker
+          label="Max Date"
+          // value={component.properties?.maxDate || null}
+          value={
+            component.properties?.maxDate
+              ? parseISO(component.properties.maxDate)
+              : null
+          }
+          onChange={(newValue) => handleChange("maxDate", newValue ? format(newValue, "yyyy-MM-dd") : "")}
+          slotProps={{ textField: { fullWidth: true, size: "small" } }}
+        />
+        <TextField
+          label="Unavailable Dates (comma-separated)"
+          fullWidth
+          placeholder="yyyy-mm-dd, yyyy-mm-dd"
+          value={component.properties?.unavailableDates || ""}
+          onChange={(e) => handleChange("unavailableDates", e.target.value)}
+          size="small"
+        />
+        <TextField
+          label="Helper Text"
+          fullWidth
+          value={component.properties?.helperText || ""}
+          onChange={(e) => handleChange("helperText", e.target.value)}
+          size="small"
+        />
+      </Stack>
+    </LocalizationProvider>
   );
+  
+  
+  // const renderDatePickerFields = () => (
+  //   <Stack spacing={2}>
+  //     <TextField
+  //       label="Label"
+  //       required
+  //       fullWidth
+  //       value={component.properties?.label || ""}
+  //       onChange={(e) => handleChange("label", e.target.value)}
+  //       size="small"
+  //     />
+  //     <TextField
+  //       label="Output Variable"
+  //       required
+  //       fullWidth
+  //       value={component.properties?.outputVariable || ""}
+  //       onChange={(e) => handleChange("outputVariable", e.target.value)}
+  //       size="small"
+  //     />
+  //     <TextField
+  //       label="Initial Value"
+  //       fullWidth
+  //       value={component.properties?.initValue || ""}
+  //       onChange={(e) => handleChange("initValue", e.target.value)}
+  //       size="small"
+  //     />
+  //     <TextField
+  //       label="Min Date"
+  //       fullWidth
+  //       type="date"
+  //       value={component.properties?.minDate || ""}
+  //       onChange={(e) => handleChange("minDate", e.target.value)}
+  //       size="small"
+  //       InputLabelProps={{ shrink: true }}
+  //     />
+  //     <TextField
+  //       label="Max Date"
+  //       fullWidth
+  //       type="date"
+  //       value={component.properties?.maxDate || ""}
+  //       onChange={(e) => handleChange("maxDate", e.target.value)}
+  //       size="small"
+  //       InputLabelProps={{ shrink: true }}
+  //     />
+  //     <TextField
+  //       label="Helper Text"
+  //       fullWidth
+  //       value={component.properties?.helperText || ""}
+  //       onChange={(e) => handleChange("helperText", e.target.value)}
+  //       size="small"
+  //     />
+  //     <FormControl fullWidth size="small">
+  //       <InputLabel>Required</InputLabel>
+  //       <Select
+  //         value={component.properties?.required || "false"}
+  //         onChange={(e) => handleChange("required", e.target.value)}
+  //         label="Required"
+  //       >
+  //         <MenuItem value="true">True</MenuItem>
+  //         <MenuItem value="false">False</MenuItem>
+  //       </Select>
+  //     </FormControl>
+  //   </Stack>
+  // );
 
   const renderIfElseFields = () => (
     <Stack spacing={2}>

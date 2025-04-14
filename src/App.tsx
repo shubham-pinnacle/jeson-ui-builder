@@ -1313,12 +1313,22 @@ function App() {
                     return {
                       type: "DatePicker",
                       label: component.properties.label || "",
-                      "output-variable":
-                        component.properties.outputVariable || "",
-                      "init-value": component.properties.initValue || "",
-                      required: component.properties.required || false,
-                      visible: component.properties.visible || false,
-                      enabled: component.properties.enabled || false,
+                      name: "date",
+                      // "output-variable":
+                      //   component.properties.outputVariable || "",
+                      // "init-value": component.properties.initValue || "",
+                      required: component.properties.required === "false" ||
+                      component.properties?.required === false
+                        ? false
+                        : true,
+                      visible: component.properties.visible === "false" ||
+                      component.properties?.visible === false
+                        ? false
+                        : true,
+                      enabled: component.properties.enabled === "false" ||
+                      component.properties?.enabled === false
+                        ? false
+                        : true,
                       "min-date": component.properties.minDate || "",
                       "max-date": component.properties.maxDate || "",
                       "unavailable-dates":
