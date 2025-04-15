@@ -32,8 +32,56 @@ const uiSlice = createSlice({
     setJsonOutput: (state, action: PayloadAction<string>) => {
       try {
         const parsed = JSON.parse(action.payload);
-        state.components = parsed;
-        state.jsonOutput = action.payload;
+        if (Array.isArray(parsed)) {
+          // Keep track of existing components that are not in the new JSON
+          const existingComponents = state.components;
+          const newComponentIds = parsed.map(comp => comp.id);
+          const missingComponents = existingComponents.filter(
+            comp => !newComponentIds.includes(comp.id) && comp.type === 'datepicker'
+          );
+
+          // Combine new components with preserved datepicker components
+          const updatedComponents = [...parsed];
+
+          // Add back any missing datepicker components
+          missingComponents.forEach(comp => {
+            if (!updatedComponents.find(c => c.id === comp.id)) {
+              updatedComponents.push(comp);
+            }
+          });
+
+          // Process each component
+          state.components = updatedComponents.map(newComp => {
+            if (newComp.type === 'datepicker') {
+              const defaultProps = {
+                label: '',
+                outputVariable: '',
+                initValue: '',
+                minDate: '',
+                maxDate: '',
+                unavailableDates: ''
+              };
+              
+              // Find existing component
+              const existingComp = existingComponents.find(comp => comp.id === newComp.id);
+              
+              return {
+                ...newComp,
+                properties: {
+                  ...defaultProps,
+                  ...(existingComp?.properties || {}),
+                  ...(newComp.properties || {})
+                }
+              };
+            }
+            return newComp;
+          });
+
+          // Update JSON output to reflect the preserved components
+          state.jsonOutput = JSON.stringify(state.components, null, 2);
+        } else {
+          state.jsonOutput = action.payload;
+        }
       } catch (e) {
         console.error('Invalid JSON');
       }

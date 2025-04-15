@@ -318,7 +318,8 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             fullWidth
             style={{
               textTransform: 'none',
-              marginTop: '8px'
+              marginTop: '8px',
+              marginBottom: '6px'
             }}
           >
             {component.properties?.buttonText || 'Submit'}
@@ -379,9 +380,13 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
         <PreviewHeader>
           <PreviewTitle>{screenTitle}</PreviewTitle>
         </PreviewHeader>
-        <PreviewContent $hasFooter={!!footerComponent}>
-          {nonFooterComponents.map(component => renderComponent(component))}
-        </PreviewContent>
+        <Box sx={{ flex: 1, padding: 2, overflowY: 'auto' }}>
+          {nonFooterComponents.map(component => (
+            <React.Fragment key={component.id}>
+              {renderComponent(component)}
+            </React.Fragment>
+          ))}
+        </Box>
         {footerComponent && (
           <FooterContainer>
             {renderComponent(footerComponent)}
