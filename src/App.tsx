@@ -1084,11 +1084,7 @@ function App() {
                     return {
                       type: "TextSubheading",
                       text: component.properties.text || "",
-                      visible:
-                        component.properties?.visible === "false" ||
-                        component.properties?.visible === false
-                          ? false
-                          : true,
+                      visible
                     };
                   case "text-body":
                     return {
