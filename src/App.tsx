@@ -315,7 +315,7 @@ function App() {
           break;
         case "check-box":
           newComponent.properties = {
-            label: "Checkbox Group",
+            label: "",
             description:"",
             
             name: `checkbox_group_${Date.now()}`,
@@ -328,7 +328,7 @@ function App() {
           break;
         case "radio-button":
           newComponent.properties = {
-            label: "Radio Group",
+            label: "",
             description: "",
             outputVarible: "",
             options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
@@ -513,7 +513,7 @@ function App() {
         break;
       case "check-box":
         newComponent.properties = {
-          label: "Checkbox Group",
+          label: "",
           name: `checkbox_group_${Date.now()}`,
           options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
           visible: true,
@@ -524,7 +524,7 @@ function App() {
         break;
       case "radio-button":
         newComponent.properties = {
-          label: "Radio Group",
+          label: "",
           description:"",
           outputVarible: "",
           options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
@@ -535,7 +535,7 @@ function App() {
         break;
       case "drop-down":
         newComponent.properties = {
-          label: "Dropdown",
+          label: "",
           description:"",
           name: `dropdown_field_${Date.now()}`,
           options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
@@ -890,7 +890,7 @@ function App() {
         // If not found by ID, try to find by type and properties
         if (!updatedSelectedComponent) {
           // For text components, find by type
-          if (
+          if ( 
             [
               "text-heading",
               "sub-heading",
@@ -1115,8 +1115,8 @@ function App() {
                       name:
                         component.properties.name || `checkbox_${Date.now()}`,
                       label: component.properties.label || "",
-                      required: component.properties.required || false,
-                      visible: component.properties.visible || true,
+                      required,
+                      visible,
                       minSelectedItems:
                         component.properties.minSelectedItems || "",
                       maxSelectedItems:
@@ -1158,8 +1158,8 @@ function App() {
                       name:
                         component.properties.name || `dropdown_${Date.now()}`,
                       label: component.properties.label || "",
-                      required: component.properties.required || false,
-                      visible: component.properties.visible || true,
+                      required,
+                      visible,
                       placeholder:
                         component.properties.placeholder || "Select an option",
                       "data-source": component.properties.options
@@ -1238,7 +1238,7 @@ function App() {
                       "aspect-ratio":
                         parseFloat(component.properties.aspectRatio) || 1,
                       "scale-type": component.properties.scaleType || "contain",
-                      "alt-text": component.properties.altText || "image",
+                      "alt-text": component.properties.altText || "",
                     };
 
                   case "PhotoPicker":

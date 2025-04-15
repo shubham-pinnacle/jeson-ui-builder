@@ -318,7 +318,8 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             fullWidth
             style={{
               textTransform: 'none',
-              marginTop: '8px'
+              marginTop: '8px',
+              marginBottom: '6px'
             }}
           >
             {component.properties?.buttonText || 'Submit'}
