@@ -366,12 +366,12 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         />
       )}
 
-<TextField
+      <TextField
         label="Output Variable"
         required
         fullWidth
-        value={component.properties?.outputVarible || ""}
-        onChange={(e) => handleChange("outputVarible", e.target.value)}
+        value={component.properties?.outputVariable || ""}
+        onChange={(e) => handleChange("outputVariable", e.target.value)}
         size="small"
       />
      
@@ -733,7 +733,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           }
           onChange={(event, newValue) => {
             const selectedTitles = newValue.map((item) => item.title);
-            handleChange("allowedMimeTypes", selectedTitles); // 👈 Key update here
+            handleChange("allowedMimeTypes", selectedTitles); // 
           }}
           getOptionLabel={(option) => option.title}
           renderOption={(props, option, { selected }) => {

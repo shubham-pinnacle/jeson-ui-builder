@@ -330,7 +330,7 @@ function App() {
           newComponent.properties = {
             label: "Radio Group",
             description: "",
-            outputVarible: "",
+            outputVariable: "",
             options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
             visible: true,
             required: false,
@@ -526,7 +526,7 @@ function App() {
         newComponent.properties = {
           label: "Radio Group",
           description:"",
-          outputVarible: "",
+          outputVariable: "",
           options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
           visible: true,
           required: false,
@@ -766,17 +766,17 @@ function App() {
                   properties = {
                     label: child.label || "",
                     description: child.description || "",
-                    outputVarible: child.outputVarible || "",
+                    outputVariable: child.name || "",
+                    enabled: child.enabled || true,
+                    required: child.required || false,
+                    visible: child.visible || true,
                     options: JSON.stringify(
                       child["data-source"]?.map((opt: any) => opt.title) || [
-                        "Option 1",
-                        "Option 2",
-                        "Option 3",
+                        "Option 1", 
+                        "Option 2", 
+                        "Option 3"
                       ]
                     ),
-                    visible: child.visible || true,
-                    required: child.required || false,
-                    enabled: child.enabled || true,
                   };
                   break;
                 case "Dropdown":
@@ -1138,8 +1138,8 @@ function App() {
                     return {
                       type: "RadioButtonsGroup",
                       label: component.properties.label || "",
-                      description:component.properties.description || "",
-                      outputVarible: component.properties.outputVarible || "",
+                      description: component.properties.description || "",
+                      name: component.properties.outputVariable || "",
                       enabled,
                       required,
                       visible,
@@ -1150,7 +1150,11 @@ function App() {
                               title: option,
                             })
                           )
-                        : [{ id: "default_option", title: "Default Option" }],
+                        : [
+                            { id: "option_1", title: "Option 1" },
+                            { id: "option_2", title: "Option 2" },
+                            { id: "option_3", title: "Option 3" },
+                          ],
                     };
                   case "drop-down":
                     return {
