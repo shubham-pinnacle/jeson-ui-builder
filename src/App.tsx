@@ -539,10 +539,11 @@ function App() {
         newComponent.properties = {
           label: "",
           description:"",
-          name: `dropdown_field_${Date.now()}`,
+          outputVariable: "",
           options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
           visible: true,
           required: false,
+          enabled: true,
           placeholder: "Select an option",
         };
         break;
@@ -796,7 +797,7 @@ function App() {
                   type = "drop-down";
                   properties = {
                     label: child.label || "",
-                    name: child.name || `dropdown_field_${Date.now()}`,
+                    outputVariable: child.name || "",
                     options: JSON.stringify(
                       child["data-source"]?.map((opt: any) => opt.title) || [
                         "Option 1",
@@ -806,6 +807,7 @@ function App() {
                     ),
                     visible: child.visible || true,
                     required: child.required || false,
+                    enabled: child.enabled || true,
                     placeholder: child.placeholder || "Select an option",
                   };
                   break;
@@ -1200,11 +1202,11 @@ function App() {
                   case "drop-down":
                     return {
                       type: "Dropdown",
-                      name:
-                        component.properties.name || `dropdown_${Date.now()}`,
+                      name: component.properties.outputVariable || "",
                       label: component.properties.label || "",
                       required,
                       visible,
+                      enabled,
                       placeholder:
                         component.properties.placeholder || "Select an option",
                       "data-source": component.properties.options

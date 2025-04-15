@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -41,6 +41,7 @@ import { parseISO } from "date-fns";
 
 
 
+
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
@@ -71,6 +72,13 @@ const top100Films = [
   { title: "video/mpeg" }
 ];
 
+
+const PropertyOptions = [
+  { title: "id" },
+  { title: "description" },
+  { title: "metadata" },
+ 
+];
 const PropertiesPanel = styled(Paper)(({ theme }) => ({
   width: 300,
   height: "100%",
@@ -133,30 +141,80 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
   screens,
   onClose,
 }) => {
+
+  
+  // const [selectedOptions, setSelectedOptions] = useState([]);
+  const [selectedOptions, setSelectedOptions] = useState<{ title: string }[]>([]);
+  const [fieldValues, setFieldValues] = useState<{ [key: string]: string }>({});
+
+  // const [fieldValues, setFieldValues] = useState({});
+
+  const handleFieldChange = (key, value) => {
+    setFieldValues((prev) => ({ ...prev, [key]: value }));
+  };
+
+
   const handleChange = (property: string, value: any) => {
     onPropertyChange(component.id, property, value);
   };
 
   const handleOptionAdd = (field: string) => {
-    const currentOptions = Array.isArray(component.properties?.[field])
-      ? component.properties[field]
-      : [];
-    const newOption = component.properties?.["newOption"] || "";
-    if (newOption) {
-      const updatedOptions = [...currentOptions, newOption];
-      handleChange(field, updatedOptions);
+    // Create a new option object based on selected fields
+    const newOptionObj: any = {};
+    
+    // Always add id and title fields (id is required)
+    newOptionObj.id = component.properties?.newOption || "";
+    newOptionObj.title = component.properties?.newOption || "";
+    
+    // Add other selected fields if they have values
+    selectedOptions.forEach(option => {
+      if (option.title !== "id" && fieldValues[option.title]) {
+        newOptionObj[option.title] = fieldValues[option.title];
+      }
+    });
+    
+    // Only add the option if it has an id/title
+    if (newOptionObj.id) {
+      // Get current data-source or initialize empty array
+      const currentDataSource = Array.isArray(component.properties?.["data-source"])
+        ? component.properties["data-source"]
+        : [];
+        
+      // Add the new option to data-source
+      const updatedDataSource = [...currentDataSource, newOptionObj];
+      
+      // Update the data-source property
+      handleChange("data-source", updatedDataSource);
+      
+      // Clear the input fields
       handleChange("newOption", "");
+      setFieldValues({});
     }
   };
 
-  const handleOptionDelete = (field: string, optionToDelete: string) => {
-    const currentOptions = Array.isArray(component.properties?.[field])
-      ? component.properties[field]
-      : [];
-    const updatedOptions = currentOptions.filter(
-      (option: string) => option !== optionToDelete
-    );
-    handleChange(field, updatedOptions);
+  const handleOptionDelete = (field: string, optionToDelete: string | any) => {
+    // If we're dealing with data-source array
+    if (field === "data-source") {
+      const currentDataSource = Array.isArray(component.properties?.[field])
+        ? component.properties[field]
+        : [];
+      
+      // Filter out the option with matching id
+      const updatedDataSource = currentDataSource.filter(
+        (option: any) => option.id !== optionToDelete.id
+      );
+      
+      handleChange(field, updatedDataSource);
+    } else {
+      // Original implementation for other fields
+      const currentOptions = Array.isArray(component.properties?.[field])
+        ? component.properties[field]
+        : [];
+      const updatedOptions = currentOptions.filter(
+        (option: string) => option !== optionToDelete
+      );
+      handleChange(field, updatedOptions);
+    }
   };
 
   const renderDatePicker = () => {
@@ -415,7 +473,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         size="small"
       />
      
-      <FormControl fullWidth size="small">
+      {/* <FormControl fullWidth size="small">
         <InputLabel>Property (Optional)</InputLabel>
         <Select
           value={component.properties?.property || ""}
@@ -426,10 +484,112 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           <MenuItem value="value1">Value 1</MenuItem>
           <MenuItem value="value2">Value 2</MenuItem>
         </Select>
-      </FormControl>
+      </FormControl> */}
+
+
+
+
+
+
+{/* 
+<Autocomplete
+        multiple
+        id="checkboxes-tags-demo"
+        options={PropertyOptions}
+        disableCloseOnSelect
+        getOptionLabel={(option) => option.title}
+        onChange={(event, newValue) => {
+          setSelectedOptions(newValue);
+        }}
+        renderOption={(props, option, { selected }) => {
+          const { key, ...optionProps } = props;
+          return (
+            <li key={key} {...optionProps}>
+              <Checkbox
+                icon={icon}
+                checkedIcon={checkedIcon}
+                style={{ marginRight: 8 }}
+                checked={selected}
+              />
+              {option.title}
+            </li>
+          );
+        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Checkboxes"
+            placeholder="Favorites"
+            size="small"
+          />
+        )}
+        fullWidth
+      /> */}
+
+
+
+<Autocomplete
+  multiple
+  id="checkboxes-tags-demo"
+  options={PropertyOptions}
+  disableCloseOnSelect
+  getOptionLabel={(option) => option.title}
+  onChange={(event, newValue) => {
+    // newValue will be typed as { title: string }[]
+    setSelectedOptions(newValue);
+  }}
+  renderOption={(props, option, { selected }) => {
+    // option has the type { title: string } now
+    const { key, ...optionProps } = props;
+    return (
+      <li key={key} {...optionProps}>
+        <Checkbox
+          icon={icon}
+          checkedIcon={checkedIcon}
+          style={{ marginRight: 8 }}
+          checked={selected}
+        />
+        {option.title}
+      </li>
+    );
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Checkboxes"
+      placeholder="Favorites"
+      size="small"
+    />
+  )}
+  fullWidth
+/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <Box sx={{ mt: 2 }}>
         <Typography variant="subtitle2" gutterBottom>
-          Options
+          Options:
         </Typography>
         <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
           <TextField
@@ -439,6 +599,21 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             onChange={(e) => handleChange("newOption", e.target.value)}
             placeholder="Add new option"
           />
+
+  </Stack>
+
+<Box mt={2}>
+  {selectedOptions.map((option) => (
+    <FormControl fullWidth size="small" key={option.title} sx={{ mb: 2 }}>
+      <TextField
+        label={`${option.title}`}
+        value={fieldValues[option.title] || ""}
+        onChange={(e) => handleFieldChange(option.title, e.target.value)}
+        size="small"
+      />
+    </FormControl>
+  ))}
+</Box>
           <Button
             variant="outlined"
             onClick={() => handleOptionAdd("options")}
@@ -446,7 +621,6 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           >
             Add
           </Button>
-        </Stack>
         <List>
           {Array.isArray(component.properties?.options) &&
             component.properties.options.map((option: string) => (
