@@ -855,6 +855,30 @@ function App() {
                   };
                   break;
 
+                  case "date-picker":
+                    type = "DatePicker";
+                    properties = {
+                      label: child.label || "",
+                      outputVariable: child.name || "",
+                      initValue: child["init-value"]
+                        ? new Date(child["init-value"])
+                        : null,
+                      minDate: child["min-date"]
+                        ? new Date(child["min-date"])
+                        : null,
+                      maxDate: child["max-date"]
+                        ? new Date(child["max-date"])
+                        : null,
+                      unavailableDates: Array.isArray(child["unavailable-dates"])
+                        ? child["unavailable-dates"].join(", ")
+                        : "",
+                      helperText: child["helper-text"] || "",
+                      required: child.required ?? false,
+                      visible: child.visible ?? true,
+                      enabled: child.enabled ?? true,
+                    };
+                    break;
+
                 default:
                   return null;
               }
