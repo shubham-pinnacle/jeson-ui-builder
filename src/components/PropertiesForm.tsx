@@ -295,7 +295,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         onChange={(e) => handleChange("label", e.target.value)}
         size="small"
       />
-      <TextField
+     <TextField
         label="Output Variable"
         required
         fullWidth
@@ -488,8 +488,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           onChange={(e) => handleChange("required", e.target.value)}
           label="Required (Optional)"
         >
-          <MenuItem value="false">False</MenuItem>
           <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">
