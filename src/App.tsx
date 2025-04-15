@@ -304,7 +304,7 @@ function App() {
         case "text-area":
           newComponent.properties = {
             label: "",
-            name: `textarea_field_${Date.now()}`,
+            outputVariable: "",
             required: false,
             initValue: "",
             helperText: "",
@@ -316,14 +316,14 @@ function App() {
         case "check-box":
           newComponent.properties = {
             label: "",
-            description:"",
-            
-            name: `checkbox_group_${Date.now()}`,
+            description: "",
+            outputVariable: "",
             options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
             visible: true,
             required: false,
-            minSelectedItems: "",
-            maxSelectedItems: "",
+            enabled: true,
+            minSelectedItems: 0,
+            maxSelectedItems: 0,
           };
           break;
         case "radio-button":
@@ -502,7 +502,7 @@ function App() {
       case "text-area":
         newComponent.properties = {
           label: "",
-          name: `textarea_field_${Date.now()}`,
+          outputVariable: "",
           required: false,
           initValue: "",
           helperText: "",
@@ -514,12 +514,14 @@ function App() {
       case "check-box":
         newComponent.properties = {
           label: "",
-          name: `checkbox_group_${Date.now()}`,
+          description: "",
+          outputVariable: "",
           options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
           visible: true,
           required: false,
-          minSelectedItems: "",
-          maxSelectedItems: "",
+          enabled: true,
+          minSelectedItems: 0,
+          maxSelectedItems: 0,
         };
         break;
       case "radio-button":
@@ -731,7 +733,7 @@ function App() {
                   type = "text-area";
                   properties = {
                     label: child.label || '',
-                    name: child.name || '',
+                    outputVariable: child.name || "",
                     required: child.required || false,
                     initValue: child['init-value'] || '',
                     helperText: child['helper-text'] || '',
@@ -746,7 +748,8 @@ function App() {
                   type = "check-box";
                   properties = {
                     label: child.label || "",
-                    name: child.name || `checkbox_group_${Date.now()}`,
+                    description: child.description || "",
+                    outputVariable: child.name || "",
                     options: JSON.stringify(
                       child["data-source"]?.map((opt: any) => opt.title) || [
                         "Option 1",
@@ -756,8 +759,18 @@ function App() {
                     ),
                     visible: child.visible || true,
                     required: child.required || false,
-                    minSelectedItems: child.minSelectedItems || "",
-                    maxSelectedItems: child.maxSelectedItems || "",
+                    enabled: child.enabled || true,
+                    // minSelectedItems: child.minSelectedItems || "",
+                    // maxSelectedItems: child.maxSelectedItems || "",
+
+                    "min-selected-items":
+                    child["min-selected-items"] !== undefined
+                      ? Number(child["min-selected-items"])
+                      : 0,
+                  "max-selected-items":
+                    child["max-selected-items"] !== undefined
+                      ? Number(child["max-selected-items"])
+                      : 0,
                   };
                   break;
                   case "RadioButtonsGroup":
@@ -1120,8 +1133,7 @@ function App() {
                   case "text-area":
                     return {
                       type: "TextArea",
-                      name:
-                        component.properties.name || `textarea_${Date.now()}`,
+                      name: component.properties.outputVariable || "",
                       label: component.properties.label || "",
                       "init-value": component.properties.initValue || "",
                       "helper-text": component.properties.helperText || "",
@@ -1136,15 +1148,24 @@ function App() {
                   case "check-box":
                     return {
                       type: "CheckboxGroup",
-                      name:
-                        component.properties.name || `checkbox_${Date.now()}`,
+                      description: component.properties.description || "",
+                      name: component.properties.outputVariable || "",
                       label: component.properties.label || "",
                       required,
                       visible,
-                      minSelectedItems:
-                        component.properties.minSelectedItems || "",
-                      maxSelectedItems:
-                        component.properties.maxSelectedItems || "",
+                      enabled,
+                      // minSelectedItems:
+                      //   component.properties.minSelectedItems || "",
+                      // maxSelectedItems:
+                      //   component.properties.maxSelectedItems || "",
+                      "min-selected-items":
+                      component.properties.minSelectedItems !== undefined
+                        ? Number(component.properties.minSelectedItems)
+                        : 0,
+                    "max-selected-items":
+                      component.properties.maxSelectedItems !== undefined
+                        ? Number(component.properties.maxSelectedItems)
+                        : 0,
                       "data-source": component.properties.options
                         ? JSON.parse(component.properties.options).map(
                             (option: string) => ({
