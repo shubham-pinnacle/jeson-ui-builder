@@ -1313,8 +1313,161 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
     </Stack>
   );
 
+  const renderEmbeddedLinkFields = () => {
+    return (
+      <Stack spacing={2}>
+        <TextField
+          label="Text"
+          required
+          fullWidth
+          value={component.properties?.text || ""}
+          onChange={(e) => handleChange("text", e.target.value)}
+          size="small"
+        />
+        <FormControl fullWidth size="small">
+          <InputLabel>Visible (Optional)</InputLabel>
+          <Select
+            value={component.properties?.visible || true}
+            onChange={(e) => handleChange("visible", e.target.value)}
+            label="Visible (Optional)"
+          >
+            <MenuItem value="true">True</MenuItem>
+            <MenuItem value="false">False</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl fullWidth size="small">
+          <InputLabel>On Click Action</InputLabel>
+          <Select
+            value={component.properties?.onClick || ""}
+            onChange={(e) => handleChange("onClick", e.target.value)}
+            label="On Click Action"
+          >
+            <MenuItem value="open_url">Open URL</MenuItem>
+            <MenuItem value="navigate">Navigate</MenuItem>
+            <MenuItem value="data_exchange">Data Exchange</MenuItem>
+          </Select>
+        </FormControl>
+        {component.properties?.onClick === "open_url" && (
+          <TextField
+            label="URL"
+            required
+            fullWidth
+            value={component.properties?.url || ""}
+            onChange={(e) => handleChange("url", e.target.value)}
+            size="small"
+          />
+        )}
+        {component.properties?.onClick === "navigate" && (
+          <FormControl fullWidth size="small">
+            <InputLabel>Screen Name</InputLabel>
+            <Select
+              value={component.properties?.screenName || ""}
+              onChange={(e) => handleChange("screenName", e.target.value)}
+              label="Screen Name"
+            >
+              {screens.map((screen) => (
+                <MenuItem key={screen.id} value={screen.title}>
+                  {screen.title}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+      </Stack>
+    );
+  };
+
+  const renderOptInFields = () => {
+    return (
+      <Stack spacing={2}>
+        <TextField
+          label="Label"
+          fullWidth
+          value={component.properties?.label || ""}
+          onChange={(e) => handleChange("label", e.target.value)}
+          size="small"
+        />
+        <FormControl fullWidth size="small">
+          <InputLabel>Required</InputLabel>
+          <Select
+            value={component.properties?.required || "false"}
+            onChange={(e) => handleChange("required", e.target.value)}
+            label="Required"
+          >
+            <MenuItem value="false">False</MenuItem>
+            <MenuItem value="true">True</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl fullWidth size="small">
+          <InputLabel>Visible</InputLabel>
+          <Select
+            value={component.properties?.visible || "true"}
+            onChange={(e) => handleChange("visible", e.target.value)}
+            label="Visible"
+          >
+            <MenuItem value="false">False</MenuItem>
+            <MenuItem value="true">True</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl fullWidth size="small">
+          <InputLabel>Init Value</InputLabel>
+          <Select
+            value={component.properties?.initValue || "false"}
+            onChange={(e) => handleChange("initValue", e.target.value)}
+            label="Init Value"
+          >
+            <MenuItem value="false">False</MenuItem>
+            <MenuItem value="true">True</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl fullWidth size="small">
+          <InputLabel>On Click Action</InputLabel>
+          <Select
+            value={component.properties?.onClick || "none"}
+            onChange={(e) => handleChange("onClick", e.target.value)}
+            label="On Click Action"
+          >
+            <MenuItem value="none">None</MenuItem>
+            <MenuItem value="navigate">Navigate</MenuItem>
+            <MenuItem value="dataexchange">Data Exchange</MenuItem>
+            <MenuItem value="open_url">Open URL</MenuItem>
+          </Select>
+        </FormControl>
+        {component.properties?.onClick === "navigate" && (
+          <FormControl fullWidth size="small">
+            <InputLabel>Screen Name</InputLabel>
+            <Select
+              value={component.properties?.screenName || ""}
+              onChange={(e) => handleChange("screenName", e.target.value)}
+              label="Screen Name"
+            >
+              {screens.map((screen) => (
+                <MenuItem key={screen.id} value={screen.title}>
+                  {screen.title}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+        {component.properties?.onClick === "open_url" && (
+          <TextField
+            label="URL"
+            fullWidth
+            required
+            value={component.properties?.url || ""}
+            onChange={(e) => handleChange("url", e.target.value)}
+            size="small"
+          />
+        )}
+      </Stack>
+    );
+  };
+
   const renderFields = () => {
     switch (component.type) {
+      case "embedded-link":
+        return renderEmbeddedLinkFields();
+
       case "text-body":
       case "text-caption":
         return renderTextFields();
@@ -1333,7 +1486,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
       case "embedded-link":
         return renderButtonFields();
       case "opt-in":
-        return renderSelectFields();
+        return renderOptInFields();
+
       case "PhotoPicker":
         return renderPhotoFields();
       case "DocumentPicker":

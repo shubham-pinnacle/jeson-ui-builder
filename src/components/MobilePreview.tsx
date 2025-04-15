@@ -309,6 +309,43 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             </FormGroup>
           </StyledFormControl>
         );
+      case 'embedded-link':
+        if (component.properties?.visible === 'false') return null;
+        const isNavigation = component.properties?.onClick === 'Navigate';
+        const linkStyle = {
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          color: '#1976d2',
+          cursor: 'pointer',
+          textDecoration: 'none',
+          '&:hover': {
+            textDecoration: 'underline'
+          }
+        };
+
+        return (
+          <Box 
+            sx={linkStyle}
+            onClick={() => {
+              if (isNavigation) {
+                console.log('Navigate to screen:', component.properties?.screenName);
+              }
+            }}
+          >
+            <Typography>{component.properties?.text || 'Link'}</Typography>
+            <Box
+              component="span"
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                fontSize: '1.2em'
+              }}
+            >
+              {isNavigation ? '→' : '↗'}
+            </Box>
+          </Box>
+        );
       case 'footer-button':
         return (
           <Button
@@ -326,12 +363,36 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
           </Button>
         );
       case 'opt-in':
+        if (component.properties?.visible === 'false') return null;
         return (
-          <FormControlLabel
-            key={component.id}
-            control={<Checkbox required={component.properties?.required === 'true'} />}
-            label={component.properties?.label || 'I agree'}
-          />
+          <Box key={component.id} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={component.properties?.initValue === 'true'}
+                  required={component.properties?.required === 'true'}
+                />
+              }
+              label={component.properties?.label || ''}
+            />
+            {component.properties?.onClick === 'navigate' && (
+              <Box
+                component="span"
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  fontSize: '1.2em',
+                  color: '#1976d2',
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  console.log('Navigate to screen:', component.properties?.screenName);
+                }}
+              >
+                →
+              </Box>
+            )}
+          </Box>
         );
       case 'PhotoPicker':
       case 'DocumentPicker':
