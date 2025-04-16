@@ -1,46 +1,30 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ComponentType, UIState } from '../types';
 
-const initialState: UIState = {
-  components: [],
-  selectedComponent: null,
-  jsonOutput: '',
+interface UiState {
+  isPreviewVisible: boolean;
+  isDragging: boolean;
+  selectedComponentId: string | null;
+}
+
+const initialState: UiState = {
+  isPreviewVisible: false,
+  isDragging: false,
+  selectedComponentId: null,
 };
 
 const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
-    addComponent: (state, action: PayloadAction<ComponentType>) => {
-      state.components.push(action.payload);
-      state.jsonOutput = JSON.stringify(state.components, null, 2);
+    togglePreview: (state) => {
+      state.isPreviewVisible = !state.isPreviewVisible;
     },
-    updateComponent: (state, action: PayloadAction<ComponentType>) => {
-      const index = state.components.findIndex(comp => comp.id === action.payload.id);
-      if (index !== -1) {
-        state.components[index] = action.payload;
-        state.jsonOutput = JSON.stringify(state.components, null, 2);
-      }
+    setDragging: (state, action: PayloadAction<boolean>) => {
+      state.isDragging = action.payload;
     },
-    removeComponent: (state, action: PayloadAction<string>) => {
-      state.components = state.components.filter(comp => comp.id !== action.payload);
-      state.jsonOutput = JSON.stringify(state.components, null, 2);
+    setSelectedComponentId: (state, action: PayloadAction<string | null>) => {
+      state.selectedComponentId = action.payload;
     },
-    setSelectedComponent: (state, action: PayloadAction<ComponentType | null>) => {
-      state.selectedComponent = action.payload;
-    },
-    setJsonOutput: (state, action: PayloadAction<string>) => {
-      try {
-        const parsed = JSON.parse(action.payload);
-        if (Array.isArray(parsed)) {
-          // Keep track of existing components that are not in the new JSON
-          const existingComponents = state.components;
-          const newComponentIds = parsed.map(comp => comp.id);
-          const missingComponents = existingComponents.filter(
-            comp => !newComponentIds.includes(comp.id) && comp.type === 'datepicker'
-          );
-
-          // Combine new components with preserved datepicker components
           const updatedComponents = [...parsed];
 
           // Add back any missing datepicker components
@@ -68,33 +52,13 @@ const uiSlice = createSlice({
               return {
                 ...newComp,
                 properties: {
-                  ...defaultProps,
-                  ...(existingComp?.properties || {}),
-                  ...(newComp.properties || {})
-                }
-              };
-            }
-            return newComp;
-          });
-
-          // Update JSON output to reflect the preserved components
-          state.jsonOutput = JSON.stringify(state.components, null, 2);
-        } else {
-          state.jsonOutput = action.payload;
-        }
-      } catch (e) {
-        console.error('Invalid JSON');
-      }
-    },
   },
 });
 
 export const {
-  addComponent,
-  updateComponent,
-  removeComponent,
-  setSelectedComponent,
-  setJsonOutput,
+  togglePreview,
+  setDragging,
+  setSelectedComponentId,
 } = uiSlice.actions;
 
-export default uiSlice.reducer; 
+export default uiSlice.reducer;
