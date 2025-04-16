@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Component } from '../types';
+import { Component } from '../../types';
 import { TextField, FormControl, FormLabel, FormGroup, FormControlLabel, Radio, RadioGroup, Checkbox, Button, Select, MenuItem, InputLabel, Typography, Box } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
