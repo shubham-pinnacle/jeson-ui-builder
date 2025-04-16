@@ -1394,8 +1394,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             onChange={(e) => handleChange("required", e.target.value)}
             label="Required"
           >
-            <MenuItem value="false">False</MenuItem>
             <MenuItem value="true">True</MenuItem>
+            <MenuItem value="false">False</MenuItem>
           </Select>
         </FormControl>
         <FormControl fullWidth size="small">
@@ -1405,8 +1405,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             onChange={(e) => handleChange("visible", e.target.value)}
             label="Visible"
           >
-            <MenuItem value="false">False</MenuItem>
             <MenuItem value="true">True</MenuItem>
+            <MenuItem value="false">False</MenuItem>
           </Select>
         </FormControl>
         <FormControl fullWidth size="small">
@@ -1416,21 +1416,21 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             onChange={(e) => handleChange("initValue", e.target.value)}
             label="Init Value"
           >
-            <MenuItem value="false">False</MenuItem>
             <MenuItem value="true">True</MenuItem>
+            <MenuItem value="false">False</MenuItem>
           </Select>
         </FormControl>
         <FormControl fullWidth size="small">
           <InputLabel>On Click Action</InputLabel>
           <Select
-            value={component.properties?.onClick || "none"}
+            value={component.properties?.onClick || ""}
             onChange={(e) => handleChange("onClick", e.target.value)}
             label="On Click Action"
           >
-            <MenuItem value="none">None</MenuItem>
             <MenuItem value="navigate">Navigate</MenuItem>
             <MenuItem value="dataexchange">Data Exchange</MenuItem>
             <MenuItem value="open_url">Open URL</MenuItem>
+            <MenuItem value="none">None</MenuItem>
           </Select>
         </FormControl>
         {component.properties?.onClick === "navigate" && (
