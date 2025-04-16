@@ -549,8 +549,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Checkboxes"
-            placeholder="Favorites"
+            label="Properties (optional)"
+            
             size="small"
           />
         )}
@@ -567,7 +567,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             fullWidth
             value={component.properties?.newOption || ""}
             onChange={(e) => handleChange("newOption", e.target.value)}
-            placeholder="Add new option"
+            placeholder="Title"
           />
 
         </Stack>
@@ -633,7 +633,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
     onChange={(e) => handleChange("initValue", e.target.value)}
     label="Init Value (Optional)"
   >
-    <MenuItem value="">Select value</MenuItem>
+    
     {Array.isArray(initValue) &&
       initValue.map((option: any) => (
         <MenuItem key={option.id} value={option} >
