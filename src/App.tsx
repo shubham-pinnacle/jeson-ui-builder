@@ -1179,6 +1179,25 @@ function App() {
                             { id: "option_3", title: "Option 3" },
                           ],
                     };
+                  case "embedded-link":
+                    return {
+                      type: "EmbeddedLink",
+                      text: component.properties?.text || "",
+                      visible,
+                      "on-click-action": component.properties?.onClick === "navigate" ? {
+                        name: "navigate",
+                        next: {
+                          type: "screen",
+                          name: component.properties?.screenName || ""
+                        }
+                      } : component.properties?.onClick === "open_url" ? {
+                        name: "open_url",
+                        url: component.properties?.url || ""
+                      } : {
+                        name: component.properties?.onClick || ""
+                      }
+                    };
+
                   case "radio-button":
                     return {
                       type: "RadioButtonsGroup",
@@ -1373,6 +1392,52 @@ function App() {
                         component.properties.compareToVariable || "",
                       cases: component.properties.cases || ["default"],
                     };
+                  case "opt-in":
+                    const optInJson = {
+                      type: "OptIn",
+                      name: "OptIn",
+                      label: component.properties?.label || "",
+                      required: component.properties?.required === "true",
+                      visible: component.properties?.visible === "true",
+                      "init-value": component.properties?.initValue === "true"
+                    };
+
+                    // Add on-click-action if it's not none
+                    if (component.properties?.onClick && component.properties.onClick !== "none") {
+                      if (component.properties.onClick === "navigate") {
+                        optInJson["on-click-action"] = {
+                          name: "navigate",
+                          next: {
+                            type: "screen",
+                            name: component.properties?.screenName || ""
+                          },
+                          payload: {}
+                        };
+                      } else if (component.properties.onClick === "open_url") {
+                        optInJson["on-click-action"] = {
+                          name: "open_url",
+                          url: component.properties?.url || "",
+                          payload: {}
+                        };
+                      } else if (component.properties.onClick === "dataexchange") {
+                        optInJson["on-click-action"] = {
+                          name: "dataexchange",
+                          payload: {}
+                        };
+                      }
+                    }
+
+                    // // Add select/unselect actions
+                    // optInJson["on-select-action"] = {
+                    //   name: "update_data",
+                    //   payload: {}
+                    // };
+                    // optInJson["on-unselect-action"] = {
+                    //   name: "update_data",
+                    //   payload: {}
+                    // };
+
+                    return optInJson;
                   case "date-picker":
                     return {
                       type: "DatePicker",
