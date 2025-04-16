@@ -175,9 +175,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
     const newOptionObj: any = {};
 
     // Generate a unique ID using timestamp
-    // newOptionObj.id = `option_${Date.now()}`;
-    // newOptionObj.id = component.properties?.id || "";
-    
+    newOptionObj.id = `option_${Date.now()}`;
     // Use the input value for title
     newOptionObj.title = component.properties?.newOption || "";
 
