@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -38,13 +38,12 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format } from "date-fns";
 import { parseISO } from "date-fns";
-
-
-
+import { useDispatch, useSelector } from 'react-redux';
+import { updateOption } from '../slices/optionSlice';
+import { RootState } from '../store';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
-
 
 const top100Films = [
   { title: "application/gzip" },
@@ -72,13 +71,12 @@ const top100Films = [
   { title: "video/mpeg" }
 ];
 
-
 const PropertyOptions = [
   { title: "id" },
   { title: "description" },
   { title: "metadata" },
- 
 ];
+
 const PropertiesPanel = styled(Paper)(({ theme }) => ({
   width: 300,
   height: "100%",
@@ -142,71 +140,125 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
   onClose,
 }) => {
 
-  
-  // const [selectedOptions, setSelectedOptions] = useState([]);
   const [selectedOptions, setSelectedOptions] = useState<{ title: string }[]>([]);
   const [fieldValues, setFieldValues] = useState<{ [key: string]: string }>({});
-
-  // const [fieldValues, setFieldValues] = useState({});
 
   const handleFieldChange = (key, value) => {
     setFieldValues((prev) => ({ ...prev, [key]: value }));
   };
 
-
   const handleChange = (property: string, value: any) => {
     onPropertyChange(component.id, property, value);
   };
 
+  type Option = {
+    id: any;
+    title: any;
+    description: string;
+    metadata: string;
+  };
+
+  const [arr, setArr] = useState<Option[]>([]);
+
+  const initValue = arr.map((option) => option.title);
+
+  useEffect(() => {console.log("initValue", initValue);
+    console.log("arr", arr);
+  },[initValue,arr]);
+
+  const dispatch = useDispatch();
+ 
+
+ 
+
   const handleOptionAdd = (field: string) => {
-    // Create a new option object based on selected fields
     const newOptionObj: any = {};
+
+    // Generate a unique ID using timestamp
+    // newOptionObj.id = `option_${Date.now()}`;
+    // newOptionObj.id = component.properties?.id || "";
     
-    // Always add id and title fields (id is required)
-    newOptionObj.id = component.properties?.newOption || "";
+    // Use the input value for title
     newOptionObj.title = component.properties?.newOption || "";
-    
-    // Add other selected fields if they have values
+
     selectedOptions.forEach(option => {
       if (option.title !== "id" && fieldValues[option.title]) {
         newOptionObj[option.title] = fieldValues[option.title];
       }
     });
+
+
     
-    // Only add the option if it has an id/title
+    setArr(prevArr => [
+      ...prevArr,
+      {
+        id: newOptionObj.id,
+        title: newOptionObj.title,
+        ...(newOptionObj.description && { description: newOptionObj.description }),
+        ...(newOptionObj.metadata && { metadata: newOptionObj.metadata }),
+      }
+    ])
+
+    dispatch(updateOption({
+      id: newOptionObj.id,
+      title: newOptionObj.title,
+      ...(newOptionObj.description && { description: newOptionObj.description }),
+      ...(newOptionObj.metadata && { metadata: newOptionObj.metadata }),
+    }));
+    
+
+    console.log("New option being added:", {
+      id: newOptionObj.id,
+      title: newOptionObj.title,
+      description: newOptionObj.description || "Not provided",
+      metadata: newOptionObj.metadata || "Not provided"
+    });
+    console.log("Full option object:", newOptionObj);
+
     if (newOptionObj.id) {
-      // Get current data-source or initialize empty array
       const currentDataSource = Array.isArray(component.properties?.["data-source"])
-        ? component.properties["data-source"]
+        ? [...component.properties["data-source"]]
         : [];
-        
-      // Add the new option to data-source
-      const updatedDataSource = [...currentDataSource, newOptionObj];
-      
-      // Update the data-source property
+
+      console.log("Existing options before adding new one:", currentDataSource);
+
+      const updatedDataSource = [
+        ...currentDataSource,
+        newOptionObj
+      ];
+
+      console.log("Updated data-source array (old + new):", updatedDataSource);
+      console.log("Total options count:", updatedDataSource.length);
+
+      console.log("All options with key fields:");
+      updatedDataSource.forEach((option, index) => {
+        console.log(`Option ${index + 1}:`, {
+          id: option.id,
+          title: option.title,
+          description: option.description || "Not provided",
+          metadata: option.metadata || "Not provided"
+        });
+      });
+
       handleChange("data-source", updatedDataSource);
-      
-      // Clear the input fields
+
       handleChange("newOption", "");
       setFieldValues({});
     }
   };
 
   const handleOptionDelete = (field: string, optionToDelete: string | any) => {
-    // If we're dealing with data-source array
     if (field === "data-source") {
       const currentDataSource = Array.isArray(component.properties?.[field])
         ? component.properties[field]
         : [];
-      
-      // Filter out the option with matching id
+
       const updatedDataSource = currentDataSource.filter(
         (option: any) => option.id !== optionToDelete.id
       );
-      
+
       handleChange(field, updatedDataSource);
     } else {
-      // Original implementation for other fields
       const currentOptions = Array.isArray(component.properties?.[field])
         ? component.properties[field]
         : [];
@@ -353,7 +405,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         onChange={(e) => handleChange("label", e.target.value)}
         size="small"
       />
-     <TextField
+      <TextField
         label="Output Variable"
         required
         fullWidth
@@ -472,27 +524,8 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         onChange={(e) => handleChange("outputVariable", e.target.value)}
         size="small"
       />
-     
-      {/* <FormControl fullWidth size="small">
-        <InputLabel>Property (Optional)</InputLabel>
-        <Select
-          value={component.properties?.property || ""}
-          onChange={(e) => handleChange("property", e.target.value)}
-          label="Property (Optional)"
-        >
-          <MenuItem value="">Select property</MenuItem>
-          <MenuItem value="value1">Value 1</MenuItem>
-          <MenuItem value="value2">Value 2</MenuItem>
-        </Select>
-      </FormControl> */}
 
-
-
-
-
-
-{/* 
-<Autocomplete
+      <Autocomplete
         multiple
         id="checkboxes-tags-demo"
         options={PropertyOptions}
@@ -524,68 +557,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           />
         )}
         fullWidth
-      /> */}
-
-
-
-<Autocomplete
-  multiple
-  id="checkboxes-tags-demo"
-  options={PropertyOptions}
-  disableCloseOnSelect
-  getOptionLabel={(option) => option.title}
-  onChange={(event, newValue) => {
-    // newValue will be typed as { title: string }[]
-    setSelectedOptions(newValue);
-  }}
-  renderOption={(props, option, { selected }) => {
-    // option has the type { title: string } now
-    const { key, ...optionProps } = props;
-    return (
-      <li key={key} {...optionProps}>
-        <Checkbox
-          icon={icon}
-          checkedIcon={checkedIcon}
-          style={{ marginRight: 8 }}
-          checked={selected}
-        />
-        {option.title}
-      </li>
-    );
-  }}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="Checkboxes"
-      placeholder="Favorites"
-      size="small"
-    />
-  )}
-  fullWidth
-/>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      />
 
       <Box sx={{ mt: 2 }}>
         <Typography variant="subtitle2" gutterBottom>
@@ -600,20 +572,20 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             placeholder="Add new option"
           />
 
-  </Stack>
+        </Stack>
 
-<Box mt={2}>
-  {selectedOptions.map((option) => (
-    <FormControl fullWidth size="small" key={option.title} sx={{ mb: 2 }}>
-      <TextField
-        label={`${option.title}`}
-        value={fieldValues[option.title] || ""}
-        onChange={(e) => handleFieldChange(option.title, e.target.value)}
-        size="small"
-      />
-    </FormControl>
-  ))}
-</Box>
+        <Box mt={2}>
+          {selectedOptions.map((option) => (
+            <FormControl fullWidth size="small" key={option.title} sx={{ mb: 2 }}>
+              <TextField
+                label={`${option.title}`}
+                value={fieldValues[option.title] || ""}
+                onChange={(e) => handleFieldChange(option.title, e.target.value)}
+                size="small"
+              />
+            </FormControl>
+          ))}
+        </Box>
           <Button
             variant="outlined"
             onClick={() => handleOptionAdd("options")}
@@ -621,6 +593,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           >
             Add
           </Button>
+
         <List>
           {Array.isArray(component.properties?.options) &&
             component.properties.options.map((option: string) => (
@@ -639,7 +612,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             ))}
         </List>
       </Box>
-      <FormControl fullWidth size="small">
+      {/* <FormControl fullWidth size="small">
         <InputLabel>Init Value (Optional)</InputLabel>
         <Select
           value={component.properties?.initValue || ""}
@@ -648,13 +621,30 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         >
           <MenuItem value="">Select value</MenuItem>
           {Array.isArray(component.properties?.options) &&
-            component.properties.options.map((option: string) => (
-              <MenuItem key={option} value={option}>
-                {option}
+            initValue.map((option: string) => (
+              <MenuItem key={initValue} value={initValue}>
+                {initValue}
               </MenuItem>
             ))}
         </Select>
-      </FormControl>
+      </FormControl> */}
+      <FormControl fullWidth size="small">
+  <InputLabel>Init Value (Optional)</InputLabel>
+  <Select
+    value={component.properties?.initValue || ""}
+    onChange={(e) => handleChange("initValue", e.target.value)}
+    label="Init Value (Optional)"
+  >
+    <MenuItem value="">Select value</MenuItem>
+    {Array.isArray(initValue) &&
+      initValue.map((option: any) => (
+        <MenuItem key={option.id} value={option} >
+          {option}
+        </MenuItem>
+      ))}
+  </Select>
+</FormControl>
+
       <FormControl fullWidth size="small">
         <InputLabel>Required (Optional)</InputLabel>
         <Select
@@ -739,7 +729,6 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         value={component.properties?.leftCaption || ""}
         onChange={(e) => {
           handleChange("leftCaption", e.target.value);
-          // If left caption is filled, clear center caption
           if (e.target.value && component.properties?.centerCaption) {
             handleChange("centerCaption", "");
           }
@@ -753,7 +742,6 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         value={component.properties?.centerCaption || ""}
         onChange={(e) => {
           handleChange("centerCaption", e.target.value);
-          // If center caption is filled, clear left and right captions
           if (e.target.value) {
             handleChange("leftCaption", "");
             handleChange("rightCaption", "");
@@ -771,7 +759,6 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         value={component.properties?.rightCaption || ""}
         onChange={(e) => {
           handleChange("rightCaption", e.target.value);
-          // If right caption is filled, clear center caption
           if (e.target.value && component.properties?.centerCaption) {
             handleChange("centerCaption", "");
           }
@@ -896,6 +883,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
       </FormControl>
     </Stack>
   );
+
   const renderDocumentFields = () => (
     <Stack spacing={2}>
       <TextField
@@ -933,50 +921,48 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           <MenuItem value="camera">Camera</MenuItem>
         </Select>
       </FormControl>
-      
+
       <Autocomplete
-          multiple
-          fullWidth
-          size="small"
-          options={top100Films}
-          disableCloseOnSelect
-          value={
-            top100Films.filter((film) =>
-              component.properties?.allowedMimeTypes?.includes(film.title)
-            ) || []
-          }
-          onChange={(event, newValue) => {
-            const selectedTitles = newValue.map((item) => item.title);
-            handleChange("allowedMimeTypes", selectedTitles); // 
-          }}
-          getOptionLabel={(option) => option.title}
-          renderOption={(props, option, { selected }) => {
-            const { key, ...optionProps } = props;
-            return (
-              <li key={key} {...optionProps}>
-                <Checkbox
-                  icon={icon}
-                  checkedIcon={checkedIcon}
-                  style={{ marginRight: 8 }}
-                  checked={selected}
-                />
-                {option.title}
-              </li>
-            );
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Allowed Meme Types (Optional)"
-              placeholder="Select allowed types"
-              fullWidth
-              size="small"
-            />
-          )}
-        />
+        multiple
+        fullWidth
+        size="small"
+        options={top100Films}
+        disableCloseOnSelect
+        value={
+          top100Films.filter((film) =>
+            component.properties?.allowedMimeTypes?.includes(film.title)
+          ) || []
+        }
+        onChange={(event, newValue) => {
+          const selectedTitles = newValue.map((item) => item.title);
+          handleChange("allowedMimeTypes", selectedTitles); // 
+        }}
+        getOptionLabel={(option) => option.title}
+        renderOption={(props, option, { selected }) => {
+          const { key, ...optionProps } = props;
+          return (
+            <li key={key} {...optionProps}>
+              <Checkbox
+                icon={icon}
+                checkedIcon={checkedIcon}
+                style={{ marginRight: 8 }}
+                checked={selected}
+              />
+              {option.title}
+            </li>
+          );
+        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Allowed Meme Types (Optional)"
+            placeholder="Select allowed types"
+            fullWidth
+            size="small"
+          />
+        )}
+      />
 
-
-      
       <TextField
         label="Minimum Photos (Optional)"
         type="number"
@@ -1051,7 +1037,6 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
             const file = e.target.files?.[0];
             if (file) {
               if (file.size > 5 * 1024 * 1024) {
-                // 5MB limit
                 alert("File size should not exceed 5MB");
                 return;
               }
@@ -1059,13 +1044,10 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
               reader.onload = (event) => {
                 const base64String = event.target?.result as string;
                 if (base64String) {
-                  // Set default scale-type when image is uploaded
                   handleChange("scaleType", "contain");
 
-                  // Store the base64 data
                   handleChange("base64Data", base64String.split(",")[1] || "");
 
-                  // Store the complete data URL for preview
                   handleChange("src", base64String);
                 }
               };
@@ -1165,37 +1147,191 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
     </Stack>
   );
 
- 
-  // Initialize date picker properties
-  React.useEffect(() => {
-    if (component.type === 'datepicker') {
-      const defaultProperties = {
-        label: "",
-        outputVariable: "",
-        initValue: "",
-        minDate: "",
-        maxDate: "",
-        unavailableDates: ""
-      };
+  const renderIfElseFields = () => (
+    <Stack spacing={2}>
+      <TextField
+        label="Condition Name"
+        required
+        fullWidth
+        value={component.properties?.conditionName || ""}
+        onChange={(e) => handleChange("conditionName", e.target.value)}
+        size="small"
+      />
+      <TextField
+        label="Compare To Variable"
+        required
+        fullWidth
+        value={component.properties?.compareToVariable || ""}
+        onChange={(e) => handleChange("compareToVariable", e.target.value)}
+        size="small"
+      />
+      <FormControl fullWidth size="small">
+        <InputLabel>Condition</InputLabel>
+        <Select
+          value={component.properties?.condition1 || "equals"}
+          onChange={(e) => handleChange("condition1", e.target.value)}
+          label="Condition"
+        >
+          <MenuItem value="equals">Equals</MenuItem>
+          <MenuItem value="not_equals">Not Equals</MenuItem>
+          <MenuItem value="greater_than">Greater Than</MenuItem>
+          <MenuItem value="less_than">Less Than</MenuItem>
+        </Select>
+      </FormControl>
 
-      // Only update if some properties are missing
-      if (!component.properties || Object.keys(defaultProperties).some(key => !(key in (component.properties || {})))) {
-        handleChange("properties", { 
-          ...defaultProperties,
-          ...(component.properties || {})
-        });
-      }
+      <OptionsDisplay />
+    </Stack>
+  );
+
+  const OptionsDisplay = () => {
+    const options = useSelector((state: RootState) => state.option.arr);
+
+    return (
+      <div>
+        <h2>All Options:</h2>
+        <ul>
+          {options.map((item, index) => (
+            <li key={index}>{item.title}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
+  const renderSwitchFields = () => (
+    <Stack spacing={2}>
+      <TextField
+        label="Switch On"
+        required
+        fullWidth
+        value={component.properties?.switchOn || ""}
+        onChange={(e) => handleChange("switchOn", e.target.value)}
+        size="small"
+      />
+      <TextField
+        label="Compare To Variable"
+        required
+        fullWidth
+        value={component.properties?.compareToVariable || ""}
+        onChange={(e) => handleChange("compareToVariable", e.target.value)}
+        size="small"
+      />
+      <Box>
+        <TextField
+          label="Add Case"
+          fullWidth
+          value={component.properties?.newOption || ""}
+          onChange={(e) => handleChange("newOption", e.target.value)}
+          size="small"
+        />
+        <Button
+          variant="outlined"
+          onClick={() => handleOptionAdd("cases")}
+          sx={{ mt: 1 }}
+          fullWidth
+        >
+          Add Case
+        </Button>
+      </Box>
+      <List>
+        {(component.properties?.cases || []).map((caseValue: string) => (
+          <OptionItem key={caseValue}>
+            <ListItemText primary={caseValue} />
+            <ListItemSecondaryAction>
+              <IconButton
+                edge="end"
+                onClick={() => handleOptionDelete("cases", caseValue)}
+                size="small"
+              >
+                <FaTimes />
+              </IconButton>
+            </ListItemSecondaryAction>
+          </OptionItem>
+        ))}
+      </List>
+    </Stack>
+  );
+
+  const renderUserDetailsFields = () => (
+    <Stack spacing={2}>
+      <FormControl fullWidth size="small">
+        <InputLabel>Required Fields</InputLabel>
+        <Select
+          multiple
+          value={component.properties?.requiredFields || []}
+          onChange={(e) => handleChange("requiredFields", e.target.value)}
+          label="Required Fields"
+          renderValue={(selected) => (selected as string[]).join(", ")}
+        >
+          <MenuItem value="name">Name</MenuItem>
+          <MenuItem value="email">Email</MenuItem>
+          <MenuItem value="address">Address</MenuItem>
+          <MenuItem value="dateOfBirth">Date of Birth</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl fullWidth size="small">
+        <InputLabel>Optional Fields</InputLabel>
+        <Select
+          multiple
+          value={component.properties?.optionalFields || []}
+          onChange={(e) => handleChange("optionalFields", e.target.value)}
+          label="Optional Fields"
+          renderValue={(selected) => (selected as string[]).join(", ")}
+        >
+          <MenuItem value="phone">Phone</MenuItem>
+          <MenuItem value="gender">Gender</MenuItem>
+          <MenuItem value="occupation">Occupation</MenuItem>
+        </Select>
+      </FormControl>
+    </Stack>
+  );
+
+  const renderFields = () => {
+    switch (component.type) {
+      case "text-body":
+      case "text-caption":
+        return renderTextFields();
+      case "text-heading":
+      case "sub-heading":
+        return renderTextHeading();
+      case "rich-text":
+      case "text-input":
+      case "text-area":
+        return renderInputFields();
+      case "radio-button":
+      case "check-box":
+      case "drop-down":
+        return renderSelectFields();
+      case "footer-button":
+      case "embedded-link":
+        return renderButtonFields();
+      case "opt-in":
+        return renderSelectFields();
+      case "PhotoPicker":
+        return renderPhotoFields();
+      case "DocumentPicker":
+        return renderDocumentFields();
+      case "image":
+        return renderImageFields();
+      case "date-picker":
+        return renderDatePickerFields();
+      case "if-else":
+        return renderIfElseFields();
+      case "switch":
+        return renderSwitchFields();
+      case "user-details":
+        return renderUserDetailsFields();
+      default:
+        return null;
     }
-  }, [component.id, component.type]);
-
-  // Move hooks to the component level
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  };
 
   const renderDatePickerFields = () => {
     const unavailableDates = (component.properties?.unavailableDates || '').split(',').map(d => d.trim()).filter(d => d);
-    const DatePickerComponent = isMobile ? MobileDatePicker : DatePicker;
-    
+    const selectedDate = component.properties?.selectedDate ? parseISO(component.properties.selectedDate) : null;
+
+    const DatePickerComponent = useTheme().breakpoints.down('sm') ? MobileDatePicker : DatePicker;
+
     return (
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Stack spacing={2}>
@@ -1217,7 +1353,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           />
           <DatePickerComponent
             label="Initial Value"
-            value={component.properties?.initValue ? parseISO(component.properties.initValue) : null}
+            value={selectedDate}
             onChange={(newValue) => handleChange("initValue", newValue ? format(newValue, "yyyy-MM-dd") : "")}
             shouldDisableDate={(date) => unavailableDates.includes(format(date, 'yyyy-MM-dd'))}
             slotProps={{
@@ -1356,176 +1492,28 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
     );
   };
 
+  useEffect(() => {
+    if (component.type === 'datepicker') {
+      const defaultProperties = {
+        label: "",
+        outputVariable: "",
+        initValue: "",
+        minDate: "",
+        maxDate: "",
+        unavailableDates: ""
+      };
 
-  const renderIfElseFields = () => (
-    <Stack spacing={2}>
-      <TextField
-        label="Condition Name"
-        required
-        fullWidth
-        value={component.properties?.conditionName || ""}
-        onChange={(e) => handleChange("conditionName", e.target.value)}
-        size="small"
-      />
-      <TextField
-        label="Compare To Variable"
-        required
-        fullWidth
-        value={component.properties?.compareToVariable || ""}
-        onChange={(e) => handleChange("compareToVariable", e.target.value)}
-        size="small"
-      />
-      <FormControl fullWidth size="small">
-        <InputLabel>Condition</InputLabel>
-        <Select
-          value={component.properties?.condition1 || "equals"}
-          onChange={(e) => handleChange("condition1", e.target.value)}
-          label="Condition"
-        >
-          <MenuItem value="equals">Equals</MenuItem>
-          <MenuItem value="not_equals">Not Equals</MenuItem>
-          <MenuItem value="greater_than">Greater Than</MenuItem>
-          <MenuItem value="less_than">Less Than</MenuItem>
-        </Select>
-      </FormControl>
-      <TextField
-        label="Compare With Value"
-        required
-        fullWidth
-        value={component.properties?.compareWithValue || ""}
-        onChange={(e) => handleChange("compareWithValue", e.target.value)}
-        size="small"
-      />
-    </Stack>
-  );
-
-  const renderSwitchFields = () => (
-    <Stack spacing={2}>
-      <TextField
-        label="Switch On"
-        required
-        fullWidth
-        value={component.properties?.switchOn || ""}
-        onChange={(e) => handleChange("switchOn", e.target.value)}
-        size="small"
-      />
-      <TextField
-        label="Compare To Variable"
-        required
-        fullWidth
-        value={component.properties?.compareToVariable || ""}
-        onChange={(e) => handleChange("compareToVariable", e.target.value)}
-        size="small"
-      />
-      <Box>
-        <TextField
-          label="Add Case"
-          fullWidth
-          value={component.properties?.newOption || ""}
-          onChange={(e) => handleChange("newOption", e.target.value)}
-          size="small"
-        />
-        <Button
-          variant="outlined"
-          onClick={() => handleOptionAdd("cases")}
-          sx={{ mt: 1 }}
-          fullWidth
-        >
-          Add Case
-        </Button>
-      </Box>
-      <List>
-        {(component.properties?.cases || []).map((caseValue: string) => (
-          <OptionItem key={caseValue}>
-            <ListItemText primary={caseValue} />
-            <ListItemSecondaryAction>
-              <IconButton
-                edge="end"
-                onClick={() => handleOptionDelete("cases", caseValue)}
-                size="small"
-              >
-                <FaTimes />
-              </IconButton>
-            </ListItemSecondaryAction>
-          </OptionItem>
-        ))}
-      </List>
-    </Stack>
-  );
-
-  const renderUserDetailsFields = () => (
-    <Stack spacing={2}>
-      <FormControl fullWidth size="small">
-        <InputLabel>Required Fields</InputLabel>
-        <Select
-          multiple
-          value={component.properties?.requiredFields || []}
-          onChange={(e) => handleChange("requiredFields", e.target.value)}
-          label="Required Fields"
-          renderValue={(selected) => (selected as string[]).join(", ")}
-        >
-          <MenuItem value="name">Name</MenuItem>
-          <MenuItem value="email">Email</MenuItem>
-          <MenuItem value="address">Address</MenuItem>
-          <MenuItem value="dateOfBirth">Date of Birth</MenuItem>
-        </Select>
-      </FormControl>
-      <FormControl fullWidth size="small">
-        <InputLabel>Optional Fields</InputLabel>
-        <Select
-          multiple
-          value={component.properties?.optionalFields || []}
-          onChange={(e) => handleChange("optionalFields", e.target.value)}
-          label="Optional Fields"
-          renderValue={(selected) => (selected as string[]).join(", ")}
-        >
-          <MenuItem value="phone">Phone</MenuItem>
-          <MenuItem value="gender">Gender</MenuItem>
-          <MenuItem value="occupation">Occupation</MenuItem>
-        </Select>
-      </FormControl>
-    </Stack>
-  );
-
-  const renderFields = () => {
-    switch (component.type) {
-      case "text-body":
-      case "text-caption":
-        return renderTextFields();
-      case "text-heading":
-      case "sub-heading":
-        return renderTextHeading();
-      case "rich-text":
-      case "text-input":
-      case "text-area":
-        return renderInputFields();
-      case "radio-button":
-      case "check-box":
-      case "drop-down":
-        return renderSelectFields();
-      case "footer-button":
-      case "embedded-link":
-        return renderButtonFields();
-      case "opt-in":
-        return renderSelectFields();
-      case "PhotoPicker":
-        return renderPhotoFields();
-      case "DocumentPicker":
-        return renderDocumentFields();
-      case "image":
-        return renderImageFields();
-      case "date-picker":
-        return renderDatePickerFields();
-      case "if-else":
-        return renderIfElseFields();
-      case "switch":
-        return renderSwitchFields();
-      case "user-details":
-        return renderUserDetailsFields();
-      default:
-        return null;
+      if (!component.properties || Object.keys(defaultProperties).some(key => !(key in (component.properties || {})))) {
+        handleChange("properties", { 
+          ...defaultProperties,
+          ...(component.properties || {})
+        });
+      }
     }
-  };
+  }, [component.id, component.type]);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <PropertiesPanel elevation={0}>

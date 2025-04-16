@@ -30,7 +30,8 @@ import { Component } from "./types";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import { Description } from "@mui/icons-material";
-
+import { useSelector } from 'react-redux';
+import { RootState } from './store/index';
 const AppContainer = styled("div")({
   display: "flex",
   height: "100vh",
@@ -204,6 +205,7 @@ interface Screen {
 }
 
 function App() {
+const arr = [1 ,2  ,3 ]
   const [screens, setScreens] = useState<Screen[]>([
     {
       id: "WELCOME",
@@ -234,7 +236,16 @@ function App() {
   const [selectedScreenIndex, setSelectedScreenIndex] = useState<number | null>(
     null
   );
+  const options = useSelector((state: RootState) => state.option.arr);
 
+  useEffect(()=>{
+      console.log("Redux ", options);  
+  },[options])
+
+  
+
+
+  
   // Update JSON editor when screens change
   useEffect(() => {
     const jsonString = JSON.stringify(generateJson(), null, 2);
@@ -331,10 +342,11 @@ function App() {
             label: "",
             description: "",
             outputVariable: "",
-            options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
+            options: JSON.stringify(options),
             visible: true,
             required: false,
             enabled: true,
+            initValue: "",
           };
           break;
         case "PhotoPicker":
@@ -529,10 +541,11 @@ function App() {
           label: "",
           description:"",
           outputVariable: "",
-          options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
+          options: JSON.stringify(options),
           visible: true,
           required: false,
           enabled: true,
+          initValue: "",
         };
         break;
       case "drop-down":
@@ -784,12 +797,9 @@ function App() {
                     enabled: child.enabled || true,
                     required: child.required || false,
                     visible: child.visible || true,
+                    initValue: child.initValue || "",
                     options: JSON.stringify(
-                      child["data-source"]?.map((opt: any) => opt.title) || [
-                        "Option 1", 
-                        "Option 2", 
-                        "Option 3"
-                      ]
+                      child["data-source"]?.map((opt: any) => opt.title) || arr
                     ),
                   };
                   break;
@@ -1186,18 +1196,8 @@ function App() {
                       enabled,
                       required,
                       visible,
-                      "data-source": component.properties.options
-                        ? JSON.parse(component.properties.options).map(
-                            (option: string) => ({
-                              id: option.toLowerCase().replace(/\s+/g, "_"),
-                              title: option,
-                            })
-                          )
-                        : [
-                            { id: "option_1", title: "Option 1" },
-                            { id: "option_2", title: "Option 2" },
-                            { id: "option_3", title: "Option 3" },
-                          ],
+                      "init-value": component.properties.initValue || "",
+                      "data-source": options,
                     };
                   case "drop-down":
                     return {
