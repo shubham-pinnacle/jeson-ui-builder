@@ -368,7 +368,45 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             />
           </Box>
         );
-      
+        case 'embedded-link':
+          if (component.properties?.visible === 'false') return null;
+          const isNavigation = component.properties?.onClick === 'Navigate';
+          const linkStyle = {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center', // Center horizontally
+            gap: 1,
+            color: '#1976d2',
+            cursor: 'pointer',
+            textDecoration: 'none',
+            textAlign: 'center', // Center text
+            '&:hover': {
+              textDecoration: 'underline'
+            }
+          };
+        
+          return (
+            <Box 
+              sx={linkStyle}
+              onClick={() => {
+                if (isNavigation) {
+                  console.log('Navigate to screen:', component.properties?.screenName);
+                }
+              }}
+            >
+              <Typography>{component.properties?.text || 'Link'}</Typography>
+              <Box
+                component="span"
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  fontSize: '1.2em'
+                }}
+              >
+                {isNavigation ? '→' : '↗'}
+              </Box>
+            </Box>
+          );
       default:
         return null;
     }
