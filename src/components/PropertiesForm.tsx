@@ -1542,6 +1542,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
           justifyContent: "flex-start",
           mt: -0.4,
           marginX: "-11px",
+
         }}
       >
         <FormControlLabel
@@ -1561,7 +1562,15 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
 
       <Box sx={{ mt: 0.2 }}>{renderFields()}</Box>
     </PropertiesPanel>
+
   );
+
+
+
+
+
+
+
 };
 
 export default PropertiesForm;
