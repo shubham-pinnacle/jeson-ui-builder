@@ -506,21 +506,44 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
     }
   };
 
-  return (
-    <PreviewContainer>
-      <PreviewFrame>
-        <PreviewHeader>
-          <PreviewTitle>{screenTitle}</PreviewTitle>
-        </PreviewHeader>
-        <PreviewContent $hasFooter={!!footerComponent}>
-          {nonFooterComponents.map((component) => renderComponent(component))}
-        </PreviewContent>
-        {footerComponent && (
-          <FooterContainer>{renderComponent(footerComponent)}</FooterContainer>
-        )}
-      </PreviewFrame>
-    </PreviewContainer>
-  );
+  // return (
+  //   <PreviewContainer>
+  //     <PreviewFrame>
+  //       <PreviewHeader>
+  //         <PreviewTitle>{screenTitle}</PreviewTitle>
+  //       </PreviewHeader>
+  //       <PreviewContent $hasFooter={!!footerComponent}>
+  //         {nonFooterComponents.map((component) => renderComponent(component))}
+  //       </PreviewContent>
+  //       {footerComponent && (
+  //         <FooterContainer>{renderComponent(footerComponent)}</FooterContainer>
+  //       )}
+  //     </PreviewFrame>
+  //   </PreviewContainer>
+  // );
+
+  // In the return statement of MobilePreview component:
+return (
+  <PreviewContainer>
+    <PreviewFrame>
+      <PreviewHeader>
+        <PreviewTitle>{screenTitle}</PreviewTitle>
+      </PreviewHeader>
+      <PreviewContent $hasFooter={!!footerComponent}>
+        {nonFooterComponents.map((component) => (
+          <div key={component.id}> {/* Add key here */}
+            {renderComponent(component)}
+          </div>
+        ))}
+      </PreviewContent>
+      {footerComponent && (
+        <FooterContainer>
+          {renderComponent(footerComponent)}
+        </FooterContainer>
+      )}
+    </PreviewFrame>
+  </PreviewContainer>
+);
 };
 
 export default MobilePreview;

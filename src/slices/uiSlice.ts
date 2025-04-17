@@ -29,58 +29,89 @@ const uiSlice = createSlice({
     setSelectedComponent: (state, action: PayloadAction<ComponentType | null>) => {
       state.selectedComponent = action.payload;
     },
+    // setJsonOutput: (state, action: PayloadAction<string>) => {
+    //   try {
+    //     const parsed = JSON.parse(action.payload);
+    //     if (Array.isArray(parsed)) {
+    //       // Keep track of existing components that are not in the new JSON
+    //       const existingComponents = state.components;
+    //       const newComponentIds = parsed.map(comp => comp.id);
+    //       const missingComponents = existingComponents.filter(
+    //         comp => !newComponentIds.includes(comp.id) && comp.type === 'datepicker'
+    //       );
+
+    //       // Combine new components with preserved datepicker components
+    //       const updatedComponents = [...parsed];
+
+    //       // Add back any missing datepicker components
+    //       missingComponents.forEach(comp => {
+    //         if (!updatedComponents.find(c => c.id === comp.id)) {
+    //           updatedComponents.push(comp);
+    //         }
+    //       });
+
+    //       // Process each component
+    //       state.components = updatedComponents.map(newComp => {
+    //         if (newComp.type === 'datepicker') {
+    //           const defaultProps = {
+    //             label: '',
+    //             outputVariable: '',
+    //             initValue: '',
+    //             minDate: '',
+    //             maxDate: '',
+    //             unavailableDates: ''
+    //           };
+              
+    //           // Find existing component
+    //           const existingComp = existingComponents.find(comp => comp.id === newComp.id);
+              
+    //           return {
+    //             ...newComp,
+    //             properties: {
+    //               ...defaultProps,
+    //               ...(existingComp?.properties || {}),
+    //               ...(newComp.properties || {})
+    //             }
+    //           };
+    //         }
+    //         return newComp;
+    //       });
+
+    //       // Update JSON output to reflect the preserved components
+    //       state.jsonOutput = JSON.stringify(state.components, null, 2);
+    //     } else {
+    //       state.jsonOutput = action.payload;
+    //     }
+    //   } catch (e) {
+    //     console.error('Invalid JSON');
+    //   }
+    // },
+
     setJsonOutput: (state, action: PayloadAction<string>) => {
       try {
         const parsed = JSON.parse(action.payload);
         if (Array.isArray(parsed)) {
-          // Keep track of existing components that are not in the new JSON
-          const existingComponents = state.components;
-          const newComponentIds = parsed.map(comp => comp.id);
-          const missingComponents = existingComponents.filter(
-            comp => !newComponentIds.includes(comp.id) && comp.type === 'datepicker'
-          );
-
-          // Combine new components with preserved datepicker components
-          const updatedComponents = [...parsed];
-
-          // Add back any missing datepicker components
-          missingComponents.forEach(comp => {
-            if (!updatedComponents.find(c => c.id === comp.id)) {
-              updatedComponents.push(comp);
-            }
-          });
-
-          // Process each component
-          state.components = updatedComponents.map(newComp => {
-            if (newComp.type === 'datepicker') {
-              const defaultProps = {
-                label: '',
-                outputVariable: '',
-                initValue: '',
-                minDate: '',
-                maxDate: '',
-                unavailableDates: ''
-              };
-              
-              // Find existing component
-              const existingComp = existingComponents.find(comp => comp.id === newComp.id);
-              
+          // Create fresh components array while maintaining proper structure
+          state.components = parsed.map(comp => {
+            // For datepicker components, ensure they have all required properties
+            if (comp.type === 'date-picker') {
               return {
-                ...newComp,
+                ...comp,
                 properties: {
-                  ...defaultProps,
-                  ...(existingComp?.properties || {}),
-                  ...(newComp.properties || {})
+                  label: comp.properties?.label || '',
+                  name: comp.properties?.name || `date_field_${Date.now()}`,
+                  initValue: comp.properties?.initValue || new Date().toISOString().split('T')[0],
+                  visible: comp.properties?.visible !== false,
+                  minDate: comp.properties?.minDate || '',
+                  maxDate: comp.properties?.maxDate || '',
+                  disabled: comp.properties?.disabled || false
                 }
               };
             }
-            return newComp;
+            return comp;
           });
-
-          // Update JSON output to reflect the preserved components
+          
           state.jsonOutput = JSON.stringify(state.components, null, 2);
-        } else {
-          state.jsonOutput = action.payload;
         }
       } catch (e) {
         console.error('Invalid JSON');

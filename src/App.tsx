@@ -557,6 +557,18 @@ function App() {
           screenName: "",
         };
         break;
+        case "date-picker":
+          newComponent.properties = {
+            label: "",
+            name: `date_field_${Date.now()}`,
+            required: false,
+            initValue: new Date().toISOString().split('T')[0], 
+            visible: true,
+            minDate: "", 
+            maxDate: "",
+            disabled: false
+          };
+          break;
     }
 
     const updatedScreens = [...screens];
