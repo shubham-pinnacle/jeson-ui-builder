@@ -398,6 +398,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
           </StyledFormControl>
         );
       case "image":
+        
         return (
           <Box
             sx={{ width: "100%", display: "flex", justifyContent: "center" }}
@@ -459,6 +460,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
             </Box>
           );
       case "date-picker":
+        if (component.properties?.visible === 'false') return null;
         const formatDate = (date: string | number | Date) => {
           const d = new Date(date);
           const year = d.getFullYear();
