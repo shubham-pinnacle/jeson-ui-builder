@@ -125,7 +125,7 @@ const components = {
     { id: 'if-else', name: 'If-Else', icon: VscSymbolClass },
     { id: 'switch', name: 'Switch', icon: RiSwitchLine },
     { id: 'date-picker', name: 'Date Picker', icon: AiOutlineCalendar },
-    { id: 'user-details', name: 'User Details', icon: RiUserLine },
+    //{ id: 'user-details', name: 'User Details', icon: RiUserLine },
   ],
 };
 
