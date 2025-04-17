@@ -8,7 +8,7 @@ import { BiImageAlt, BiImage } from 'react-icons/bi';
 import { AiOutlineLink, AiOutlineCalendar } from 'react-icons/ai';
 import { VscSymbolClass } from 'react-icons/vsc';
 import { RiUserLine, RiSwitchLine } from 'react-icons/ri';
-import { Component } from '../types';
+import { Component } from '../../types';
 import { Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import Grid from '@mui/material/Grid';

@@ -309,46 +309,6 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             </FormGroup>
           </StyledFormControl>
         );
-        case 'embedded-link':
-          if (component.properties?.visible === 'false') return null;
-          const isNavigation = component.properties?.onClick === 'Navigate';
-          const linkStyle = {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center', // Center horizontally
-            gap: 1,
-            color: '#1976d2',
-            cursor: 'pointer',
-            textDecoration: 'none',
-            textAlign: 'center', // Center text
-            '&:hover': {
-              textDecoration: 'underline'
-            }
-          };
-        
-          return (
-            <Box 
-              sx={linkStyle}
-              onClick={() => {
-                if (isNavigation) {
-                  console.log('Navigate to screen:', component.properties?.screenName);
-                }
-              }}
-            >
-              <Typography>{component.properties?.text || 'Link'}</Typography>
-              <Box
-                component="span"
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  fontSize: '1.2em'
-                }}
-              >
-                {isNavigation ? '→' : '↗'}
-              </Box>
-            </Box>
-          );
-        
       case 'footer-button':
         return (
           <Button
@@ -358,44 +318,19 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             fullWidth
             style={{
               textTransform: 'none',
-              marginTop: '8px',
-              marginBottom: '6px'
+              marginTop: '8px'
             }}
           >
-            {component.properties?.buttonText || 'Submit'}
+            {component.properties?.label || 'Button'}
           </Button>
         );
       case 'opt-in':
-        if (component.properties?.visible === 'false') return null;
         return (
-          <Box key={component.id} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={component.properties?.initValue === 'true'}
-                  required={component.properties?.required === 'true'}
-                />
-              }
-              label={component.properties?.label || ''}
-            />
-            {component.properties?.onClick === 'navigate' && (
-              <Box
-                component="span"
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  fontSize: '1.2em',
-                  color: '#1976d2',
-                  cursor: 'pointer'
-                }}
-                onClick={() => {
-                  console.log('Navigate to screen:', component.properties?.screenName);
-                }}
-              >
-                →
-              </Box>
-            )}
-          </Box>
+          <FormControlLabel
+            key={component.id}
+            control={<Checkbox required={component.properties?.required === 'true'} />}
+            label={component.properties?.label || 'I agree'}
+          />
         );
       case 'PhotoPicker':
       case 'DocumentPicker':
@@ -433,6 +368,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             />
           </Box>
         );
+      
       default:
         return null;
     }
@@ -444,13 +380,9 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
         <PreviewHeader>
           <PreviewTitle>{screenTitle}</PreviewTitle>
         </PreviewHeader>
-        <Box sx={{ flex: 1, padding: 2, overflowY: 'auto' }}>
-          {nonFooterComponents.map(component => (
-            <React.Fragment key={component.id}>
-              {renderComponent(component)}
-            </React.Fragment>
-          ))}
-        </Box>
+        <PreviewContent $hasFooter={!!footerComponent}>
+          {nonFooterComponents.map(component => renderComponent(component))}
+        </PreviewContent>
         {footerComponent && (
           <FooterContainer>
             {renderComponent(footerComponent)}

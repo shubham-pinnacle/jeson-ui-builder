@@ -1,8 +1,8 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
-import { Component } from '../types';
-import PropertiesForm from './PropertiesForm';
+import { Component } from '../../types';
+import PropertiesForm from '../PropertiesForm';
 import { DropResult } from 'react-beautiful-dnd';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
