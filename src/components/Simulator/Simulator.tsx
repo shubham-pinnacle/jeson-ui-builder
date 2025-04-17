@@ -194,12 +194,12 @@ const Caption = styled.p`
   margin: 0;
 `;
 
-interface MobilePreviewProps {
+interface SimulatorProps {
   components: Component[];
   screenTitle: string;
 }
 
-const MobilePreview: React.FC<MobilePreviewProps> = ({
+const Simulator: React.FC<SimulatorProps> = ({
   components,
   screenTitle,
 }) => {
@@ -523,4 +523,4 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
   );
 };
 
-export default MobilePreview;
+export default Simulator;

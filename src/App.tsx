@@ -23,7 +23,7 @@ import DeleteIcon from "@mui/icons-material/Close";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Builder from "./components/Builder/Builder";
-import MobilePreview from "./components/Preview/MobilePreview";
+import Simulator from "./components/Simulator/Simulator";
 import MetaJsonGenerator from "./components/MetaJsonGenerator";
 import ScreenDialog from "./components/ScreenDialog";
 import { Component } from "./types";
@@ -1730,7 +1730,7 @@ function App() {
             </MetaJsonGeneratorContainer>
           </JsonEditorContainer>
           <PreviewContainer isVisible={showPreview}>
-            <MobilePreview
+            <Simulator
               components={screens[activeScreenIndex].components}
               screenTitle={screens[activeScreenIndex].title}
             />
