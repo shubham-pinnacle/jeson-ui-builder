@@ -228,31 +228,36 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
     };
 
     switch (component.type) {
-      case "text-heading":
+      case 'text-heading':
+        if (component.properties?.visible === 'false') return null;
         return (
           <Typography variant="h4" sx={{ fontWeight: "bold" }}>
             {component.properties.text}
           </Typography>
         );
-      case "sub-heading":
+      case 'sub-heading':
+        if (component.properties?.visible === 'false') return null;
         return (
           <Typography variant="h6" sx={{ color: "#666" }}>
             {component.properties.text}
           </Typography>
         );
-      case "text-body":
+      case 'text-body':
+        if (component.properties?.visible === 'false') return null;
         return (
           <Typography variant="body1" sx={{ color: "#333" }}>
             {component.properties.text}
           </Typography>
         );
-      case "text-caption":
+      case 'text-caption':
+        if (component.properties?.visible === 'false') return null;
         return (
           <Typography variant="caption" sx={{ color: "#999" }}>
             {component.properties.text}
           </Typography>
         );
-      case "text-input":
+      case 'text-input':
+        if (component.properties?.visible === 'false') return null;
         return (
           <Box sx={{ width: "100%" }}>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
@@ -268,7 +273,8 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
             />
           </Box>
         );
-      case "text-area":
+      case 'text-area':
+        if (component.properties?.visible === 'false') return null;
         return (
           <Box sx={{ width: "100%" }}>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
@@ -284,7 +290,8 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
             />
           </Box>
         );
-      case "drop-down":
+      case 'drop-down':
+        if (component.properties?.visible === 'false') return null;
         return (
           <StyledFormControl key={component.id}>
             <InputLabel>{component.properties?.label || "Select"}</InputLabel>
@@ -306,7 +313,8 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
             </Select>
           </StyledFormControl>
         );
-      case "radio-button":
+      case 'radio-button':
+        if (component.properties?.visible === 'false') return null;
         return (
           <StyledFormControl key={`${component.id}_radio`}>
             <FormLabel>{component.properties?.label || "Options"}</FormLabel>
@@ -324,7 +332,8 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
             </RadioGroup>
           </StyledFormControl>
         );
-      case "check-box":
+      case 'check-box':
+        if (component.properties?.visible === 'false') return null;
         return (
           <StyledFormControl key={`${component.id}_checkbox`}>
             <FormLabel>{component.properties?.label || "Options"}</FormLabel>
@@ -356,7 +365,8 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
             {component.properties?.buttonText || 'Button'}
           </Button>
         );
-      case "opt-in":
+      case 'opt-in':
+        if (component.properties?.visible === 'false') return null;
         return (
           <FormControlLabel
             key={component.id}
@@ -366,8 +376,9 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
             label={component.properties?.label || "I agree"}
           />
         );
-      case "PhotoPicker":
-      case "DocumentPicker":
+      case 'PhotoPicker':
+      case 'DocumentPicker':
+        if (component.properties?.visible === 'false') return null;
         return (
           <StyledFormControl key={component.id}>
             <FormLabel>
