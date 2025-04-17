@@ -321,7 +321,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
               marginTop: '8px'
             }}
           >
-            {component.properties?.label || 'Button'}
+            {component.properties?.buttonText || 'Button'}
           </Button>
         );
       case 'opt-in':
