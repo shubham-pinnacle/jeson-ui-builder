@@ -1445,7 +1445,7 @@ function App() {
                       name: "date",
                       // "output-variable":
                       //   component.properties.outputVariable || "",
-                      // "init-value": component.properties.initValue || "",
+                      "init-value": component.properties.initValue || "",
                       required: component.properties.required === "false" ||
                       component.properties?.required === false
                         ? false

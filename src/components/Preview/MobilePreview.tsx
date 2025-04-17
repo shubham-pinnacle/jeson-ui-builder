@@ -469,7 +469,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({
           return `${year}-${month}-${day}`;
         };
 
-        const rawDate = component.properties?.value;
+        const rawDate = component.properties?.initValue;
         const currentDate = rawDate
           ? formatDate(rawDate)
           : formatDate(new Date());
