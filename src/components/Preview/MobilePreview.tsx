@@ -368,6 +368,7 @@ const MobilePreview: React.FC<MobilePreviewProps> = ({ components, screenTitle }
             />
           </Box>
         );
+      
       default:
         return null;
     }
