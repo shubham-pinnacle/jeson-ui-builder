@@ -1197,7 +1197,7 @@ const arr = [1 ,2  ,3 ]
                         next: {
                           type: "screen",
                           name: component.properties?.screenName || ""
-                        } 
+                        }
                       } : component.properties?.onClick === "open_url" ? {
                         name: "open_url",
                         url: component.properties?.url || ""
