@@ -1483,7 +1483,7 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
       case "drop-down":
         return renderSelectFields();
       case "footer-button":
-      case "embedded-link":
+      // case "embedded-link":
         return renderButtonFields();
       case "opt-in":
         return renderOptInFields();
