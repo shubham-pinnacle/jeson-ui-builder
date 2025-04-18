@@ -1,7 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-
-import { Component } from '../../types';
 import { Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import Grid from '@mui/material/Grid';
@@ -13,13 +11,6 @@ const FlowNameContainer = styled.div`
   align-items: center; /* Centers content vertically */
   // border: 1px solid #ccc;
   background-color:#eee;
-  padding: 10px;
-  border-radius: 5px;
-`;
-
-
-const ComponentsContainer = styled.div`
-  border: 1px solid #ccc;
   padding: 10px;
   border-radius: 5px;
 `;
@@ -46,7 +37,6 @@ const SidebarContainer = styled.div`
     display: none;
   }
 `;
-
 
 const SectionTitle = styled.h2`
   font-size: 16px;
@@ -88,8 +78,6 @@ const ComponentName = styled.span`
   font-weight: bold;
 `;
 
-
-
 interface SidebarProps {
   onAddComponent: (componentType: string) => void;
 }
@@ -126,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddComponent }) => {
         <div key={section}>
           <SectionTitle>{section.split(/(?=[A-Z])/).join(' ')}</SectionTitle>
           <ComponentsGrid>
-            {items.map((item) => (
+            {items.map((item: any) => (
               <ComponentCard
                 key={item.id}
                 onClick={() => handleComponentClick(item.id)}
