@@ -31,7 +31,6 @@ import { BiImageAlt } from "react-icons/bi";
 import Autocomplete from "@mui/material/Autocomplete";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
-
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -39,7 +38,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format } from "date-fns";
 import { parseISO } from "date-fns";
 import { useDispatch, useSelector } from 'react-redux';
-import { updateOption } from '../slices/optionSlice';
+import { updateOption } from  "../../slices/optionSlice";
 import { RootState } from '../store';
 import Popper from '@mui/material/Popper';
 
