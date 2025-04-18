@@ -22,8 +22,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddComponent }) => {
   };
 
   return (
-    <SidebarContainer>
-      <FlowNameContainer>
+    <SidebarContainer >
+      <FlowNameContainer >
         <b>Flow Name</b>
         <Grid ml={1}>
           <EditIcon sx={{ fontSize: "14px", color: "primary.main" }} />

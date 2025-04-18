@@ -9,6 +9,7 @@ export const FlowNameContainer = styled.div`
   background-color:#eee;
   padding: 10px;
   border-radius: 5px;
+
 `;
 
 export const SidebarContainer = styled.div`
@@ -17,7 +18,7 @@ export const SidebarContainer = styled.div`
   gap: 10px;
   width: 300px;
   background: white;
-  height: 100vh;
+  height: 100%;
   padding: 20px;
   border-right: 0.5px solid #ffff;
   overflow-y: scroll; /* Still allow scrolling */
