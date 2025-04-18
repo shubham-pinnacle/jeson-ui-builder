@@ -1,8 +1,5 @@
 import React from 'react';
-import { Component } from '../types';
-import {
-  Box,
-} from '@mui/material';
+import { Component } from '../../types';
 
 import {
   PreviewContainer,
