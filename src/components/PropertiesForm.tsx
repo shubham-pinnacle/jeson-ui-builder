@@ -40,7 +40,20 @@ import { format } from "date-fns";
 import { parseISO } from "date-fns";
 import { useDispatch, useSelector } from 'react-redux';
 import { updateOption } from '../slices/optionSlice';
+import { RootState } from '../store';
+import Popper from '@mui/material/Popper';
 
+const StyledPopper = styled(Popper)(({ theme }) => ({
+  '& .MuiAutocomplete-listbox': {
+    maxHeight: '350px',
+    overflowY: 'auto',
+    overflowX: 'auto',
+    scrollbarWidth: 'none', // Firefox
+    '&::-webkit-scrollbar': {
+      display: 'none', // Chrome, Safari, Edge
+    },
+  },
+}));
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
@@ -1187,46 +1200,48 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
         </Select>
       </FormControl>
       
+
       <Autocomplete
-          multiple
-          fullWidth
-          size="small"
-          options={top100Films}
-          disableCloseOnSelect
-          value={
-            top100Films.filter((film) =>
-              component.properties?.allowedMimeTypes?.includes(film.title)
-            ) || []
-          }
-          onChange={(event, newValue) => {
-            const selectedTitles = newValue.map((item) => item.title);
-            handleChange("allowedMimeTypes", selectedTitles); // 
-          }}
-          getOptionLabel={(option) => option.title}
-          renderOption={(props, option, { selected }) => {
-            const { key, ...optionProps } = props;
-            return (
-              <li key={key} {...optionProps}>
-                <Checkbox
-                  icon={icon}
-                  checkedIcon={checkedIcon}
-                  style={{ marginRight: 8 }}
-                  checked={selected}
-                />
-                {option.title}
-              </li>
-            );
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Allowed Meme Types (Optional)"
-              placeholder="Select allowed types"
-              fullWidth
-              size="small"
-            />
-          )}
+  multiple
+  fullWidth
+  size="small"
+  options={top100Films}
+  disableCloseOnSelect
+  value={
+    top100Films.filter((film) =>
+      component.properties?.allowedMimeTypes?.includes(film.title)
+    ) || []
+  }
+  onChange={(event, newValue) => {
+    const selectedTitles = newValue.map((item) => item.title);
+    handleChange("allowedMimeTypes", selectedTitles);
+  }}
+  getOptionLabel={(option) => option.title}
+  PopperComponent={StyledPopper}
+  renderOption={(props, option, { selected }) => {
+    const { key, ...optionProps } = props;
+    return (
+      <li key={key} {...optionProps}>
+        <Checkbox
+          icon={icon}
+          checkedIcon={checkedIcon}
+          style={{ marginRight: 8 }}
+          checked={selected}
         />
+        {option.title}
+      </li>
+    );
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Allowed Meme Types (Optional)"
+      placeholder="Select allowed types"
+      fullWidth
+      size="small"
+    />
+  )}
+/>
 
 
       
