@@ -14,7 +14,7 @@ const SimulatorDropDown: React.FC<Props> = ({ component }) => {
 
   return (
     <StyledFormControl>
-      <InputLabel>{label}</InputLabel>
+      <InputLabel>{label} {(component.properties?.required === 'true') && "*" }</InputLabel>
       <Select label={label} required={required} defaultValue="">
         <MenuItem value="">{placeholder}</MenuItem>
         {options.map(opt => (

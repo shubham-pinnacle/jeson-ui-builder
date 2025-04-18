@@ -12,8 +12,8 @@ const SimulatorRadioButton: React.FC<Props> = ({ component }) => {
 
   return (
     <StyledFormControl>
-      <FormLabel>{label}</FormLabel>
-      <RadioGroup>
+      <FormLabel>{label} {(component.properties?.required === 'true') && "*" }</FormLabel>
+      <RadioGroup >
         {options.map((opt, idx) => (
           <FormControlLabel
             key={`${opt}-${idx}`}
