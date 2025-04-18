@@ -16,6 +16,7 @@ const BuilderContainer = styled('div')({
   display: 'flex',
   height: '100%',
   overflow: 'hidden',
+  
 });
 
 const BuildArea = styled('div')({
@@ -217,7 +218,7 @@ const Builder: React.FC<BuilderProps> = ({
 
   return (
     <BuilderContainer>
-      <BuildArea>
+      <BuildArea sx={{ mb:15 }}>
         <Droppable droppableId="builder">
           {(provided, snapshot) => (
             <ComponentsList
