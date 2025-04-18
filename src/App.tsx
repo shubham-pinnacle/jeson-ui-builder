@@ -28,10 +28,7 @@ import MetaJsonGenerator from "./components/MetaJsonGenerator";
 import ScreenDialog from "./components/ScreenDialog";
 import { Component } from "./types";
 import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import { Description } from "@mui/icons-material";
-import
-{ useSelector } from 'react-redux';
+import{ useSelector } from 'react-redux';
 import { RootState } from './store/index';
 
 
