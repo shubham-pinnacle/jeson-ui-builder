@@ -1,17 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FaHeading, FaAlignLeft, FaParagraph, FaFont } from 'react-icons/fa';
-import { BsTextareaResize, BsInputCursorText } from 'react-icons/bs';
-import { MdRadioButtonChecked, MdCheckBox } from 'react-icons/md';
-import { IoMdArrowDropdown } from 'react-icons/io';
-import { BiImageAlt, BiImage } from 'react-icons/bi';
-import { AiOutlineLink, AiOutlineCalendar } from 'react-icons/ai';
-import { VscSymbolClass } from 'react-icons/vsc';
-import { RiUserLine, RiSwitchLine } from 'react-icons/ri';
-import { Component } from '../../types';
 import { Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import Grid from '@mui/material/Grid';
+import SidebarComponents from './SidebarComponents'
 
 const FlowNameContainer = styled.div`
   display: flex;
@@ -19,13 +11,6 @@ const FlowNameContainer = styled.div`
   align-items: center; /* Centers content vertically */
   // border: 1px solid #ccc;
   background-color:#eee;
-  padding: 10px;
-  border-radius: 5px;
-`;
-
-
-const ComponentsContainer = styled.div`
-  border: 1px solid #ccc;
   padding: 10px;
   border-radius: 5px;
 `;
@@ -52,7 +37,6 @@ const SidebarContainer = styled.div`
     display: none;
   }
 `;
-
 
 const SectionTitle = styled.h2`
   font-size: 16px;
@@ -94,41 +78,6 @@ const ComponentName = styled.span`
   font-weight: bold;
 `;
 
-const components = {
-  BasicText: [
-    { id: 'text-heading', name: 'Text Heading', icon: FaHeading },
-    { id: 'sub-heading', name: 'Sub Heading', icon: FaFont },
-    { id: 'text-body', name: 'Text Body', icon: FaAlignLeft },
-    { id: 'text-caption', name: 'Text Caption', icon: FaParagraph },
-    { id: 'rich-text', name: 'Rich Text', icon: FaFont },
-  ],
-  TextEntry: [
-    { id: 'text-input', name: 'Text Input', icon: BsInputCursorText },
-    { id: 'text-area', name: 'Text Area', icon: BsTextareaResize },
-  ],
-  SelectControls: [
-    { id: 'radio-button', name: 'Radio Button', icon: MdRadioButtonChecked },
-    { id: 'check-box', name: 'Check Box', icon: MdCheckBox },
-    { id: 'drop-down', name: 'Drop Down', icon: IoMdArrowDropdown },
-  ],
-  Buttons: [
-    { id: 'footer-button', name: 'Footer Button', icon: AiOutlineLink },
-    { id: 'embedded-link', name: 'Embedded Link', icon: AiOutlineLink },
-    { id: 'opt-in', name: 'Opt In', icon: MdCheckBox },
-  ],
-  MediaInput: [
-    { id: 'PhotoPicker', name: 'Photo', icon: BiImageAlt },
-    { id: 'DocumentPicker', name: 'Document', icon: BiImageAlt },
-    { id: 'image', name: 'Image', icon: BiImage },
-  ],
-  AdvancedControls: [
-    { id: 'if-else', name: 'If-Else', icon: VscSymbolClass },
-    { id: 'switch', name: 'Switch', icon: RiSwitchLine },
-    { id: 'date-picker', name: 'Date Picker', icon: AiOutlineCalendar },
-    //{ id: 'user-details', name: 'User Details', icon: RiUserLine },
-  ],
-};
-
 interface SidebarProps {
   onAddComponent: (componentType: string) => void;
 }
@@ -161,11 +110,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddComponent }) => {
 
         </Grid>
       </FlowNameContainer>
-      {Object.entries(components).map(([section, items]) => (
+      {Object.entries(SidebarComponents).map(([section, items]) => (
         <div key={section}>
           <SectionTitle>{section.split(/(?=[A-Z])/).join(' ')}</SectionTitle>
           <ComponentsGrid>
-            {items.map((item) => (
+            {items.map((item: any) => (
               <ComponentCard
                 key={item.id}
                 onClick={() => handleComponentClick(item.id)}
