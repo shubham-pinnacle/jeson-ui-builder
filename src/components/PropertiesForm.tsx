@@ -40,9 +40,6 @@ import { format } from "date-fns";
 import { parseISO } from "date-fns";
 import { useDispatch, useSelector } from 'react-redux';
 import { updateOption } from '../slices/optionSlice';
-import { RootState } from '../store';
-
-
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;

@@ -6,8 +6,6 @@ import PropertiesForm from '../PropertiesForm';
 import { DropResult } from 'react-beautiful-dnd';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
-import { Box, Typography, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
 
 interface StyledProps {
   $isSelected?: boolean;
