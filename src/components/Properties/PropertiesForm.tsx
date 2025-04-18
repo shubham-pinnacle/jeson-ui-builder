@@ -41,6 +41,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateOption } from  "../../slices/optionSlice";
 import { RootState } from '../store';
 import Popper from '@mui/material/Popper';
+import AllowedMimeTypes from './AllowedMimeTypes'
 
 const StyledPopper = styled(Popper)(({ theme }) => ({
   '& .MuiAutocomplete-listbox': {
@@ -57,31 +58,7 @@ const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 
-const top100Films = [
-  { title: "application/gzip" },
-  { title: "application/msword" },
-  { title: "application/pdf" },
-  { title: "application/vnd.ms-powerpoint" },
-  { title: "application/vnd.oasis.opendocument.presentation" },
-  { title: "application/vnd.oasis.opendocument.spreadsheet" },
-  { title: "application/vnd.oasis.opendocument.text" },
-  { title: "application/vnd.openxmlformats-officedocument.presentationml.presentation" },
-  { title: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
-  { title: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
-  { title: "application/x-7z-compressed" },
-  { title: "application/zip" },
-  { title: "image/avif" },
-  { title: "image/gif" },
-  { title: "image/heic" },
-  { title: "image/heif" },
-  { title: "image/jpeg" },
-  { title: "image/png" },
-  { title: "image/tiff" },
-  { title: "image/webp" },
-  { title: "text/plain" },
-  { title: "video/mp4" },
-  { title: "video/mpeg" }
-];
+
 const PropertyOptions = [
   { title: "id" },
   { title: "description" },
@@ -1204,10 +1181,10 @@ const PropertiesForm: React.FC<PropertiesFormProps> = ({
   multiple
   fullWidth
   size="small"
-  options={top100Films}
+  options={AllowedMimeTypes}
   disableCloseOnSelect
   value={
-    top100Films.filter((film) =>
+    AllowedMimeTypes.filter((film) =>
       component.properties?.allowedMimeTypes?.includes(film.title)
     ) || []
   }
