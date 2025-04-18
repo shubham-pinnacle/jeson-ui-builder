@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ComponentType, UIState } from '../types';
+import { ComponentType, UIState } from "../types/index";
 
 const initialState: UIState = {
   components: [],
