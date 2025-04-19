@@ -12,7 +12,7 @@ const SimulatorCheckBoxGroup: React.FC<Props> = ({ component }) => {
 
   return (
     <StyledFormControl>
-      <FormLabel>{label}</FormLabel>
+      <FormLabel>{label} {(component.properties?.required === 'true') && "*" }</FormLabel>
       <FormGroup>
         {options.map((opt, idx) => (
           <FormControlLabel

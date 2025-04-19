@@ -20,6 +20,7 @@ const SimulatorDatePicker: React.FC<Props> = ({ component }) => {
       type="text"
       label={component.properties?.label || 'Select Date'}
       variant="outlined"
+      required= {component.properties?.required === 'true'}
       fullWidth
       InputLabelProps={{ shrink: true }}
       inputProps={{ pattern: '\\d{4}-\\d{2}-\\d{2}', placeholder: 'YYYY-MM-DD' }}
