@@ -318,8 +318,8 @@ useEffect(()=>{
             initValue: "",
             helperText: "",
             visible: true,
-            maxLength: 0,
-            enabled: false,
+            maxLength: 600,
+            enabled: null,
           };
           break;
         case "check-box":
@@ -517,8 +517,8 @@ useEffect(()=>{
           initValue: "",
           helperText: "",
           visible: true,
-          maxLength: 0,
-          enabled: false,
+          maxLength: 600,
+          enabled: null,
         };
         break;
       case "check-box":
@@ -754,8 +754,8 @@ useEffect(()=>{
                     visible: child.visible || true,
                     maxLength: child['max-length'] !== undefined
                       ? Number(child['max-length'])
-                      : 0,
-                    enabled: child.enabled || false
+                      : 600,
+                    enabled: child.enabled || null
                   };
                   break;
                 case "CheckboxGroup":
@@ -1086,6 +1086,7 @@ useEffect(()=>{
                     : true;
 
                 const enabled =
+                  component.properties?.enabled === null ? null : 
                   component.properties?.enabled === "false" ||
                   component.properties?.enabled === false
                     ? false
@@ -1173,8 +1174,12 @@ useEffect(()=>{
                       type: "TextArea",
                       name: component.properties.outputVariable || "",
                       label: component.properties.label || "",
-                      "init-value": component.properties.initValue || "",
-                      "helper-text": component.properties.helperText || "",
+                      ...(component.properties?.initValue
+                        ? { "init-value": component.properties.initValue }
+                        : {}),
+                      ...(component.properties?.helperText
+                        ? { "helper-text": component.properties.helperText }
+                        : {}),
                       visible,
                       ...(component.properties?.required
                         ? { "required": required }
@@ -1183,7 +1188,9 @@ useEffect(()=>{
                         component.properties.maxLength !== undefined
                           ? Number(component.properties.maxLength)
                           : 0,
-                      enabled,
+                      ...(component.properties?.enabled
+                        ? { "enabled": enabled }
+                        : {}),
                     };
                   case "check-box":
                     return {

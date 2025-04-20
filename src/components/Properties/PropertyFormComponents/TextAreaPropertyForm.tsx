@@ -39,7 +39,7 @@ export default function TextAreaPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Required (Optional)</InputLabel>
         <Select
-          value={component.properties?.required || "false"}
+          value={component.properties?.required || null}
           onChange={(e) => handleChange("required", e.target.value)}
           label="Required (Optional)"
         >
@@ -60,7 +60,19 @@ export default function TextAreaPropertyForm({
         </Select>
       </FormControl>
 
-    
+
+      <FormControl fullWidth size="small">
+        <InputLabel>Enabled (Optional)</InputLabel>
+        <Select
+          value={component.properties?.enabled || null}
+          onChange={(e) => handleChange("enabled", e.target.value)}
+          label="Enabled (Optional)"
+        >
+          <MenuItem value="true">True</MenuItem>
+          <MenuItem value="false">False</MenuItem>
+        </Select>
+      </FormControl>
+
       <TextField
         label="Max-Length (Optional)"
         type="number"
