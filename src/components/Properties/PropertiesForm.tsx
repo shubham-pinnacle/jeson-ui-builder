@@ -31,7 +31,7 @@ import TextAreaPropertyForm from './PropertyFormComponents/TextAreaPropertyForm'
 import SelectFields           from "./PropertyFormComponents/SelectFields";
 import RadioFields            from "./PropertyFormComponents/RadioFields";
 import FooterButtonPropertyForm from "./PropertyFormComponents/FooterButtonPropertyForm";
-import OptInFields            from "./PropertyFormComponents/OptInFields";
+import OptInPropertyForm from "./PropertyFormComponents/OptInPropertyForm";
 import PhotoFields            from "./PropertyFormComponents/PhotoFields";
 import DocumentFields         from "./PropertyFormComponents/DocumentFields";
 import ImageFields            from "./PropertyFormComponents/ImageFields";
@@ -61,7 +61,7 @@ const fieldComponentMap: Record<string, React.FC<any>> = {
   "drop-down":     SelectFields,
   "radio-button":  RadioFields,
   "footer-button": FooterButtonPropertyForm,
-  "opt-in":        OptInFields,
+  "opt-in":        OptInPropertyForm,
   PhotoPicker:     PhotoFields,
   DocumentPicker:  DocumentFields,
   image:           ImageFields,
@@ -1925,91 +1925,91 @@ export default PropertiesForm;
 //     );
 //   };
 
-//   const renderOptInFields = () => {
-//     return (
-//       <Stack spacing={2}>
-//         <TextField
-//           label="Label"
-//           fullWidth
-//           value={component.properties?.label || ""}
-//           onChange={(e) => handleChange("label", e.target.value)}
-//           size="small"
-//         />
-//         <FormControl fullWidth size="small">
-//           <InputLabel>Required</InputLabel>
-//           <Select
-//             value={component.properties?.required || "false"}
-//             onChange={(e) => handleChange("required", e.target.value)}
-//             label="Required"
-//           >
-//             <MenuItem value="true">True</MenuItem>
-//             <MenuItem value="false">False</MenuItem>
-//           </Select>
-//         </FormControl>
-//         <FormControl fullWidth size="small">
-//           <InputLabel>Visible</InputLabel>
-//           <Select
-//             value={component.properties?.visible || "true"}
-//             onChange={(e) => handleChange("visible", e.target.value)}
-//             label="Visible"
-//           >
-//             <MenuItem value="true">True</MenuItem>
-//             <MenuItem value="false">False</MenuItem>
-//           </Select>
-//         </FormControl>
-//         <FormControl fullWidth size="small">
-//           <InputLabel>Init Value</InputLabel>
-//           <Select
-//             value={component.properties?.initValue || "false"}
-//             onChange={(e) => handleChange("initValue", e.target.value)}
-//             label="Init Value"
-//           >
-//             <MenuItem value="true">True</MenuItem>
-//             <MenuItem value="false">False</MenuItem>
-//           </Select>
-//         </FormControl>
-//         <FormControl fullWidth size="small">
-//           <InputLabel>On Click Action</InputLabel>
-//           <Select
-//             value={component.properties?.onClick || ""}
-//             onChange={(e) => handleChange("onClick", e.target.value)}
-//             label="On Click Action"
-//           >
-//             <MenuItem value="navigate">Navigate</MenuItem>
-//             <MenuItem value="dataexchange">Data Exchange</MenuItem>
-//             <MenuItem value="open_url">Open URL</MenuItem>
-//             <MenuItem value="none">None</MenuItem>
-//           </Select>
-//         </FormControl>
-//         {component.properties?.onClick === "navigate" && (
-//           <FormControl fullWidth size="small">
-//             <InputLabel>Screen Name</InputLabel>
-//             <Select
-//               value={component.properties?.screenName || ""}
-//               onChange={(e) => handleChange("screenName", e.target.value)}
-//               label="Screen Name"
-//             >
-//               {screens.map((screen) => (
-//                 <MenuItem key={screen.id} value={screen.title}>
-//                   {screen.title}
-//                 </MenuItem>
-//               ))}
-//             </Select>
-//           </FormControl>
-//         )}
-//         {component.properties?.onClick === "open_url" && (
-//           <TextField
-//             label="URL"
-//             fullWidth
-//             required
-//             value={component.properties?.url || ""}
-//             onChange={(e) => handleChange("url", e.target.value)}
-//             size="small"
-//           />
-//         )}
-//       </Stack>
-//     );
-//   };
+  // const renderOptInFields = () => {
+  //   return (
+  //     <Stack spacing={2}>
+  //       <TextField
+  //         label="Label"
+  //         fullWidth
+  //         value={component.properties?.label || ""}
+  //         onChange={(e) => handleChange("label", e.target.value)}
+  //         size="small"
+  //       />
+  //       <FormControl fullWidth size="small">
+  //         <InputLabel>Required</InputLabel>
+  //         <Select
+  //           value={component.properties?.required || "false"}
+  //           onChange={(e) => handleChange("required", e.target.value)}
+  //           label="Required"
+  //         >
+  //           <MenuItem value="true">True</MenuItem>
+  //           <MenuItem value="false">False</MenuItem>
+  //         </Select>
+  //       </FormControl>
+  //       <FormControl fullWidth size="small">
+  //         <InputLabel>Visible</InputLabel>
+  //         <Select
+  //           value={component.properties?.visible || "true"}
+  //           onChange={(e) => handleChange("visible", e.target.value)}
+  //           label="Visible"
+  //         >
+  //           <MenuItem value="true">True</MenuItem>
+  //           <MenuItem value="false">False</MenuItem>
+  //         </Select>
+  //       </FormControl>
+  //       <FormControl fullWidth size="small">
+  //         <InputLabel>Init Value</InputLabel>
+  //         <Select
+  //           value={component.properties?.initValue || "false"}
+  //           onChange={(e) => handleChange("initValue", e.target.value)}
+  //           label="Init Value"
+  //         >
+  //           <MenuItem value="true">True</MenuItem>
+  //           <MenuItem value="false">False</MenuItem>
+  //         </Select>
+  //       </FormControl>
+  //       <FormControl fullWidth size="small">
+  //         <InputLabel>On Click Action</InputLabel>
+  //         <Select
+  //           value={component.properties?.onClick || ""}
+  //           onChange={(e) => handleChange("onClick", e.target.value)}
+  //           label="On Click Action"
+  //         >
+  //           <MenuItem value="navigate">Navigate</MenuItem>
+  //           <MenuItem value="dataexchange">Data Exchange</MenuItem>
+  //           <MenuItem value="open_url">Open URL</MenuItem>
+  //           <MenuItem value="none">None</MenuItem>
+  //         </Select>
+  //       </FormControl>
+  //       {component.properties?.onClick === "navigate" && (
+  //         <FormControl fullWidth size="small">
+  //           <InputLabel>Screen Name</InputLabel>
+  //           <Select
+  //             value={component.properties?.screenName || ""}
+  //             onChange={(e) => handleChange("screenName", e.target.value)}
+  //             label="Screen Name"
+  //           >
+  //             {screens.map((screen) => (
+  //               <MenuItem key={screen.id} value={screen.title}>
+  //                 {screen.title}
+  //               </MenuItem>
+  //             ))}
+  //           </Select>
+  //         </FormControl>
+  //       )}
+  //       {component.properties?.onClick === "open_url" && (
+  //         <TextField
+  //           label="URL"
+  //           fullWidth
+  //           required
+  //           value={component.properties?.url || ""}
+  //           onChange={(e) => handleChange("url", e.target.value)}
+  //           size="small"
+  //         />
+  //       )}
+  //     </Stack>
+  //   );
+  // };
 
 //   const renderFields = () => {
 //     switch (component.type) {

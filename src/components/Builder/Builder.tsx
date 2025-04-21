@@ -211,6 +211,8 @@ const Builder: React.FC<BuilderProps> = ({
         return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
       case 'embedded-link':
         return <ComponentContent>{component.properties?.text || ''}</ComponentContent>;
+      case 'opt-in':
+        return <ComponentContent>{component.properties?.label || 'No Content'}</ComponentContent>;
       case 'footer-button':
         return <ComponentContent>{component.properties?.buttonText || 'No Content'}</ComponentContent>;
       default:

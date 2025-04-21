@@ -424,15 +424,27 @@ useEffect(()=>{
             dateOfBirth: "",
           };
           break;
-          case "embedded-link":
-            newComponent.properties = {
-              text: "",
-              visible: true,
-              onClickAction: "",
-              screenName: "",
-              url: ""
-            };
-            break;
+        case "embedded-link":
+          newComponent.properties = {
+            text: "",
+            visible: true,
+            onClickAction: "",
+            screenName: "",
+            url: "",
+          };
+          break;
+        case "opt-in":
+          newComponent.properties = {
+            label: "",
+            required: null,
+            visible: true,
+            outputVariable: "",
+            initValue: null,
+            onClickAction: "",
+            screenName: "",
+            url: ""
+          };
+          break;
         case "footer-button":
           newComponent.properties = {
             label: "",
@@ -586,6 +598,18 @@ useEffect(()=>{
             url: ""
           };
           break;
+      case "opt-in":
+        newComponent.properties = {
+          label: "",
+          required: null,
+          visible: true,
+          outputVariable: "",
+          initValue: null,
+          onClickAction: "",
+          screenName: "",
+          url: ""
+        };
+        break;
     }
 
     const updatedScreens = [...screens];
@@ -863,6 +887,19 @@ useEffect(()=>{
                     url: child["url"]?.url || ""
                   };
                   break;
+                case "OptIn":
+                  type = "opt-in"
+                  properties = {
+                    label: child.label || "",
+                    outputVariable: child.name || "",
+                    required: child.required || null,
+                    visible: child.visible || true,
+                    initValue: child.initValue || null,
+                    onClickAction: child["on-click-action"]?.name || "",
+                    screenName: child["on-click-action"]?.next?.name || "",
+                    url: child["url"]?.url || ""
+                  };
+                  break;
                 case "Image":
                   type = "image";
                   properties = {
@@ -1116,6 +1153,13 @@ useEffect(()=>{
                   component.properties?.enabled === false
                     ? false
                     : true;
+
+                const intiValueOptIn = 
+                component.properties?.initValue === null ? null :
+                component.properties?.initValue === "false" ||
+                component.properties?.enabled === false
+                  ? false
+                  : true;
 
                 switch (component.type) {
                   case "text-heading":
@@ -1462,11 +1506,16 @@ useEffect(()=>{
                   case "opt-in":
                     const optInJson = {
                       type: "OptIn",
-                      name: "OptIn",
+                      name: component.properties.outputVariable || "",
                       label: component.properties?.label || "",
-                      required: component.properties?.required === "true",
-                      visible: component.properties?.visible === "true",
-                      "init-value": component.properties?.initValue === "true"
+                      ...(component.properties?.required
+                        ? { "required": required }
+                        : {}),
+                      visible,
+                      ...(component.properties?.initValue
+                        ? { "init-value": intiValueOptIn }
+                        : {}),
+                      // "init-value": component.properties?.initValue === "true"
                     };
 
                     // Add on-click-action if it's not none
@@ -1486,9 +1535,9 @@ useEffect(()=>{
                           url: component.properties?.url || "",
                           payload: {}
                         };
-                      } else if (component.properties.onClick === "dataexchange") {
+                      } else if (component.properties.onClick === "data_exchange") {
                         optInJson["on-click-action"] = {
-                          name: "dataexchange",
+                          name: "data_exchange",
                           payload: {}
                         };
                       }
