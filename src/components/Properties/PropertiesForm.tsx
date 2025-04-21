@@ -30,7 +30,7 @@ import TextInputPropertyForm from './PropertyFormComponents/TextInputPropertyFor
 import TextAreaPropertyForm from './PropertyFormComponents/TextAreaPropertyForm'
 import SelectFields           from "./PropertyFormComponents/SelectFields";
 import RadioFields            from "./PropertyFormComponents/RadioFields";
-import ButtonFields           from "./PropertyFormComponents/ButtonFields";
+import FooterButtonPropertyForm from "./PropertyFormComponents/FooterButtonPropertyForm";
 import OptInFields            from "./PropertyFormComponents/OptInFields";
 import PhotoFields            from "./PropertyFormComponents/PhotoFields";
 import DocumentFields         from "./PropertyFormComponents/DocumentFields";
@@ -60,7 +60,7 @@ const fieldComponentMap: Record<string, React.FC<any>> = {
   "check-box":     SelectFields,
   "drop-down":     SelectFields,
   "radio-button":  RadioFields,
-  "footer-button": ButtonFields,
+  "footer-button": FooterButtonPropertyForm,
   "opt-in":        OptInFields,
   PhotoPicker:     PhotoFields,
   DocumentPicker:  DocumentFields,

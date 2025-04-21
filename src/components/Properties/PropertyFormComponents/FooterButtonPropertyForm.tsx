@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { FieldRendererProps } from "./FieldRendererProps";
 
-export default function ButtonFields({
+export default function FooterButtonPropertyForm({
   component,
   onPropertyChange: handleChange,
   screens,
