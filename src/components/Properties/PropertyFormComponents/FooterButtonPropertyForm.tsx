@@ -53,13 +53,10 @@ export default function FooterButtonPropertyForm({
       <TextField
         label="Center Caption"
         fullWidth
-        value={component.properties?.centerCaption || ""}
+        value={component.properties?.centerCaption}
         onChange={(e) => {
           handleChange("centerCaption", e.target.value);
-          if (e.target.value) {
-            handleChange("leftCaption", "");
-            handleChange("rightCaption", "");
-          }
+            
         }}
         disabled={
           !!component.properties?.leftCaption ||
