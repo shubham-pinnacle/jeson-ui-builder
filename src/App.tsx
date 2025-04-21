@@ -16,10 +16,7 @@ import {
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import EditIcon from "@mui/icons-material/Edit";
-import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Close";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Builder from "./components/Builder/Builder";
@@ -442,8 +439,8 @@ useEffect(()=>{
             leftCaption: "",
             centerCaption: "",
             rightCaption: "",
-            enabled: false,
-            onClickAction: "complete",
+            enabled: null,
+            onClickAction: "",
             screenName: "",
           };
           break;
@@ -575,8 +572,8 @@ useEffect(()=>{
           leftCaption: "",
           centerCaption: "",
           rightCaption: "",
-          enabled: false,
-          onClickAction: "complete",
+          enabled: null,
+          onClickAction: "",
           screenName: "",
         };
         break;
@@ -851,8 +848,8 @@ useEffect(()=>{
                     leftCaption: child["left-caption"] || "",
                     centerCaption: child["center-caption"] || "",
                     rightCaption: child["right-caption"] || "",
-                    enabled: child.enabled || false,
-                    onClickAction: child["on-click-action"]?.name || "complete",
+                    enabled: child.enabled || null,
+                    onClickAction: child["on-click-action"]?.name || "",
                     screenName: child["on-click-action"]?.next?.name || "",
                   };
                   break;
@@ -1323,7 +1320,9 @@ useEffect(()=>{
                       ...(component.properties?.rightCaption
                         ? { "right-caption": component.properties.rightCaption }
                         : {}),
-                      enabled,
+                      ...(component.properties?.enabled
+                        ? { "enabled": enabled }
+                        : {}),
                       "on-click-action":
                         component.properties?.onClickAction === "navigate"
                           ? {
@@ -1333,11 +1332,15 @@ useEffect(()=>{
                                 name: component.properties?.screenName || "",
                               },
                             }
-                          : {
+                          : component.properties?.onClickAction === "complete" ? {
                               name:
                                 component.properties?.onClickAction ||
                                 "complete",
-                            },
+                            } : component.properties?.onClickAction === "data_exchange" ? {
+                              name:
+                                component.properties?.onClickAction ||
+                                "data_exchange",
+                            } : "",
                     };
                   // case 'image':
                   //   const imageSrc = component.properties.base64Data
