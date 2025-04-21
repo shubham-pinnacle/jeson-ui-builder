@@ -427,6 +427,15 @@ useEffect(()=>{
             dateOfBirth: "",
           };
           break;
+          case "embedded-link":
+            newComponent.properties = {
+              text: "",
+              visible: true,
+              onClickAction: "",
+              screenName: "",
+              url: ""
+            };
+            break;
         case "footer-button":
           newComponent.properties = {
             label: "",
@@ -571,6 +580,15 @@ useEffect(()=>{
           screenName: "",
         };
         break;
+      case "embedded-link":
+          newComponent.properties = {
+            text: "",
+            visible: true,
+            onClickAction: "",
+            screenName: "",
+            url: ""
+          };
+          break;
     }
 
     const updatedScreens = [...screens];
@@ -836,6 +854,16 @@ useEffect(()=>{
                     enabled: child.enabled || false,
                     onClickAction: child["on-click-action"]?.name || "complete",
                     screenName: child["on-click-action"]?.next?.name || "",
+                  };
+                  break;
+                case "EmbeddedLink":
+                  type = "embedded-link"
+                  properties = {
+                    text: child.text || "",
+                    visible: child.visible || true,
+                    onClickAction: child["on-click-action"]?.name || "",
+                    screenName: child["on-click-action"]?.next?.name || "",
+                    url: child["url"]?.url || ""
                   };
                   break;
                 case "Image":
@@ -1161,7 +1189,7 @@ useEffect(()=>{
                             ? { "min-chars":
                         component.properties.minChars !== undefined
                           ? Number(component.properties.minChars)
-                          : null, }
+                          : null }
                             : {}),
                       "max-chars":
                         component.properties.maxChars !== undefined
@@ -1182,14 +1210,14 @@ useEffect(()=>{
                         : {}),
                       visible,
                       ...(component.properties?.required
-                        ? { "required": required }
+                        ? { required }
                         : {}),
                       "max-length":
                         component.properties.maxLength !== undefined
                           ? Number(component.properties.maxLength)
-                          : 0,
+                          : 600,
                       ...(component.properties?.enabled
-                        ? { "enabled": enabled }
+                        ? { enabled}
                         : {}),
                     };
                   case "check-box":
@@ -1244,7 +1272,6 @@ useEffect(()=>{
                         name: component.properties?.onClick || ""
                       }
                     };
-
                   case "radio-button":
                     return {
                       type: "RadioButtonsGroup",
