@@ -39,7 +39,7 @@ import DatePickerFields       from "./PropertyFormComponents/DatePickerFields";
 import IfElseFields           from "./PropertyFormComponents/IfElseFields";
 import SwitchFields           from "./PropertyFormComponents/SwitchFields";
 import UserDetailsFields      from "./PropertyFormComponents/UserDetailsFields";
-import EmbeddedLinkFields     from "./PropertyFormComponents/EmbeddedLinkFields";
+import EmbeddedLinkPropertyForm from "./PropertyFormComponents/EmbeddedLinkPropertyForm"
 
 interface PropertiesFormProps {
   component: Component;
@@ -49,7 +49,7 @@ interface PropertiesFormProps {
 }
 
 const fieldComponentMap: Record<string, React.FC<any>> = {
-  "embedded-link": EmbeddedLinkFields,
+  "embedded-link": EmbeddedLinkPropertyForm,
   "text-body":     TextBodyPropertyForm,
   "text-caption":  TextCaptionPropertyForm,
   "text-heading":  TextHeadingPropertyForm,

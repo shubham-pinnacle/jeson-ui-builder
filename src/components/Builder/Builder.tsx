@@ -209,6 +209,8 @@ const Builder: React.FC<BuilderProps> = ({
         return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
       case 'radio-button':
         return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
+      case 'embedded-link':
+        return <ComponentContent>{component.properties?.text || ''}</ComponentContent>;
       case 'footer-button':
         return <ComponentContent>{component.properties?.label || ''}</ComponentContent>;
       default:

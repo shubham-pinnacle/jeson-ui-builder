@@ -40,7 +40,7 @@ export default function EmbeddedLinkFields({
       </FormControl>
 
       <FormControl fullWidth size="small">
-        <InputLabel>On Click Action</InputLabel>
+        <InputLabel>On Click Action * </InputLabel>
         <Select
           value={component.properties?.onClick || ""}
           onChange={(e) => handleChange("onClick", e.target.value)}
@@ -72,7 +72,7 @@ export default function EmbeddedLinkFields({
             label="Screen Name"
           >
             {screens.map((screen) => (
-              <MenuItem key={screen.id} value={screen.title}>
+              <MenuItem key={screen.id} value={screen.id}>
                 {screen.title}
               </MenuItem>
             ))}
