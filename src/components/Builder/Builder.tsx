@@ -204,7 +204,7 @@ const Builder: React.FC<BuilderProps> = ({
           </ComponentContent>
         );
       case 'text-area':
-        return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
+        return <ComponentContent>{component.properties?.label || 'No Content'}</ComponentContent>;
       case 'check-box':
         return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
       case 'radio-button':
@@ -212,7 +212,7 @@ const Builder: React.FC<BuilderProps> = ({
       case 'embedded-link':
         return <ComponentContent>{component.properties?.text || ''}</ComponentContent>;
       case 'footer-button':
-        return <ComponentContent>{component.properties?.label || ''}</ComponentContent>;
+        return <ComponentContent>{component.properties?.buttonText || 'No Content'}</ComponentContent>;
       default:
         return null;
     }

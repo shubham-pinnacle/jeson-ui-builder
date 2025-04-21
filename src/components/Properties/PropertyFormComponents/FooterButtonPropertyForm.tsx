@@ -28,7 +28,7 @@ export default function FooterButtonPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Enabled (Optional)</InputLabel>
         <Select
-          value={component.properties?.enabled || "false"}
+          value={component.properties?.enabled || null}
           onChange={(e) => handleChange("enabled", e.target.value)}
           label="Enabled (Optional)"
         >
@@ -79,9 +79,9 @@ export default function FooterButtonPropertyForm({
       />
 
       <FormControl fullWidth size="small">
-        <InputLabel>On Click Action</InputLabel>
+        <InputLabel>On Click Action * </InputLabel>
         <Select
-          value={component.properties?.onClickAction || "complete"}
+          value={component.properties?.onClickAction || ""}
           onChange={(e) => handleChange("onClickAction", e.target.value)}
           label="On Click Action"
         >
