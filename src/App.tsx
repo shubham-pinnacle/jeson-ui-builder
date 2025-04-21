@@ -283,8 +283,8 @@ useEffect(()=>{
           newComponent.properties = {
             text: "",
             visible: true,
-            fontWeight: "normal",
-            strikethrough: false,
+            fontWeight: "",
+            strikethrough: null,
             markdown: false,
           };
           break;
@@ -292,8 +292,8 @@ useEffect(()=>{
           newComponent.properties = {
             text: "",
             visible: true,
-            fontWeight: "normal",
-            strikethrough: false,
+            fontWeight: "",
+            strikethrough: null,
             markdown: false,
           };
           break;
@@ -301,25 +301,25 @@ useEffect(()=>{
           newComponent.properties = {
             label: "",
             name: `field_${Date.now()}`,
-            required: false,
+            required: null,
             inputType: "text",
             initValue: "",
             helperText: "",
             visible: true,
-            minChars: 0,
-            maxChars: 0,
+            minChars: null,
+            maxChars: 80,
           };
           break;
         case "text-area":
           newComponent.properties = {
             label: "",
             outputVariable: "",
-            required: false,
+            required: null,
             initValue: "",
             helperText: "",
             visible: true,
-            maxLength: 0,
-            enabled: false,
+            maxLength: 600,
+            enabled: null,
           };
           break;
         case "check-box":
@@ -482,8 +482,8 @@ useEffect(()=>{
         newComponent.properties = {
           text: "",
           visible: true,
-          strikethrough: false,
-          fontWeight: "normal",
+          strikethrough: null,
+          fontWeight: "",
           markdown: false,
         };
         break;
@@ -491,8 +491,8 @@ useEffect(()=>{
         newComponent.properties = {
           text: "",
           visible: true,
-          strikethrough: false,
-          fontWeight: "normal",
+          strikethrough: null,
+          fontWeight: "",
           markdown: false,
         };
         break;
@@ -500,25 +500,25 @@ useEffect(()=>{
         newComponent.properties = {
           label: "",
           name: `field_${Date.now()}`,
-          required: false,
+          required: null,
           inputType: "text",
           initValue: "",
           helperText: "",
           visible: true,
-          minChars: 0,
-          maxChars: 0,
+          minChars: null,
+          maxChars: 80,
         };
         break;
       case "text-area":
         newComponent.properties = {
           label: "",
           outputVariable: "",
-          required: false,
+          required: null,
           initValue: "",
           helperText: "",
           visible: true,
-          maxLength: 0,
-          enabled: false,
+          maxLength: 600,
+          enabled: null,
         };
         break;
       case "check-box":
@@ -706,8 +706,8 @@ useEffect(()=>{
                     //color: child.color || '#666666',
                     //fontSize: child.fontSize || '14px',
                     visible: child.visible || true,
-                    fontWeight: child.fontWeight || "normal",
-                    strikethrough: child.strikethrough || false,
+                    fontWeight: child.fontWeight || "",
+                    strikethrough: child.strikethrough || null,
                     markdown: child.markdown || false,
                   };
                   break;
@@ -718,8 +718,8 @@ useEffect(()=>{
                     //color: child.color || '#999999',
                     //fontSize: child.fontSize || '12px',
                     visible: child.visible || true,
-                    fontWeight: child.fontWeight || "normal",
-                    strikethrough: child.strikethrough || false,
+                    fontWeight: child.fontWeight || "",
+                    strikethrough: child.strikethrough || null,
                     markdown: child.markdown || false,
                   };
                   break;
@@ -728,7 +728,7 @@ useEffect(()=>{
                   properties = {
                     label: child.label || "",
                     name: child.name || "",
-                    required: child.required || false,
+                    required: child.required || null,
                     inputType: child["input-type"] || "text",
                     initValue: child["init-value"] || "",
                     helperText: child["helper-text"] || "",
@@ -736,11 +736,11 @@ useEffect(()=>{
                     "min-chars":
                       child["min-chars"] !== undefined
                         ? Number(child["min-chars"])
-                        : 0,
+                        : null,
                     "max-chars":
                       child["max-chars"] !== undefined
                         ? Number(child["max-chars"])
-                        : 0,
+                        : 80,
                   };
                   break;
                 case "TextArea":
@@ -748,14 +748,14 @@ useEffect(()=>{
                   properties = {
                     label: child.label || '',
                     outputVariable: child.name || "",
-                    required: child.required || false,
+                    required: child.required || null,
                     initValue: child['init-value'] || '',
                     helperText: child['helper-text'] || '',
                     visible: child.visible || true,
                     maxLength: child['max-length'] !== undefined
                       ? Number(child['max-length'])
-                      : 0,
-                    enabled: child.enabled || false
+                      : 600,
+                    enabled: child.enabled || null
                   };
                   break;
                 case "CheckboxGroup":
@@ -1067,24 +1067,26 @@ useEffect(()=>{
                     : true;
 
                 const required =
+                  component.properties?.required === null ? null : 
                   component.properties?.required === "false" ||
                   component.properties?.required === false
                     ? false
                     : true;
 
                 const strikethrough =
-                  component.properties?.strikethrough === "false" ||
-                  component.properties?.strikethrough === false
+                  component.properties?.strikethrough === null ? null : 
+                  component.properties?.strikethrough === false || component.properties?.strikethrough === "false"
                     ? false
                     : true;
 
                 const markdown =
-                  component.properties?.markdown === "false" ||
+                component.properties?.markdown === null ? null : component.properties?.markdown === "false" ||
                   component.properties?.markdown === false
                     ? false
                     : true;
 
                 const enabled =
+                  component.properties?.enabled === null ? null : 
                   component.properties?.enabled === "false" ||
                   component.properties?.enabled === false
                     ? false
@@ -1112,17 +1114,25 @@ useEffect(()=>{
                       type: "TextBody",
                       text: component.properties.text || "",
                       visible,
-                      ["font-weight"]: component.properties.fontWeight,
-                      strikethrough,
-                      markdown,
+                      ...(component.properties?.fontWeight
+                        ? { "font-weight": component.properties.fontWeight }
+                        : {}),
+                      ...(component.properties?.strikethrough
+                        ? { "strikethrough": strikethrough }
+                        : {}),
+                      markdown
                     };
                   case "text-caption":
                     return {
                       type: "TextCaption",
                       text: component.properties.text || "",
                       visible,
-                      ["font-weight"]: component.properties.fontWeight,
-                      strikethrough,
+                      ...(component.properties?.fontWeight
+                        ? { "font-weight": component.properties.fontWeight }
+                        : {}),
+                      ...(component.properties?.strikethrough
+                        ? { "strikethrough": strikethrough }
+                        : {}),
                       markdown,
                       // color: component.properties.color || '#999999',
                       // fontSize: component.properties.fontSize || '12px'
@@ -1132,19 +1142,31 @@ useEffect(()=>{
                       type: "TextInput",
                       label: component.properties.label || '',
                       name: component.properties.outputVariable || '',
-                      required,
+                      ...(component.properties?.required
+                        ? { "required": required }
+                        : {}),
                       "input-type": component.properties.inputType || "text",
-                      "init-value": component.properties.initValue || "",
-                      "helper-text": component.properties.helperText || "",
+                      ...(component.properties?.initValue
+                        ? { "init-value": component.properties.initValue }
+                        : {}),
+                      ...(component.properties?.helperText
+                        ? { "helper-text": component.properties.helperText }
+                        : {}),
                       visible,
-                      "min-chars":
+                      // "min-chars":
+                      //   component.properties.minChars !== undefined
+                      //     ? Number(component.properties.minChars)
+                      //     : null,
+                      ...(component.properties?.minChars
+                            ? { "min-chars":
                         component.properties.minChars !== undefined
                           ? Number(component.properties.minChars)
-                          : 0,
+                          : null, }
+                            : {}),
                       "max-chars":
                         component.properties.maxChars !== undefined
                           ? Number(component.properties.maxChars)
-                          : 0,
+                          : 80,
                     };
 
                   case "text-area":
@@ -1152,15 +1174,23 @@ useEffect(()=>{
                       type: "TextArea",
                       name: component.properties.outputVariable || "",
                       label: component.properties.label || "",
-                      "init-value": component.properties.initValue || "",
-                      "helper-text": component.properties.helperText || "",
+                      ...(component.properties?.initValue
+                        ? { "init-value": component.properties.initValue }
+                        : {}),
+                      ...(component.properties?.helperText
+                        ? { "helper-text": component.properties.helperText }
+                        : {}),
                       visible,
-                      required,
+                      ...(component.properties?.required
+                        ? { "required": required }
+                        : {}),
                       "max-length":
                         component.properties.maxLength !== undefined
                           ? Number(component.properties.maxLength)
                           : 0,
-                      enabled,
+                      ...(component.properties?.enabled
+                        ? { "enabled": enabled }
+                        : {}),
                     };
                   case "check-box":
                     return {

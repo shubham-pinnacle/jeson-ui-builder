@@ -150,7 +150,7 @@ const Builder: React.FC<BuilderProps> = ({
             color={component.properties.color}
             fontSize={component.properties.fontSize}
           >
-            {component.properties.text || 'Heading Text'}
+            {component.properties.text || ''}
           </ComponentContent>
         );
       case 'sub-heading':
@@ -160,7 +160,7 @@ const Builder: React.FC<BuilderProps> = ({
             color={component.properties.color || '#666666'}
             fontSize={component.properties.fontSize}
           >
-            {component.properties.text || 'Sub Heading Text'}
+            {component.properties.text || ''}
           </ComponentContent>
         );
       case 'text-caption':
@@ -170,7 +170,7 @@ const Builder: React.FC<BuilderProps> = ({
             color={component.properties.color || '#999999'}
             fontSize={component.properties.fontSize}
           >
-            {component.properties.text || 'Caption Text'}
+            {component.properties.text || ''}
           </ComponentContent>
         );
         console.log(component.properties,"jsdksks")
@@ -191,7 +191,7 @@ const Builder: React.FC<BuilderProps> = ({
                 color: '#333', 
                 marginBottom: '4px' 
               }}>
-                {component.properties.label || 'Label'}
+                {component.properties.label || 'No Content'}
               </label>
             </div>
             
@@ -200,7 +200,7 @@ const Builder: React.FC<BuilderProps> = ({
       case 'text-body':
         return (
           <ComponentContent fontSize="14px" color={component.properties?.color || '#666666'}>
-            {component.properties?.text || 'Body Text Content'}
+            {component.properties?.text || ''}
           </ComponentContent>
         );
       case 'text-area':
