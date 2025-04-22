@@ -16,20 +16,18 @@ import {
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import EditIcon from "@mui/icons-material/Edit";
-import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Close";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Builder from "./components/Builder/Builder";
-import MobilePreview from "./components/Preview/MobilePreview";
+import Simulator from "./components/Simulator/Simulator";
 import MetaJsonGenerator from "./components/MetaJsonGenerator";
 import ScreenDialog from "./components/ScreenDialog";
 import { Component } from "./types";
 import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import { Description } from "@mui/icons-material";
+import{ useSelector } from 'react-redux';
+import { RootState } from './store/index';
+
 
 const AppContainer = styled("div")({
   display: "flex",
@@ -235,6 +233,14 @@ function App() {
     null
   );
 
+
+
+const  options = useSelector((state: RootState) => state.option.arr);
+
+useEffect(()=>{
+    console.log("Redux ", options);  
+},[options])
+
   // Update JSON editor when screens change
   useEffect(() => {
     const jsonString = JSON.stringify(generateJson(), null, 2);
@@ -274,8 +280,8 @@ function App() {
           newComponent.properties = {
             text: "",
             visible: true,
-            fontWeight: "normal",
-            strikethrough: false,
+            fontWeight: "",
+            strikethrough: null,
             markdown: false,
           };
           break;
@@ -283,8 +289,8 @@ function App() {
           newComponent.properties = {
             text: "",
             visible: true,
-            fontWeight: "normal",
-            strikethrough: false,
+            fontWeight: "",
+            strikethrough: null,
             markdown: false,
           };
           break;
@@ -292,25 +298,25 @@ function App() {
           newComponent.properties = {
             label: "",
             name: `field_${Date.now()}`,
-            required: false,
+            required: null,
             inputType: "text",
             initValue: "",
             helperText: "",
             visible: true,
-            minChars: 0,
-            maxChars: 0,
+            minChars: null,
+            maxChars: 80,
           };
           break;
         case "text-area":
           newComponent.properties = {
             label: "",
             outputVariable: "",
-            required: false,
+            required: null,
             initValue: "",
             helperText: "",
             visible: true,
-            maxLength: 0,
-            enabled: false,
+            maxLength: 600,
+            enabled: null,
           };
           break;
         case "check-box":
@@ -335,6 +341,7 @@ function App() {
             visible: true,
             required: false,
             enabled: true,
+            initValue: "",
           };
           break;
         case "PhotoPicker":
@@ -417,14 +424,35 @@ function App() {
             dateOfBirth: "",
           };
           break;
+        case "embedded-link":
+          newComponent.properties = {
+            text: "",
+            visible: true,
+            onClickAction: "",
+            screenName: "",
+            url: "",
+          };
+          break;
+        case "opt-in":
+          newComponent.properties = {
+            label: "",
+            required: null,
+            visible: true,
+            outputVariable: "",
+            initValue: null,
+            onClickAction: "",
+            screenName: "",
+            url: ""
+          };
+          break;
         case "footer-button":
           newComponent.properties = {
             label: "",
             leftCaption: "",
             centerCaption: "",
             rightCaption: "",
-            enabled: false,
-            onClickAction: "complete",
+            enabled: null,
+            onClickAction: "",
             screenName: "",
           };
           break;
@@ -472,8 +500,8 @@ function App() {
         newComponent.properties = {
           text: "",
           visible: true,
-          strikethrough: false,
-          fontWeight: "normal",
+          strikethrough: null,
+          fontWeight: "",
           markdown: false,
         };
         break;
@@ -481,8 +509,8 @@ function App() {
         newComponent.properties = {
           text: "",
           visible: true,
-          strikethrough: false,
-          fontWeight: "normal",
+          strikethrough: null,
+          fontWeight: "",
           markdown: false,
         };
         break;
@@ -490,25 +518,25 @@ function App() {
         newComponent.properties = {
           label: "",
           name: `field_${Date.now()}`,
-          required: false,
+          required: null,
           inputType: "text",
           initValue: "",
           helperText: "",
           visible: true,
-          minChars: 0,
-          maxChars: 0,
+          minChars: null,
+          maxChars: 80,
         };
         break;
       case "text-area":
         newComponent.properties = {
           label: "",
           outputVariable: "",
-          required: false,
+          required: null,
           initValue: "",
           helperText: "",
           visible: true,
-          maxLength: 0,
-          enabled: false,
+          maxLength: 600,
+          enabled: null,
         };
         break;
       case "check-box":
@@ -533,6 +561,8 @@ function App() {
           visible: true,
           required: false,
           enabled: true,
+          initValue: "",
+
         };
         break;
       case "drop-down":
@@ -544,6 +574,8 @@ function App() {
           visible: true,
           required: false,
           placeholder: "Select an option",
+          enabled: true,
+          outputVariable: "",
         };
         break;
       case "footer-button":
@@ -552,8 +584,8 @@ function App() {
           leftCaption: "",
           centerCaption: "",
           rightCaption: "",
-          enabled: false,
-          onClickAction: "complete",
+          enabled: null,
+          onClickAction: "",
           screenName: "",
         };
         break;
@@ -569,6 +601,27 @@ function App() {
             disabled: false
           };
           break;
+      case "embedded-link":
+          newComponent.properties = {
+            text: "",
+            visible: true,
+            onClickAction: "",
+            screenName: "",
+            url: ""
+          };
+          break;
+      case "opt-in":
+        newComponent.properties = {
+          label: "",
+          required: null,
+          visible: true,
+          outputVariable: "",
+          initValue: null,
+          onClickAction: "",
+          screenName: "",
+          url: ""
+        };
+        break;
     }
 
     const updatedScreens = [...screens];
@@ -704,8 +757,8 @@ function App() {
                     //color: child.color || '#666666',
                     //fontSize: child.fontSize || '14px',
                     visible: child.visible || true,
-                    fontWeight: child.fontWeight || "normal",
-                    strikethrough: child.strikethrough || false,
+                    fontWeight: child.fontWeight || "",
+                    strikethrough: child.strikethrough || null,
                     markdown: child.markdown || false,
                   };
                   break;
@@ -716,8 +769,8 @@ function App() {
                     //color: child.color || '#999999',
                     //fontSize: child.fontSize || '12px',
                     visible: child.visible || true,
-                    fontWeight: child.fontWeight || "normal",
-                    strikethrough: child.strikethrough || false,
+                    fontWeight: child.fontWeight || "",
+                    strikethrough: child.strikethrough || null,
                     markdown: child.markdown || false,
                   };
                   break;
@@ -726,7 +779,7 @@ function App() {
                   properties = {
                     label: child.label || "",
                     name: child.name || "",
-                    required: child.required || false,
+                    required: child.required || null,
                     inputType: child["input-type"] || "text",
                     initValue: child["init-value"] || "",
                     helperText: child["helper-text"] || "",
@@ -734,11 +787,11 @@ function App() {
                     "min-chars":
                       child["min-chars"] !== undefined
                         ? Number(child["min-chars"])
-                        : 0,
+                        : null,
                     "max-chars":
                       child["max-chars"] !== undefined
                         ? Number(child["max-chars"])
-                        : 0,
+                        : 80,
                   };
                   break;
                 case "TextArea":
@@ -746,14 +799,14 @@ function App() {
                   properties = {
                     label: child.label || '',
                     outputVariable: child.name || "",
-                    required: child.required || false,
+                    required: child.required || null,
                     initValue: child['init-value'] || '',
                     helperText: child['helper-text'] || '',
                     visible: child.visible || true,
                     maxLength: child['max-length'] !== undefined
                       ? Number(child['max-length'])
-                      : 0,
-                    enabled: child.enabled || false
+                      : 600,
+                    enabled: child.enabled || null
                   };
                   break;
                 case "CheckboxGroup":
@@ -795,6 +848,7 @@ function App() {
                     enabled: child.enabled || true,
                     required: child.required || false,
                     visible: child.visible || true,
+                    initValue: child.initValue || "",
                     options: JSON.stringify(
                       child["data-source"]?.map((opt: any) => opt.title) || [
                         "Option 1", 
@@ -816,6 +870,8 @@ function App() {
                         "Option 3",
                       ]
                     ),
+                    outputVariable: child.name || "",
+                    enabled: child.enabled || true,
                     visible: child.visible || true,
                     required: child.required || false,
                     placeholder: child.placeholder || "Select an option",
@@ -828,9 +884,32 @@ function App() {
                     leftCaption: child["left-caption"] || "",
                     centerCaption: child["center-caption"] || "",
                     rightCaption: child["right-caption"] || "",
-                    enabled: child.enabled || false,
-                    onClickAction: child["on-click-action"]?.name || "complete",
+                    enabled: child.enabled || null,
+                    onClickAction: child["on-click-action"]?.name || "",
                     screenName: child["on-click-action"]?.next?.name || "",
+                  };
+                  break;
+                case "EmbeddedLink":
+                  type = "embedded-link"
+                  properties = {
+                    text: child.text || "",
+                    visible: child.visible || true,
+                    onClickAction: child["on-click-action"]?.name || "",
+                    screenName: child["on-click-action"]?.next?.name || "",
+                    url: child["url"]?.url || ""
+                  };
+                  break;
+                case "OptIn":
+                  type = "opt-in"
+                  properties = {
+                    label: child.label || "",
+                    outputVariable: child.name || "",
+                    required: child.required || null,
+                    visible: child.visible || true,
+                    initValue: child.initValue || null,
+                    onClickAction: child["on-click-action"]?.name || "",
+                    screenName: child["on-click-action"]?.next?.name || "",
+                    url: child["url"]?.url || ""
                   };
                   break;
                 case "Image":
@@ -1062,28 +1141,37 @@ function App() {
                     : true;
 
                 const required =
+                  component.properties?.required === null ? null : 
                   component.properties?.required === "false" ||
                   component.properties?.required === false
                     ? false
                     : true;
 
                 const strikethrough =
-                  component.properties?.strikethrough === "false" ||
-                  component.properties?.strikethrough === false
+                  component.properties?.strikethrough === null ? null : 
+                  component.properties?.strikethrough === false || component.properties?.strikethrough === "false"
                     ? false
                     : true;
 
                 const markdown =
-                  component.properties?.markdown === "false" ||
+                component.properties?.markdown === null ? null : component.properties?.markdown === "false" ||
                   component.properties?.markdown === false
                     ? false
                     : true;
 
                 const enabled =
+                  component.properties?.enabled === null ? null : 
                   component.properties?.enabled === "false" ||
                   component.properties?.enabled === false
                     ? false
                     : true;
+
+                const intiValueOptIn = 
+                component.properties?.initValue === null ? null :
+                component.properties?.initValue === "false" ||
+                component.properties?.enabled === false
+                  ? false
+                  : true;
 
                 switch (component.type) {
                   case "text-heading":
@@ -1107,17 +1195,25 @@ function App() {
                       type: "TextBody",
                       text: component.properties.text || "",
                       visible,
-                      ["font-weight"]: component.properties.fontWeight,
-                      strikethrough,
-                      markdown,
+                      ...(component.properties?.fontWeight
+                        ? { "font-weight": component.properties.fontWeight }
+                        : {}),
+                      ...(component.properties?.strikethrough
+                        ? { "strikethrough": strikethrough }
+                        : {}),
+                      markdown
                     };
                   case "text-caption":
                     return {
                       type: "TextCaption",
                       text: component.properties.text || "",
                       visible,
-                      ["font-weight"]: component.properties.fontWeight,
-                      strikethrough,
+                      ...(component.properties?.fontWeight
+                        ? { "font-weight": component.properties.fontWeight }
+                        : {}),
+                      ...(component.properties?.strikethrough
+                        ? { "strikethrough": strikethrough }
+                        : {}),
                       markdown,
                       // color: component.properties.color || '#999999',
                       // fontSize: component.properties.fontSize || '12px'
@@ -1127,19 +1223,31 @@ function App() {
                       type: "TextInput",
                       label: component.properties.label || '',
                       name: component.properties.outputVariable || '',
-                      required,
+                      ...(component.properties?.required
+                        ? { "required": required }
+                        : {}),
                       "input-type": component.properties.inputType || "text",
-                      "init-value": component.properties.initValue || "",
-                      "helper-text": component.properties.helperText || "",
+                      ...(component.properties?.initValue
+                        ? { "init-value": component.properties.initValue }
+                        : {}),
+                      ...(component.properties?.helperText
+                        ? { "helper-text": component.properties.helperText }
+                        : {}),
                       visible,
-                      "min-chars":
+                      // "min-chars":
+                      //   component.properties.minChars !== undefined
+                      //     ? Number(component.properties.minChars)
+                      //     : null,
+                      ...(component.properties?.minChars
+                            ? { "min-chars":
                         component.properties.minChars !== undefined
                           ? Number(component.properties.minChars)
-                          : 0,
+                          : null }
+                            : {}),
                       "max-chars":
                         component.properties.maxChars !== undefined
                           ? Number(component.properties.maxChars)
-                          : 0,
+                          : 80,
                     };
 
                   case "text-area":
@@ -1147,15 +1255,23 @@ function App() {
                       type: "TextArea",
                       name: component.properties.outputVariable || "",
                       label: component.properties.label || "",
-                      "init-value": component.properties.initValue || "",
-                      "helper-text": component.properties.helperText || "",
+                      ...(component.properties?.initValue
+                        ? { "init-value": component.properties.initValue }
+                        : {}),
+                      ...(component.properties?.helperText
+                        ? { "helper-text": component.properties.helperText }
+                        : {}),
                       visible,
-                      required,
+                      ...(component.properties?.required
+                        ? { required }
+                        : {}),
                       "max-length":
                         component.properties.maxLength !== undefined
                           ? Number(component.properties.maxLength)
-                          : 0,
-                      enabled,
+                          : 600,
+                      ...(component.properties?.enabled
+                        ? { enabled}
+                        : {}),
                     };
                   case "check-box":
                     return {
@@ -1209,7 +1325,6 @@ function App() {
                         name: component.properties?.onClick || ""
                       }
                     };
-
                   case "radio-button":
                     return {
                       type: "RadioButtonsGroup",
@@ -1219,27 +1334,17 @@ function App() {
                       enabled,
                       required,
                       visible,
-                      "data-source": component.properties.options
-                        ? JSON.parse(component.properties.options).map(
-                            (option: string) => ({
-                              id: option.toLowerCase().replace(/\s+/g, "_"),
-                              title: option,
-                            })
-                          )
-                        : [
-                            { id: "option_1", title: "Option 1" },
-                            { id: "option_2", title: "Option 2" },
-                            { id: "option_3", title: "Option 3" },
-                          ],
+                      "init-value": component.properties.initValue || "",
+                      "data-source": options,
                     };
                   case "drop-down":
                     return {
                       type: "Dropdown",
-                      name:
-                        component.properties.name || `dropdown_${Date.now()}`,
+                      name: component.properties.outputVariable || "",
                       label: component.properties.label || "",
                       required,
                       visible,
+                      enabled,
                       placeholder:
                         component.properties.placeholder || "Select an option",
                       "data-source": component.properties.options
@@ -1271,7 +1376,9 @@ function App() {
                       ...(component.properties?.rightCaption
                         ? { "right-caption": component.properties.rightCaption }
                         : {}),
-                      enabled,
+                      ...(component.properties?.enabled
+                        ? { "enabled": enabled }
+                        : {}),
                       "on-click-action":
                         component.properties?.onClickAction === "navigate"
                           ? {
@@ -1281,11 +1388,15 @@ function App() {
                                 name: component.properties?.screenName || "",
                               },
                             }
-                          : {
+                          : component.properties?.onClickAction === "complete" ? {
                               name:
                                 component.properties?.onClickAction ||
                                 "complete",
-                            },
+                            } : component.properties?.onClickAction === "data_exchange" ? {
+                              name:
+                                component.properties?.onClickAction ||
+                                "data_exchange",
+                            } : "",
                     };
                   // case 'image':
                   //   const imageSrc = component.properties.base64Data
@@ -1407,11 +1518,16 @@ function App() {
                   case "opt-in":
                     const optInJson = {
                       type: "OptIn",
-                      name: "OptIn",
+                      name: component.properties.outputVariable || "",
                       label: component.properties?.label || "",
-                      required: component.properties?.required === "true",
-                      visible: component.properties?.visible === "true",
-                      "init-value": component.properties?.initValue === "true"
+                      ...(component.properties?.required
+                        ? { "required": required }
+                        : {}),
+                      visible,
+                      ...(component.properties?.initValue
+                        ? { "init-value": intiValueOptIn }
+                        : {}),
+                      // "init-value": component.properties?.initValue === "true"
                     };
 
                     // Add on-click-action if it's not none
@@ -1431,9 +1547,9 @@ function App() {
                           url: component.properties?.url || "",
                           payload: {}
                         };
-                      } else if (component.properties.onClick === "dataexchange") {
+                      } else if (component.properties.onClick === "data_exchange") {
                         optInJson["on-click-action"] = {
-                          name: "dataexchange",
+                          name: "data_exchange",
                           payload: {}
                         };
                       }
@@ -1742,7 +1858,7 @@ function App() {
             </MetaJsonGeneratorContainer>
           </JsonEditorContainer>
           <PreviewContainer isVisible={showPreview}>
-            <MobilePreview
+            <Simulator
               components={screens[activeScreenIndex].components}
               screenTitle={screens[activeScreenIndex].title}
             />

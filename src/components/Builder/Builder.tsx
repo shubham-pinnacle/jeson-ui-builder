@@ -2,12 +2,10 @@ import React from 'react';
 import { styled } from '@mui/material/styles';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { Component } from '../../types';
-import PropertiesForm from '../PropertiesForm';
+import PropertiesForm from '../Properties/PropertiesForm';
 import { DropResult } from 'react-beautiful-dnd';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
-import { Box, Typography, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
 
 interface StyledProps {
   $isSelected?: boolean;
@@ -18,6 +16,7 @@ const BuilderContainer = styled('div')({
   display: 'flex',
   height: '100%',
   overflow: 'hidden',
+  
 });
 
 const BuildArea = styled('div')({
@@ -151,7 +150,7 @@ const Builder: React.FC<BuilderProps> = ({
             color={component.properties.color}
             fontSize={component.properties.fontSize}
           >
-            {component.properties.text || 'Heading Text'}
+            {component.properties.text || ''}
           </ComponentContent>
         );
       case 'sub-heading':
@@ -161,7 +160,7 @@ const Builder: React.FC<BuilderProps> = ({
             color={component.properties.color || '#666666'}
             fontSize={component.properties.fontSize}
           >
-            {component.properties.text || 'Sub Heading Text'}
+            {component.properties.text || ''}
           </ComponentContent>
         );
       case 'text-caption':
@@ -171,7 +170,7 @@ const Builder: React.FC<BuilderProps> = ({
             color={component.properties.color || '#999999'}
             fontSize={component.properties.fontSize}
           >
-            {component.properties.text || 'Caption Text'}
+            {component.properties.text || ''}
           </ComponentContent>
         );
         console.log(component.properties,"jsdksks")
@@ -192,7 +191,7 @@ const Builder: React.FC<BuilderProps> = ({
                 color: '#333', 
                 marginBottom: '4px' 
               }}>
-                {component.properties.label || 'Label'}
+                {component.properties.label || 'No Content'}
               </label>
             </div>
             
@@ -201,17 +200,21 @@ const Builder: React.FC<BuilderProps> = ({
       case 'text-body':
         return (
           <ComponentContent fontSize="14px" color={component.properties?.color || '#666666'}>
-            {component.properties?.text || 'Body Text Content'}
+            {component.properties?.text || ''}
           </ComponentContent>
         );
       case 'text-area':
-        return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
+        return <ComponentContent>{component.properties?.label || 'No Content'}</ComponentContent>;
       case 'check-box':
         return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
       case 'radio-button':
         return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
+      case 'embedded-link':
+        return <ComponentContent>{component.properties?.text || ''}</ComponentContent>;
+      case 'opt-in':
+        return <ComponentContent>{component.properties?.label || 'No Content'}</ComponentContent>;
       case 'footer-button':
-        return <ComponentContent>{component.properties?.label || ''}</ComponentContent>;
+        return <ComponentContent>{component.properties?.buttonText || 'No Content'}</ComponentContent>;
       default:
         return null;
     }
@@ -219,7 +222,7 @@ const Builder: React.FC<BuilderProps> = ({
 
   return (
     <BuilderContainer>
-      <BuildArea>
+      <BuildArea sx={{ mb:15 }}>
         <Droppable droppableId="builder">
           {(provided, snapshot) => (
             <ComponentsList
