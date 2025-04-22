@@ -365,7 +365,7 @@ useEffect(()=>{
             description: "",
             outputVariable: "",
             allowedMimeTypes: [], 
-            minDocuments: "",
+            minDocuments: "0",
             maxDocuments: "",
             maxFileSize: "25",
             visible: true,
@@ -623,6 +623,20 @@ useEffect(()=>{
           enabled: true,
           required: false,
           accept: "image/*",
+        };
+        break;
+      case "DocumentPicker":
+        newComponent.properties = {
+          label: "",
+          description: "",
+          outputVariable: "",
+          allowedMimeTypes: [], 
+          minDocuments: "0",
+          maxDocuments: "",
+          maxFileSize: "25",
+          visible: true,
+          enabled: true,
+          required: false,
         };
         break;
     }
@@ -933,13 +947,14 @@ useEffect(()=>{
                   properties = {
                     label: child.label || "",
                     description: child.description || "",
+                    outputVariable: child.name || "",
                     visible: child.visible ?? true,
                     enabled: child.enabled ?? true,
                     allowedMimeTypes: Array.isArray(child["allowed-mime-types"])
                       ? child["allowed-mime-types"]
                       : ["image/jpeg", "application/pdf"], // default fallback
-                    minPhotos: child["min-uploaded-documents"]?.toString() || "1",
-                    maxPhotos: child["max-uploaded-documents"]?.toString() || "1",
+                    minDocuments: child["min-uploaded-documents"]?.toString() || "1",
+                    maxDocuments: child["max-uploaded-documents"]?.toString() || "1",
                     maxFileSize: child["max-file-size-kb"]
                       ? (child["max-file-size-kb"] / 1024).toString()
                       : "10", // in MB
@@ -1487,13 +1502,18 @@ useEffect(()=>{
                     return {
                       type: "DocumentPicker",
                       label: component.properties.label || "",
-                      name: "document_picker",
-                      description: component.properties.description || "",
+                      name: component.properties.outputVariable || "",
+                      ...(component.properties?.description
+                        ? { "description": component.properties.description }
+                        : {}),
                       visible,
                       enabled,
-                      "allowed-mime-types": component.properties.allowedMimeTypes || [],
-                      "min-uploaded-documents": parseInt(component.properties.minPhotos) || 1,
-                      "max-uploaded-documents": parseInt(component.properties.maxPhotos) || 30,
+                      // "allowed-mime-types": component.properties.allowedMimeTypes || [],
+                      ...(component.properties?.allowedMimeTypes
+                        ? { "allowed-mime-types": component.properties.allowedMimeTypes }
+                        : {}),
+                      "min-uploaded-documents": parseInt(component.properties.minDocuments) || 0,
+                      "max-uploaded-documents": parseInt(component.properties.maxDocuments) || 30,
                       "max-file-size-kb":
                         parseInt(component.properties.maxFileSize) * 1024 || 10240,
                     };

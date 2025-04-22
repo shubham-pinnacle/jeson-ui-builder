@@ -32,7 +32,7 @@ import RadioFields            from "./PropertyFormComponents/RadioFields";
 import FooterButtonPropertyForm from "./PropertyFormComponents/FooterButtonPropertyForm";
 import OptInPropertyForm from "./PropertyFormComponents/OptInPropertyForm";
 import PhotoPropertyForm from "./PropertyFormComponents/PhotoPropertyForm";
-import DocumentFields         from "./PropertyFormComponents/DocumentFields";
+import DocumentPropertyForm from "./PropertyFormComponents/DocumentPropertyForm";
 import ImageFields            from "./PropertyFormComponents/ImageFields";
 import DatePickerFields       from "./PropertyFormComponents/DatePickerFields";
 import IfElseFields           from "./PropertyFormComponents/IfElseFields";
@@ -62,7 +62,7 @@ const fieldComponentMap: Record<string, React.FC<any>> = {
   "footer-button": FooterButtonPropertyForm,
   "opt-in":        OptInPropertyForm,
   PhotoPicker:     PhotoPropertyForm,
-  DocumentPicker:  DocumentFields,
+  DocumentPicker:  DocumentPropertyForm,
   image:           ImageFields,
   "date-picker":   DatePickerFields,
   "if-else":       IfElseFields,
@@ -1349,8 +1349,7 @@ export default PropertiesForm;
 // />
 
 
-      
-//       <TextField
+//              <TextField
 //         label="Minimum Photos (Optional)"
 //         type="number"
 //         fullWidth
