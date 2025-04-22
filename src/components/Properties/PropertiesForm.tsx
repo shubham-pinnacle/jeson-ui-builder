@@ -13,7 +13,6 @@ import { IoMdInformationCircleOutline } from "react-icons/io";
 import { Component } from "../types";
 import { useDispatch } from "react-redux";
 import { updateOption } from "../../slices/optionSlice";
-import AllowedMimeTypes from "./AllowedMimeTypes";
 import {
   StyledPopper,
   PropertyOptions,
@@ -32,9 +31,9 @@ import SelectFields           from "./PropertyFormComponents/SelectFields";
 import RadioFields            from "./PropertyFormComponents/RadioFields";
 import FooterButtonPropertyForm from "./PropertyFormComponents/FooterButtonPropertyForm";
 import OptInPropertyForm from "./PropertyFormComponents/OptInPropertyForm";
-import PhotoFields            from "./PropertyFormComponents/PhotoFields";
-import DocumentFields         from "./PropertyFormComponents/DocumentFields";
-import ImageFields            from "./PropertyFormComponents/ImageFields";
+import PhotoPropertyForm from "./PropertyFormComponents/PhotoPropertyForm";
+import DocumentPropertyForm from "./PropertyFormComponents/DocumentPropertyForm";
+import ImagePropertyForm from "./PropertyFormComponents/ImagePropertyForm";
 import DatePickerFields       from "./PropertyFormComponents/DatePickerFields";
 import IfElseFields           from "./PropertyFormComponents/IfElseFields";
 import SwitchFields           from "./PropertyFormComponents/SwitchFields";
@@ -62,9 +61,9 @@ const fieldComponentMap: Record<string, React.FC<any>> = {
   "radio-button":  RadioFields,
   "footer-button": FooterButtonPropertyForm,
   "opt-in":        OptInPropertyForm,
-  PhotoPicker:     PhotoFields,
-  DocumentPicker:  DocumentFields,
-  image:           ImageFields,
+  PhotoPicker:     PhotoPropertyForm,
+  DocumentPicker:  DocumentPropertyForm,
+  image:           ImagePropertyForm,
   "date-picker":   DatePickerFields,
   "if-else":       IfElseFields,
   switch:          SwitchFields,
@@ -1350,8 +1349,7 @@ export default PropertiesForm;
 // />
 
 
-      
-//       <TextField
+//              <TextField
 //         label="Minimum Photos (Optional)"
 //         type="number"
 //         fullWidth
