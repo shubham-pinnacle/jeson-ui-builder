@@ -1,22 +1,90 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { Droppable, Draggable } from "react-beautiful-dnd";
 import { Component } from '../../types';
 import PropertiesForm from '../Properties/PropertiesForm';
 import { DropResult } from 'react-beautiful-dnd';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button
+} from '@mui/material';
+import { useToast } from '../ToastContext';
+
+const StyledDialog = styled(Dialog)({
+  '& .MuiDialog-paper': {
+    borderRadius: '12px',
+    backgroundColor: '#fafafa',
+    boxShadow: '0 8px 30px rgba(0, 0, 0, 0.1)',
+  },
+});
+
+const StyledDialogTitle = styled(DialogTitle)({
+  fontSize: '20px',
+  fontWeight: 600,
+  color: '#333',
+  padding: '20px 24px',
+  borderBottom: '1px solid #ddd',
+});
+
+const StyledDialogContent = styled(DialogContent)({
+  padding: '20px 24px',
+});
+
+const StyledDialogContentText = styled(DialogContentText)({
+  fontSize: '16px',
+  color: '#444',
+});
+
+const StyledDialogActions = styled(DialogActions)({
+  padding: '16px 24px',
+  display: 'flex',
+  justifyContent: 'flex-end',
+  gap: '12px',
+});
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  padding: '8px 18px',
+  fontSize: '14px',
+  fontWeight: 500,
+  borderRadius: '6px',
+  textTransform: 'none',
+  transition: 'all 0.2s ease',
+  '&.MuiButton-contained': {
+    backgroundColor: theme.palette.error.main,
+    color: '#fff',
+    '&:hover': {
+      backgroundColor: theme.palette.error.dark,
+      transform: 'scale(1.05)',
+    },
+  },
+  '&.MuiButton-outlined': {
+    borderColor: theme.palette.primary.main,
+    color: theme.palette.primary.main,
+    '&:hover': {
+      backgroundColor: theme.palette.action.hover,
+      transform: 'scale(1.05)',
+    },
+  },
+}));
+
 
 interface StyledProps {
   $isSelected?: boolean;
   $type?: string;
 }
 
+
+
 const BuilderContainer = styled('div')({
   display: 'flex',
   height: '100%',
   overflow: 'hidden',
-  
 });
 
 const BuildArea = styled('div')({
@@ -46,7 +114,7 @@ const ComponentsList = styled('div')({
 
 const ComponentWrapper = styled('div', {
   shouldForwardProp: (prop) => !['$isSelected', '$type'].includes(prop as string),
-})<StyledProps>(({ theme, $isSelected, $type }) => ({
+})<StyledProps>(({ $isSelected }) => ({
   background: 'white',
   border: `2px solid ${$isSelected ? '#2196f3' : '#e0e0e0'}`,
   borderRadius: '4px',
@@ -76,23 +144,18 @@ const ComponentTitle = styled('div')({
 
 const ComponentContent = styled('div', {
   shouldForwardProp: (prop) => !['$type', 'color', 'fontSize'].includes(prop as string),
-})<{ $type?: string; color?: string; fontSize?: string }>(({ theme, $type, color, fontSize }) => ({
+})<{ $type?: string; color?: string; fontSize?: string }>(({ $type, color, fontSize }) => ({
   padding: $type === 'text-input' ? '8px 12px' : '8px',
   borderRadius: $type === 'text-input' ? '4px' : '0',
   backgroundColor: $type === 'text-input' ? '#ffffff' : 'transparent',
   color: color || '#333333',
   fontSize: (() => {
     switch ($type) {
-      case 'text-heading':
-        return '24px';
-      case 'sub-heading':
-        return '18px';
-      case 'text-caption':
-        return '12px';
-      case 'text-input':
-        return '14px';
-      default:
-        return '14px';
+      case 'text-heading': return '24px';
+      case 'sub-heading': return '18px';
+      case 'text-caption': return '12px';
+      case 'text-input': return '14px';
+      default: return '14px';
     }
   })(),
   fontWeight: $type === 'text-heading' ? 'bold' : 'normal',
@@ -101,10 +164,8 @@ const ComponentContent = styled('div', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-start',
-  border: $type === 'text-input' ? '1px solid #e0e0e0' : 'none'
+  border: $type === 'text-input' ? '1px solid #e0e0e0' : 'none',
 }));
-
-
 
 interface BuilderProps {
   components: Component[];
@@ -127,94 +188,57 @@ const Builder: React.FC<BuilderProps> = ({
   onAddComponent,
   screens
 }) => {
+  const { showToast } = useToast(); 
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [componentToDelete, setComponentToDelete] = React.useState<Component | null>(null);
+
   const handleComponentClick = (component: Component) => {
     onComponentSelect(component);
   };
 
   const handleDeleteClick = (e: React.MouseEvent, componentId: string) => {
     e.stopPropagation();
-    onDeleteComponent(componentId);
-  };
-
-  // This function is needed to match the interface but won't be used
-  const handleAddComponentWrapper = (type: string) => {
-    onAddComponent(type);
+    const comp = components.find(c => c.id === componentId);
+    if (comp) {
+      setComponentToDelete(comp);
+      setDeleteDialogOpen(true);
+    }
   };
 
   const renderComponent = (component: Component) => {
     switch (component.type) {
       case 'text-heading':
-        return (
-          <ComponentContent
-            $type="text-heading"
-            color={component.properties.color}
-            fontSize={component.properties.fontSize}
-          >
-            {component.properties.text || ''}
-          </ComponentContent>
-        );
       case 'sub-heading':
-        return (
-          <ComponentContent
-            $type="sub-heading"
-            color={component.properties.color || '#666666'}
-            fontSize={component.properties.fontSize}
-          >
-            {component.properties.text || ''}
-          </ComponentContent>
-        );
       case 'text-caption':
-        return (
-          <ComponentContent
-            $type="text-caption"
-            color={component.properties.color || '#999999'}
-            fontSize={component.properties.fontSize}
-          >
-            {component.properties.text || ''}
-          </ComponentContent>
-        );
-        console.log(component.properties,"jsdksks")
-      case 'text-input':
-        console.log('TextInput Component Properties:', {
-          id: component.id,
-          properties: component.properties,
-          label: component.properties.label,
-          placeholder: component.properties.placeholder,
-          value: component.properties.value
-        });
-        return (
-          <ComponentContent $type="text-input">
-            <div style={{ marginBottom: '8px' }}>
-              <label style={{ 
-                display: 'block', 
-                fontSize: '14px', 
-                color: '#333', 
-                marginBottom: '4px' 
-              }}>
-                {component.properties.label || 'No Content'}
-              </label>
-            </div>
-            
-          </ComponentContent>
-        );
       case 'text-body':
         return (
-          <ComponentContent fontSize="14px" color={component.properties?.color || '#666666'}>
+          <ComponentContent
+            $type={component.type}
+            color={component.properties?.color}
+            fontSize={component.properties?.fontSize}
+          >
             {component.properties?.text || ''}
           </ComponentContent>
         );
+      case 'text-input':
+        return (
+          <ComponentContent $type="text-input">
+            <div style={{ marginBottom: '8px' }}>
+              <label style={{ display: 'block', fontSize: '14px', color: '#333', marginBottom: '4px' }}>
+                {component.properties?.label || 'No Content'}
+              </label>
+            </div>
+          </ComponentContent>
+        );
       case 'text-area':
-        return <ComponentContent>{component.properties?.label || 'No Content'}</ComponentContent>;
       case 'check-box':
-        return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
       case 'radio-button':
-        return <ComponentContent>{component.properties?.label || 'No label'}</ComponentContent>;
       case 'embedded-link':
-        return <ComponentContent>{component.properties?.text || ''}</ComponentContent>;
       case 'opt-in':
-        return <ComponentContent>{component.properties?.label || 'No Content'}</ComponentContent>;
       case 'footer-button':
-        return <ComponentContent>{component.properties?.buttonText || 'No Content'}</ComponentContent>;
+      case 'PhotoPicker':
+      case 'DocumentPicker':
+        return <ComponentContent>{component.properties?.label || component.properties?.text || 'No Content'}</ComponentContent>;
       default:
         return null;
     }
@@ -222,32 +246,27 @@ const Builder: React.FC<BuilderProps> = ({
 
   return (
     <BuilderContainer>
-      <BuildArea sx={{ mb:15 }}>
+      <BuildArea sx={{ mb: 15 }}>
         <Droppable droppableId="builder">
           {(provided, snapshot) => (
             <ComponentsList
               ref={provided.innerRef}
               {...provided.droppableProps}
               style={{
-                minHeight: '100%',
                 background: snapshot.isDraggingOver ? '#e3f2fd' : 'transparent',
-                transition: 'background-color 0.2s ease'
+                transition: 'background-color 0.2s ease',
               }}
             >
               {components.map((component, index) => (
-                <Draggable
-                  key={component.id}
-                  draggableId={component.id}
-                  index={index}
-                >
-                  {(provided, snapshot) => (  
+                <Draggable key={component.id} draggableId={component.id} index={index}>
+                  {(provided, snapshot) => (
                     <ComponentWrapper
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                       style={{
                         ...provided.draggableProps.style,
-                        opacity: snapshot.isDragging ? 0.5 : 1
+                        opacity: snapshot.isDragging ? 0.5 : 1,
                       }}
                       $isSelected={selectedComponent?.id === component.id}
                       $type={component.type}
@@ -277,7 +296,7 @@ const Builder: React.FC<BuilderProps> = ({
           )}
         </Droppable>
       </BuildArea>
-      
+
       {selectedComponent && (
         <PropertiesForm
           component={selectedComponent}
@@ -286,8 +305,70 @@ const Builder: React.FC<BuilderProps> = ({
           screens={screens}
         />
       )}
+
+<StyledDialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+  <StyledDialogTitle>Confirm Delete</StyledDialogTitle>
+  <StyledDialogContent>
+    <StyledDialogContentText>
+      Are you sure you want to delete <strong>{componentToDelete?.name}</strong>?
+    </StyledDialogContentText>
+  </StyledDialogContent>
+  <StyledDialogActions>
+    <StyledButton
+      variant="outlined"
+      onClick={() => setDeleteDialogOpen(false)}
+    >
+      Cancel
+    </StyledButton>
+    <StyledButton
+      variant="contained"
+      color="error"
+      onClick={() => {
+        if (componentToDelete) {
+          onDeleteComponent(componentToDelete.id);
+          showToast({
+            message: `${componentToDelete.name} deleted successfully.`,
+            type: 'success',
+          });
+        }
+        setDeleteDialogOpen(false);
+      }}
+    >
+      Delete
+    </StyledButton>
+  </StyledDialogActions>
+</StyledDialog>
+
+      {/* <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete <strong>{componentToDelete?.name}</strong>?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button
+              onClick={() => {
+                if (componentToDelete) {
+                  onDeleteComponent(componentToDelete.id);
+                  showToast({
+                    message: `${componentToDelete.name} deleted successfully.`,
+                    type: 'success'
+                  });
+                }
+                setDeleteDialogOpen(false);
+              }}
+              color="error"
+              variant="contained"
+            >
+
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog> */}
     </BuilderContainer>
   );
 };
 
-export default Builder; 
+export default Builder;

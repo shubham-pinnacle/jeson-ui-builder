@@ -29,6 +29,8 @@ import{ useSelector } from 'react-redux';
 import { RootState } from './store/index';
 
 
+
+
 const AppContainer = styled("div")({
   display: "flex",
   height: "100vh",
@@ -209,6 +211,7 @@ function App() {
       components: [],
     },
   ]);
+  const TextHeadingtext = useSelector((state: RootState) => state.text.value);
   const [activeScreenIndex, setActiveScreenIndex] = useState<number>(0);
   const [selectedComponent, setSelectedComponent] = useState<Component | null>(
     null
@@ -234,13 +237,12 @@ function App() {
   );
 
 
-
-const  options = useSelector((state: RootState) => state.option.arr);
-
-useEffect(()=>{
-    console.log("Redux ", options);  
-},[options])
-
+  
+  
+  useEffect(()=>{
+    console.log("asd",TextHeadingtext);
+  },[TextHeadingtext])
+  
   // Update JSON editor when screens change
   useEffect(() => {
     const jsonString = JSON.stringify(generateJson(), null, 2);
@@ -261,7 +263,7 @@ useEffect(()=>{
         id: `component_${Date.now()}_${Math.random()
           .toString(36)
           .substr(2, 9)}`,
-        type: draggableId,
+          type: draggableId,
         name: draggableId
           .replace(/-/g, " ")
           .replace(/\b\w/g, (l) => l.toUpperCase()),
@@ -271,7 +273,7 @@ useEffect(()=>{
       // Set default properties based on component type
       switch (draggableId) {
         case "text-heading":
-          newComponent.properties = { text: "", visible: true };
+          newComponent.properties = { text: TextHeadingtext || "", visible: true };
           break;
         case "sub-heading":
           newComponent.properties = { text: "", visible: true };
@@ -332,8 +334,8 @@ useEffect(()=>{
             maxSelectedItems: 0,
           };
           break;
-        case "radio-button":
-          newComponent.properties = {
+          case "radio-button":
+            newComponent.properties = {
             label: "",
             description: "",
             outputVariable: "",
@@ -491,7 +493,7 @@ useEffect(()=>{
     // Set default properties based on component type
     switch (type) {
       case "text-heading":
-        newComponent.properties = { text: "", visible: true };
+        newComponent.properties = { text: TextHeadingtext || "", visible: true };
         break;
       case "sub-heading":
         newComponent.properties = { text: "", visible: true };
@@ -768,7 +770,7 @@ useEffect(()=>{
                 case "TextHeading":
                   type = "text-heading";
                   properties = {
-                    text: child.text || "",
+                    text: TextHeadingtext,
                     visible: child.visible || true,
                   };
                   break;
@@ -1207,7 +1209,7 @@ useEffect(()=>{
                   case "text-heading":
                     return {
                       type: "TextHeading",
-                      text: component.properties.text || "",
+                      text: TextHeadingtext || "",
                       visible,
                     };
                   case "sub-heading":
@@ -1815,6 +1817,8 @@ useEffect(()=>{
       setScreens(updatedScreens);
     }
   };
+
+  
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
