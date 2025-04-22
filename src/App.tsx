@@ -29,6 +29,8 @@ import{ useSelector } from 'react-redux';
 import { RootState } from './store/index';
 
 
+
+
 const AppContainer = styled("div")({
   display: "flex",
   height: "100vh",
@@ -209,6 +211,7 @@ function App() {
       components: [],
     },
   ]);
+  const TextHeadingtext = useSelector((state: RootState) => state.text.value);
   const [activeScreenIndex, setActiveScreenIndex] = useState<number>(0);
   const [selectedComponent, setSelectedComponent] = useState<Component | null>(
     null
@@ -234,13 +237,26 @@ function App() {
   );
 
 
-
-const  options = useSelector((state: RootState) => state.option.arr);
-
-useEffect(()=>{
-    console.log("Redux ", options);  
-},[options])
-
+  useEffect(()=>{
+    console.log("asd",TextHeadingtext);
+    
+    // Update all TextHeading components with the new text value from Redux
+    setScreens(prevScreens => 
+      prevScreens.map(screen => ({
+        ...screen,
+        components: screen.components.map(component => 
+          component.type === 'text-heading' 
+            ? { ...component, properties: { ...component.properties, text: TextHeadingtext } }
+            : component
+        )
+      }))
+    );
+  },[TextHeadingtext])
+  
+  useEffect(()=>{
+    console.log("asd",TextHeadingtext);
+  },[TextHeadingtext])
+  
   // Update JSON editor when screens change
   useEffect(() => {
     const jsonString = JSON.stringify(generateJson(), null, 2);
@@ -261,7 +277,7 @@ useEffect(()=>{
         id: `component_${Date.now()}_${Math.random()
           .toString(36)
           .substr(2, 9)}`,
-        type: draggableId,
+          type: draggableId,
         name: draggableId
           .replace(/-/g, " ")
           .replace(/\b\w/g, (l) => l.toUpperCase()),
@@ -271,7 +287,7 @@ useEffect(()=>{
       // Set default properties based on component type
       switch (draggableId) {
         case "text-heading":
-          newComponent.properties = { text: "", visible: true };
+          newComponent.properties = { text: TextHeadingtext || "", visible: true };
           break;
         case "sub-heading":
           newComponent.properties = { text: "", visible: true };
@@ -332,16 +348,62 @@ useEffect(()=>{
             maxSelectedItems: 0,
           };
           break;
-        case "radio-button":
-          newComponent.properties = {
+          case "radio-button":
+            newComponent.properties = {
             label: "",
-            description: "",
+            description:"",
             outputVariable: "",
             options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
             visible: true,
             required: false,
             enabled: true,
             initValue: "",
+
+          };
+          break;
+        case "drop-down":
+          newComponent.properties = {
+            label: "",
+            description:"",
+            name: `dropdown_field_${Date.now()}`,
+            options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
+            visible: true,
+            required: false,
+            placeholder: "Select an option",
+            enabled: true,
+            outputVariable: "",
+          };
+          break;
+        case "footer-button":
+          newComponent.properties = {
+            label: "",
+            leftCaption: "",
+            centerCaption: "",
+            rightCaption: "",
+            enabled: null,
+            onClickAction: "",
+            screenName: "",
+          };
+          break;
+        case "embedded-link":
+          newComponent.properties = {
+            text: "",
+            visible: true,
+            onClickAction: "",
+            screenName: "",
+            url: ""
+          };
+          break;
+        case "opt-in":
+          newComponent.properties = {
+            label: "",
+            required: null,
+            visible: true,
+            outputVariable: "",
+            initValue: null,
+            onClickAction: "",
+            screenName: "",
+            url: ""
           };
           break;
         case "PhotoPicker":
@@ -424,38 +486,6 @@ useEffect(()=>{
             dateOfBirth: "",
           };
           break;
-        case "embedded-link":
-          newComponent.properties = {
-            text: "",
-            visible: true,
-            onClickAction: "",
-            screenName: "",
-            url: "",
-          };
-          break;
-        case "opt-in":
-          newComponent.properties = {
-            label: "",
-            required: null,
-            visible: true,
-            outputVariable: "",
-            initValue: null,
-            onClickAction: "",
-            screenName: "",
-            url: ""
-          };
-          break;
-        case "footer-button":
-          newComponent.properties = {
-            label: "",
-            leftCaption: "",
-            centerCaption: "",
-            rightCaption: "",
-            enabled: null,
-            onClickAction: "",
-            screenName: "",
-          };
-          break;
       }
 
       const updatedScreens = [...screens];
@@ -491,7 +521,7 @@ useEffect(()=>{
     // Set default properties based on component type
     switch (type) {
       case "text-heading":
-        newComponent.properties = { text: "", visible: true };
+        newComponent.properties = { text: TextHeadingtext || "", visible: true };
         break;
       case "sub-heading":
         newComponent.properties = { text: "", visible: true };
@@ -727,7 +757,7 @@ useEffect(()=>{
                 case "TextHeading":
                   type = "text-heading";
                   properties = {
-                    text: child.text || "",
+                    text: TextHeadingtext,
                     visible: child.visible || true,
                   };
                   break;
@@ -1165,7 +1195,7 @@ useEffect(()=>{
                   case "text-heading":
                     return {
                       type: "TextHeading",
-                      text: component.properties.text || "",
+                      text: TextHeadingtext || "",
                       visible,
                     };
                   case "sub-heading":
@@ -1758,6 +1788,8 @@ useEffect(()=>{
       setScreens(updatedScreens);
     }
   };
+
+  
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>

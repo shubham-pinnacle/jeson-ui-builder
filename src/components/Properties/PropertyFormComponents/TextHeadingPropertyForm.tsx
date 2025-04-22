@@ -1,16 +1,23 @@
 import { Stack, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { FieldRendererProps } from "./FieldRendererProps";
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store'
+import { setText } from '../../../slices/TextHeading/textSlice';
 
 export default function TextHeadingPropertyForm({
   component, onPropertyChange: h,
 }: Pick<FieldRendererProps, "component" | "onPropertyChange">) {
+  
+  const dispatch = useDispatch();
+  const text = useSelector((state: RootState) => state.text.value);
+  
   return (
     <Stack spacing={2}>
       <TextField
         label="Text Heading"
         required fullWidth
-        value={component.properties?.text || ""}
-        onChange={e => h("text", e.target.value)}
+        value={text || ""}
+        onChange={e => dispatch(setText(e.target.value))}
         size="small"
       />
       <FormControl fullWidth size="small">
