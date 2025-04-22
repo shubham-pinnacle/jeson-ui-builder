@@ -1,6 +1,6 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Component } from '../../types';
 import PropertiesForm from '../Properties/PropertiesForm';
 import { DropResult } from 'react-beautiful-dnd';
@@ -215,11 +215,14 @@ const Builder: React.FC<BuilderProps> = ({
         return <ComponentContent>{component.properties?.label || 'No Content'}</ComponentContent>;
       case 'footer-button':
         return <ComponentContent>{component.properties?.buttonText || 'No Content'}</ComponentContent>;
+        case 'PhotoPicker':
+          return <ComponentContent>{component.properties?.label || ''}</ComponentContent>;
       default:
         return null;
     }
   };
 
+  
   return (
     <BuilderContainer>
       <BuildArea sx={{ mb:15 }}>
