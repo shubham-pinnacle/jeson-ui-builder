@@ -33,7 +33,7 @@ import FooterButtonPropertyForm from "./PropertyFormComponents/FooterButtonPrope
 import OptInPropertyForm from "./PropertyFormComponents/OptInPropertyForm";
 import PhotoPropertyForm from "./PropertyFormComponents/PhotoPropertyForm";
 import DocumentPropertyForm from "./PropertyFormComponents/DocumentPropertyForm";
-import ImageFields            from "./PropertyFormComponents/ImageFields";
+import ImagePropertyForm from "./PropertyFormComponents/ImagePropertyForm";
 import DatePickerFields       from "./PropertyFormComponents/DatePickerFields";
 import IfElseFields           from "./PropertyFormComponents/IfElseFields";
 import SwitchFields           from "./PropertyFormComponents/SwitchFields";
@@ -63,7 +63,7 @@ const fieldComponentMap: Record<string, React.FC<any>> = {
   "opt-in":        OptInPropertyForm,
   PhotoPicker:     PhotoPropertyForm,
   DocumentPicker:  DocumentPropertyForm,
-  image:           ImageFields,
+  image:           ImagePropertyForm,
   "date-picker":   DatePickerFields,
   "if-else":       IfElseFields,
   switch:          SwitchFields,

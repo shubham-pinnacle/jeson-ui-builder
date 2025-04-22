@@ -394,8 +394,8 @@ useEffect(()=>{
           newComponent.properties = {
             name: `input_field_${Date.now()}`,
             src: "",
-            width: 200,
-            height: 200,
+            width: null,
+            height: null,
             scaleType: "contain",
             altText: "",
             aspectRatio: "",
@@ -637,6 +637,18 @@ useEffect(()=>{
           visible: true,
           enabled: true,
           required: false,
+        };
+        break;
+      case "image":
+        newComponent.properties = {
+          name: `input_field_${Date.now()}`,
+          src: "",
+          width: null,
+          height: null,
+          scaleType: "contain",
+          altText: "",
+          aspectRatio: "",
+          base64Data: "",
         };
         break;
     }
@@ -935,8 +947,8 @@ useEffect(()=>{
                     src: child.src || "",
                     base64Data: child.base64Data || "",
                     scaleType: child.scaleType || "contain",
-                    width: child.width || "200",
-                    height: child.height || "200",
+                    width: child.width || null,
+                    height: child.height || null,
                     aspectRatio: child.aspectRatio || "1",
                     altText: child.altText || "",
                     visible: child.visible ?? true,
@@ -1442,12 +1454,19 @@ useEffect(()=>{
                     return {
                       type: "Image",
                       src: imageSrc,
-                      width: parseInt(component.properties.width) || 200,
-                      height: parseInt(component.properties.height) || 200,
+                      //width: parseInt(component.properties.width) || null,
+                      ...(component.properties?.width
+                        ? { "width": parseInt(component.properties.width) }
+                        : {}),
+                      ...(component.properties?.height
+                        ? { "height": parseInt(component.properties.height) }
+                        : {}),
                       "aspect-ratio":
                         parseFloat(component.properties.aspectRatio) || 1,
                       "scale-type": component.properties.scaleType || "contain",
-                      "alt-text": component.properties.altText || "",
+                      ...(component.properties?.altText
+                        ? { "alt-text": component.properties.altText }
+                        : {}),
                     };
 
                   case "PhotoPicker":
