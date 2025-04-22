@@ -13,7 +13,6 @@ import { IoMdInformationCircleOutline } from "react-icons/io";
 import { Component } from "../types";
 import { useDispatch } from "react-redux";
 import { updateOption } from "../../slices/optionSlice";
-import AllowedMimeTypes from "./AllowedMimeTypes";
 import {
   StyledPopper,
   PropertyOptions,
@@ -32,7 +31,7 @@ import SelectFields           from "./PropertyFormComponents/SelectFields";
 import RadioFields            from "./PropertyFormComponents/RadioFields";
 import FooterButtonPropertyForm from "./PropertyFormComponents/FooterButtonPropertyForm";
 import OptInPropertyForm from "./PropertyFormComponents/OptInPropertyForm";
-import PhotoFields            from "./PropertyFormComponents/PhotoFields";
+import PhotoPropertyForm from "./PropertyFormComponents/PhotoPropertyForm";
 import DocumentFields         from "./PropertyFormComponents/DocumentFields";
 import ImageFields            from "./PropertyFormComponents/ImageFields";
 import DatePickerFields       from "./PropertyFormComponents/DatePickerFields";
@@ -62,7 +61,7 @@ const fieldComponentMap: Record<string, React.FC<any>> = {
   "radio-button":  RadioFields,
   "footer-button": FooterButtonPropertyForm,
   "opt-in":        OptInPropertyForm,
-  PhotoPicker:     PhotoFields,
+  PhotoPicker:     PhotoPropertyForm,
   DocumentPicker:  DocumentFields,
   image:           ImageFields,
   "date-picker":   DatePickerFields,

@@ -349,9 +349,9 @@ useEffect(()=>{
             label: "",
             description: "",
             outputVariable: "",
-            photoSource: "Camera Gallery",
-            minPhotos: "",
-            maxPhotos: "",
+            photoSource: "camera_gallery",
+            minPhotos: "0",
+            maxPhotos: "30",
             maxFileSize: "25",
             visible: true,
             enabled: true,
@@ -608,6 +608,21 @@ useEffect(()=>{
           onClickAction: "",
           screenName: "",
           url: ""
+        };
+        break;
+      case "PhotoPicker":
+        newComponent.properties = {
+          label: "",
+          description: "",
+          outputVariable: "",
+          photoSource: "camera_gallery",
+          minPhotos: "0",
+          maxPhotos: "30",
+          maxFileSize: "25",
+          visible: true,
+          enabled: true,
+          required: false,
+          accept: "image/*",
         };
         break;
     }
@@ -937,9 +952,9 @@ useEffect(()=>{
                     label: child.label || "",
                     description: child.description || "",
                     outputVariable: child.name || "",
-                    photoSource: child["photo-source"] || "camera",
-                    minPhotos: child["min-uploaded-photos"]?.toString() || "",
-                    maxPhotos: child["max-uploaded-photos"]?.toString() || "10",
+                    photoSource: child["photo-source"] || "camera_gallery",
+                    minPhotos: child["min-uploaded-photos"]?.toString() || "0",
+                    maxPhotos: child["max-uploaded-photos"]?.toString() || "30",
                     maxFileSize:
                       (child["max-file-size-kb"] / 1024)?.toString() || "10", // Convert back to MB
                     visible: child.visible ?? true,
@@ -947,29 +962,29 @@ useEffect(()=>{
                   };
                   break;
 
-                  case "date-picker":
-                    type = "DatePicker";
-                    properties = {
-                      label: child.label || "",
-                      outputVariable: child.name || "",
-                      initValue: child["init-value"]
-                        ? new Date(child["init-value"])
-                        : null,
-                      minDate: child["min-date"]
-                        ? new Date(child["min-date"])
-                        : null,
-                      maxDate: child["max-date"]
-                        ? new Date(child["max-date"])
-                        : null,
-                      unavailableDates: Array.isArray(child["unavailable-dates"])
-                        ? child["unavailable-dates"].join(", ")
-                        : "",
-                      helperText: child["helper-text"] || "",
-                      required: child.required ?? false,
-                      visible: child.visible ?? true,
-                      enabled: child.enabled ?? true,
-                    };
-                    break;
+                case "date-picker":
+                  type = "DatePicker";
+                  properties = {
+                    label: child.label || "",
+                    outputVariable: child.name || "",
+                    initValue: child["init-value"]
+                      ? new Date(child["init-value"])
+                      : null,
+                    minDate: child["min-date"]
+                      ? new Date(child["min-date"])
+                      : null,
+                    maxDate: child["max-date"]
+                      ? new Date(child["max-date"])
+                      : null,
+                    unavailableDates: Array.isArray(child["unavailable-dates"])
+                      ? child["unavailable-dates"].join(", ")
+                      : "",
+                    helperText: child["helper-text"] || "",
+                    required: child.required ?? false,
+                    visible: child.visible ?? true,
+                    enabled: child.enabled ?? true,
+                  };
+                  break;
 
                 default:
                   return null;
@@ -1424,8 +1439,11 @@ useEffect(()=>{
                     return {
                       type: "PhotoPicker",
                       label: component.properties.label || "",
-                      name: "photo_picker",
-                      description: component.properties.description || "",
+                      name: component.properties.outputVariable || "",
+                      // description: component.properties.description || "",
+                      ...(component.properties?.description
+                        ? { "description": component.properties.description }
+                        : {}),
                       // required: component.properties.required || false,
                       // accept: component.properties.accept || 'image/*',
                       visible,
@@ -1434,9 +1452,9 @@ useEffect(()=>{
                       "photo-source":
                         component.properties.photoSource || "camera_gallery",
                       "min-uploaded-photos":
-                        parseInt(component.properties.minPhotos) || 1,
+                        parseInt(component.properties.minPhotos) || 0,
                       "max-uploaded-photos":
-                        parseInt(component.properties.maxPhotos) || 10,
+                        parseInt(component.properties.maxPhotos) || 30,
                       "max-file-size-kb":
                         parseInt(component.properties.maxFileSize) * 1024 ||
                         10240,
@@ -1475,7 +1493,7 @@ useEffect(()=>{
                       enabled,
                       "allowed-mime-types": component.properties.allowedMimeTypes || [],
                       "min-uploaded-documents": parseInt(component.properties.minPhotos) || 1,
-                      "max-uploaded-documents": parseInt(component.properties.maxPhotos) || 1,
+                      "max-uploaded-documents": parseInt(component.properties.maxPhotos) || 30,
                       "max-file-size-kb":
                         parseInt(component.properties.maxFileSize) * 1024 || 10240,
                     };
