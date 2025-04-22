@@ -237,21 +237,7 @@ function App() {
   );
 
 
-  useEffect(()=>{
-    console.log("asd",TextHeadingtext);
-    
-    // Update all TextHeading components with the new text value from Redux
-    setScreens(prevScreens => 
-      prevScreens.map(screen => ({
-        ...screen,
-        components: screen.components.map(component => 
-          component.type === 'text-heading' 
-            ? { ...component, properties: { ...component.properties, text: TextHeadingtext } }
-            : component
-        )
-      }))
-    );
-  },[TextHeadingtext])
+  
   
   useEffect(()=>{
     console.log("asd",TextHeadingtext);
@@ -351,59 +337,13 @@ function App() {
           case "radio-button":
             newComponent.properties = {
             label: "",
-            description:"",
+            description: "",
             outputVariable: "",
             options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
             visible: true,
             required: false,
             enabled: true,
             initValue: "",
-
-          };
-          break;
-        case "drop-down":
-          newComponent.properties = {
-            label: "",
-            description:"",
-            name: `dropdown_field_${Date.now()}`,
-            options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
-            visible: true,
-            required: false,
-            placeholder: "Select an option",
-            enabled: true,
-            outputVariable: "",
-          };
-          break;
-        case "footer-button":
-          newComponent.properties = {
-            label: "",
-            leftCaption: "",
-            centerCaption: "",
-            rightCaption: "",
-            enabled: null,
-            onClickAction: "",
-            screenName: "",
-          };
-          break;
-        case "embedded-link":
-          newComponent.properties = {
-            text: "",
-            visible: true,
-            onClickAction: "",
-            screenName: "",
-            url: ""
-          };
-          break;
-        case "opt-in":
-          newComponent.properties = {
-            label: "",
-            required: null,
-            visible: true,
-            outputVariable: "",
-            initValue: null,
-            onClickAction: "",
-            screenName: "",
-            url: ""
           };
           break;
         case "PhotoPicker":
@@ -484,6 +424,38 @@ function App() {
             email: "",
             address: "",
             dateOfBirth: "",
+          };
+          break;
+        case "embedded-link":
+          newComponent.properties = {
+            text: "",
+            visible: true,
+            onClickAction: "",
+            screenName: "",
+            url: "",
+          };
+          break;
+        case "opt-in":
+          newComponent.properties = {
+            label: "",
+            required: null,
+            visible: true,
+            outputVariable: "",
+            initValue: null,
+            onClickAction: "",
+            screenName: "",
+            url: ""
+          };
+          break;
+        case "footer-button":
+          newComponent.properties = {
+            label: "",
+            leftCaption: "",
+            centerCaption: "",
+            rightCaption: "",
+            enabled: null,
+            onClickAction: "",
+            screenName: "",
           };
           break;
       }
