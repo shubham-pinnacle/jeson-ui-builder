@@ -7,6 +7,9 @@ export default function TextCaptionPropertyForm({
 }: Pick<FieldRendererProps, "component" | "onPropertyChange">) {
   const handleChange = (prop: string, value: any) => h(prop, value);
 
+  const text = component.properties?.text || "";
+  const maxLength = 409;
+  const isOverLimit = text.length > maxLength;
   return (
     <Stack spacing={2}>
       <TextField
@@ -16,6 +19,14 @@ export default function TextCaptionPropertyForm({
         value={component.properties?.text || ""}
         onChange={(e) => handleChange("text", e.target.value)}
         size="small"
+        error={isOverLimit}
+        helperText={`${text.length}/${maxLength} characters`}
+        FormHelperTextProps={{
+          sx: {
+            color: isOverLimit ? 'red' : 'text.secondary',
+            fontWeight: isOverLimit ? 600 : 400,
+          },
+        }}
       />
 
       <FormControl fullWidth size="small">
