@@ -25,8 +25,8 @@ const SimulatorImage: React.FC<Props> = ({ component }) => {
         src={imageSrc}
         alt={altText || ''}
         style={{
-          width: width || 200,
-          height: height || 200,
+          width: width || 600,
+          height: height || 600,
           aspectRatio: aspectRatio || 1,
           objectFit: scaleType || 'contain',
           maxWidth: '100%',
