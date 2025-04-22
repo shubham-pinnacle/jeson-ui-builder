@@ -165,6 +165,9 @@ const ComponentContent = styled('div', {
   alignItems: 'center',
   justifyContent: 'flex-start',
   border: $type === 'text-input' ? '1px solid #e0e0e0' : 'none',
+  whiteSpace: 'pre-wrap',        
+  overflowWrap: 'break-word',    
+  wordBreak: 'break-word',  
 }));
 
 interface BuilderProps {
