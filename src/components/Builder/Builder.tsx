@@ -236,9 +236,12 @@ const Builder: React.FC<BuilderProps> = ({
       case 'embedded-link':
       case 'opt-in':
       case 'footer-button':
+        return <ComponentContent>{component.properties?.buttonText  || 'No Content'}</ComponentContent>;
       case 'PhotoPicker':
       case 'DocumentPicker':
         return <ComponentContent>{component.properties?.label || component.properties?.text || 'No Content'}</ComponentContent>;
+      case 'date-picker':
+          return <ComponentContent>{component.properties?.label || component.properties?.text || 'No Content'}</ComponentContent>;
       default:
         return null;
     }
