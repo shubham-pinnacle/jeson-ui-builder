@@ -14,6 +14,17 @@ export default function FooterButtonPropertyForm({
   onPropertyChange: handleChange,
   screens,
 }: Pick<FieldRendererProps, "component" | "onPropertyChange" | "screens">) {
+
+  const getHelperText = (field: string, limit: number) => {
+    const value = component.properties?.[field] || "";
+    return `${value.length}/${limit} characters`;
+  };
+
+  const isOverLimit = (field: string, limit: number) => {
+    const value = component.properties?.[field] || "";
+    return value.length > limit;
+  };
+
   return (
     <Stack spacing={2}>
       <TextField
@@ -23,6 +34,14 @@ export default function FooterButtonPropertyForm({
         value={component.properties?.buttonText || ""}
         onChange={(e) => handleChange("buttonText", e.target.value)}
         size="small"
+        error={isOverLimit("buttonText", 35)}
+        helperText={getHelperText("buttonText", 35)}
+        FormHelperTextProps={{
+          sx: {
+            color: isOverLimit("buttonText", 35) ? "red" : "text.secondary",
+            fontWeight: isOverLimit("buttonText", 35) ? 600 : 400,
+          },
+        }}
       />
 
       <FormControl fullWidth size="small">
@@ -49,6 +68,14 @@ export default function FooterButtonPropertyForm({
         }}
         disabled={!!component.properties?.centerCaption}
         size="small"
+        error={isOverLimit("leftCaption", 15)}
+        helperText={getHelperText("leftCaption", 15)}
+        FormHelperTextProps={{
+          sx: {
+            color: isOverLimit("leftCaption", 15) ? "red" : "text.secondary",
+            fontWeight: isOverLimit("leftCaption", 15) ? 600 : 400,
+          },
+        }}
       />
       <TextField
         label="Center Caption"
@@ -63,6 +90,14 @@ export default function FooterButtonPropertyForm({
           !!component.properties?.rightCaption
         }
         size="small"
+        error={isOverLimit("centerCaption", 15)}
+        helperText={getHelperText("centerCaption", 15)}
+        FormHelperTextProps={{
+          sx: {
+            color: isOverLimit("centerCaption", 15) ? "red" : "text.secondary",
+            fontWeight: isOverLimit("centerCaption", 15) ? 600 : 400,
+          },
+        }}
       />
       <TextField
         label="Right Caption"
@@ -76,6 +111,14 @@ export default function FooterButtonPropertyForm({
         }}
         disabled={!!component.properties?.centerCaption}
         size="small"
+        error={isOverLimit("rightCaption", 15)}
+        helperText={getHelperText("rightCaption", 15)}
+        FormHelperTextProps={{
+          sx: {
+            color: isOverLimit("rightCaption", 15) ? "red" : "text.secondary",
+            fontWeight: isOverLimit("rightCaption", 15) ? 600 : 400,
+          },
+        }}
       />
 
       <FormControl fullWidth size="small">

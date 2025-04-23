@@ -6,6 +6,13 @@ import { FieldRendererProps } from "./FieldRendererProps";
 export default function OptInPropertyForm({
   component, onPropertyChange: handleChange, screens
 }: Pick<FieldRendererProps, "component"|"onPropertyChange"|"screens">) {
+
+  const label = component.properties?.label || "";
+  const labelLimit = 120;
+
+  const getHelperText = () => `${label.length}/${labelLimit} characters`;
+  const isOverLimit = () => label.length > labelLimit;
+
   return (
         <Stack spacing={2}>
       <TextField
@@ -15,6 +22,14 @@ export default function OptInPropertyForm({
         value={component.properties?.label || ""}
         onChange={(e) => handleChange("label", e.target.value)}
         size="small"
+        error={isOverLimit()}
+        helperText={getHelperText()}
+        FormHelperTextProps={{
+          sx: {
+            color: isOverLimit() ? "red" : "text.secondary",
+            fontWeight: isOverLimit() ? 600 : 400,
+          },
+        }}
       />
 
       <TextField

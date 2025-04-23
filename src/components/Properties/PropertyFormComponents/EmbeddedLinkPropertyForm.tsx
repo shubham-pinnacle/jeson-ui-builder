@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+
 import {
   Stack,
   TextField,
@@ -16,6 +17,26 @@ export default function EmbeddedLinkFields({
 }: Pick<FieldRendererProps, "component" | "onPropertyChange" | "screens">) {
   const handleChange = (prop: string, value: any) => h(prop, value);
 
+  const text = component.properties?.text || "";
+  const maxChars = 25;
+
+  const [touched, setTouched] = useState(false);
+
+  const formatSentenceCase = (value: string) => {
+    const trimmed = value.trimStart();
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+  };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatSentenceCase(e.target.value);
+    handleChange("text", formatted);
+    if (!touched) setTouched(true);
+  };
+
+  const isEmptyOrBlank = text.trim() === "";
+  const isOverLimit = text.length > maxChars;
+  const showError = touched && (isEmptyOrBlank || isOverLimit);
+
   return (
     <Stack spacing={2}>
       <TextField
@@ -23,8 +44,23 @@ export default function EmbeddedLinkFields({
         required
         fullWidth
         value={component.properties?.text || ""}
-        onChange={(e) => handleChange("text", e.target.value)}
+        onChange={handleTextChange}
+
         size="small"
+        error={showError}
+        helperText={
+          showError
+            ? isEmptyOrBlank
+              ? "Text cannot be empty or blank"
+              : `${text.length}/${maxChars} characters`
+            : `${text.length}/${maxChars} characters`
+        }
+        FormHelperTextProps={{
+          sx: {
+            color: showError ? "red" : "text.secondary",
+            fontWeight: showError ? 600 : 400,
+          },
+        }}
       />
 
       <FormControl fullWidth size="small">
