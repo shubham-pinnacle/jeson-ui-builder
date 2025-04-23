@@ -409,12 +409,11 @@ function App() {
             label: "",
             outputVariable: "",
             initValue: "",
-            required: false,
-            visible: false,
-            enabled: false,
+            visible: true,
+            enabled: true,
             minDate: "",
             maxDate: "",
-            unavailableDates: "",
+            unavailableDates: [],
             helperText: "",
           };
           break;
@@ -653,6 +652,19 @@ function App() {
           base64Data: "",
         };
         break;
+      case "date-picker":
+          newComponent.properties = {
+            label: "",
+            outputVariable: "",
+            initValue: "",
+            visible: true,
+            enabled: true,
+            minDate: "",
+            maxDate: "",
+            unavailableDates: [],
+            helperText: "",
+          };
+          break;
     }
 
     const updatedScreens = [...screens];
@@ -1007,14 +1019,12 @@ function App() {
                       : null,
                     unavailableDates: Array.isArray(child["unavailable-dates"])
                       ? child["unavailable-dates"].join(", ")
-                      : "",
+                      : [],
                     helperText: child["helper-text"] || "",
-                    required: child.required ?? false,
                     visible: child.visible ?? true,
                     enabled: child.enabled ?? true,
                   };
                   break;
-
                 default:
                   return null;
               }
@@ -1617,28 +1627,26 @@ function App() {
                     return {
                       type: "DatePicker",
                       label: component.properties.label || "",
-                      name: "date",
-                      // "output-variable":
-                      //   component.properties.outputVariable || "",
-                      "init-value": component.properties.initValue || "",
-                      required: component.properties.required === "false" ||
-                      component.properties?.required === false
-                        ? false
-                        : true,
-                      visible: component.properties.visible === "false" ||
-                      component.properties?.visible === false
-                        ? false
-                        : true,
-                      enabled: component.properties.enabled === "false" ||
-                      component.properties?.enabled === false
-                        ? false
-                        : true,
-                      "min-date": component.properties.minDate || "",
-                      "max-date": component.properties.maxDate || "",
-                      "unavailable-dates":
-                        component.properties.unavailableDates || "",
-                      "helper-text": component.properties.helperText || "",
+                      name: component.properties.outputVariable || '',
+                      ...(component.properties?.initValue
+                        ? { "init-value": component.properties.initValue }
+                        : {}),
+                      visible,
+                      enabled,
+                      ...(component.properties?.minDate
+                        ? { "min-date": component.properties.minDate }
+                        : {}),
+                      ...(component.properties?.maxDate
+                        ? { "max-date": component.properties.maxDate }
+                        : {}),
+                      ...(component.properties?.unavailableDates
+                        ? { "unavailable-dates": component.properties.unavailableDates }
+                        : {}),
+                      ...(component.properties?.helperText
+                        ? { "helper-text": component.properties.helperText }
+                        : {}),
                     };
+
                   case "user-details":
                     return {
                       type: "UserDetails",
