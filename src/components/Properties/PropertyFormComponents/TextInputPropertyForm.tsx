@@ -8,6 +8,16 @@ export default function TextInputPropertyForm({
 }: Pick<FieldRendererProps, "component" | "onPropertyChange">) {
   const handleChange = (prop: string, value: any) => h(prop, value);
 
+  const getHelperText = (field: string, limit: number) => {
+    const value = component.properties?.[field] || "";
+    return `${value.length}/${limit} characters`;
+  };
+
+  const isOverLimit = (field: string, limit: number) => {
+    const value = component.properties?.[field] || "";
+    return value.length > limit;
+  };
+  
   return (
     <Stack spacing={2}>
       <TextField
@@ -17,6 +27,14 @@ export default function TextInputPropertyForm({
         value={component.properties?.label || ""}
         onChange={(e) => handleChange("label", e.target.value)}
         size="small"
+        error={isOverLimit("label", 20)}
+        helperText={getHelperText("label", 20)}
+        FormHelperTextProps={{
+          sx: {
+            color: isOverLimit("label", 20) ? "red" : "text.secondary",
+            fontWeight: isOverLimit("label", 20) ? 600 : 400,
+          },
+        }}
       />
 
       <TextField
@@ -104,6 +122,14 @@ export default function TextInputPropertyForm({
         value={component.properties?.helperText || ""}
         onChange={(e) => handleChange("helperText", e.target.value)}
         size="small"
+        error={isOverLimit("helperText", 80)}
+        helperText={getHelperText("helperText", 80)}
+        FormHelperTextProps={{
+          sx: {
+            color: isOverLimit("helperText", 80) ? "red" : "text.secondary",
+            fontWeight: isOverLimit("helperText", 80) ? 600 : 400,
+          },
+        }}
       />
     </Stack>
   );
