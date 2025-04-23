@@ -7,6 +7,9 @@ export default function TextBodyPropertyForm({
   onPropertyChange: h,
 }: Pick<FieldRendererProps, "component" | "onPropertyChange">) {
   const handleChange = (prop: string, value: any) => h(prop, value);
+  const text = component.properties?.text || "";
+  const maxChars = 4603;
+  const isOverLimit = text.length > maxChars;
 
   return (
     <Stack spacing={2}>
@@ -17,6 +20,14 @@ export default function TextBodyPropertyForm({
         value={component.properties?.text || ""}
         onChange={(e) => handleChange("text", e.target.value)}
         size="small"
+        error={isOverLimit}
+        helperText={`${text.length}/${maxChars} characters`}
+        FormHelperTextProps={{
+          sx: {
+            color: isOverLimit ? 'red' : 'text.secondary',
+            fontWeight: isOverLimit ? 600 : 400,
+          },
+        }}
       />
 
       <FormControl fullWidth size="small">
