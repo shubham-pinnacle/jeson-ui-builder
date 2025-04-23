@@ -16,6 +16,23 @@ export default function EmbeddedLinkFields({
 }: Pick<FieldRendererProps, "component" | "onPropertyChange" | "screens">) {
   const handleChange = (prop: string, value: any) => h(prop, value);
 
+
+  const text = component.properties?.text || "";
+  const maxChars = 25;
+
+  const formatSentenceCase = (value: string) => {
+    const trimmed = value.trimStart();
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+  };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatSentenceCase(e.target.value);
+    handleChange("text", formatted);
+  };
+
+  const isEmptyOrBlank = text.trim() === "";
+  const isOverLimit = text.length > maxChars;
+
   return (
     <Stack spacing={2}>
       <TextField
@@ -25,6 +42,18 @@ export default function EmbeddedLinkFields({
         value={component.properties?.text || ""}
         onChange={(e) => handleChange("text", e.target.value)}
         size="small"
+        error={isEmptyOrBlank || isOverLimit}
+        helperText={
+          isEmptyOrBlank
+            ? "Text cannot be empty or blank"
+            : `${text.length}/${maxChars} characters`
+        }
+        FormHelperTextProps={{
+          sx: {
+            color: isEmptyOrBlank || isOverLimit ? "red" : "text.secondary",
+            fontWeight: isEmptyOrBlank || isOverLimit ? 600 : 400,
+          },
+        }}
       />
 
       <FormControl fullWidth size="small">
