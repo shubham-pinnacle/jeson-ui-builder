@@ -859,11 +859,7 @@ function App() {
                     description: child.description || "",
                     outputVariable: child.name || "",
                     options: JSON.stringify(
-                      child["data-source"]?.map((opt: any) => opt.title) || [
-                        "Option 1",
-                        "Option 2",
-                        "Option 3",
-                      ]
+                      child["data-source"]?.map((opt: any) => opt.title)
                     ),
                     visible: child.visible || true,
                     required: child.required || false,
@@ -1377,7 +1373,7 @@ function App() {
                       required,
                       visible,
                       "init-value": component.properties.initValue || "",
-                      "data-source": options,
+                      "data-source": component.properties.options
                     };
                   case "drop-down":
                     return {
