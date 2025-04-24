@@ -28,6 +28,8 @@ import Dialog from "@mui/material/Dialog";
 import{ useSelector } from 'react-redux';
 import { RootState } from './store/index';
 
+import { useToast } from './components/ToastContext';
+
 
 
 
@@ -204,6 +206,7 @@ interface Screen {
 }
 
 function App() {
+  const { showToast } = useToast();
   const [screens, setScreens] = useState<Screen[]>([
     {
       id: "WELCOME",
@@ -236,7 +239,13 @@ function App() {
     null
   );
 
-
+  // useEffect(() => {
+  //   showToast({
+  //     message: 'Maximum of 50 components are allowed per screen.',
+  //     type: 'error',
+  //   });
+  // }, []); 
+  
   
   
   useEffect(()=>{
@@ -483,7 +492,20 @@ function App() {
   };
 
   const handleAddComponent = (type: string) => {
-    const newComponent: Component = {
+
+    const currentComponents = screens[activeScreenIndex]?.components || [];
+
+      if (currentComponents.length >= 50) {
+        // useEffect(() => {
+          showToast({
+            message: 'Maximum of 50 components are allowed per screen.',
+            type: 'error',
+          });
+        // }, []); 
+        
+        return;
+      }
+        const newComponent: Component = {
       id: `component_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       type,
       name: type.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
