@@ -20,6 +20,7 @@ import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { FaTimes } from "react-icons/fa";
 import { FieldRendererProps } from "./FieldRendererProps";
+import { useEffect } from "react";
 
 export default function RadioFields(props: FieldRendererProps) {
   const {
@@ -34,6 +35,14 @@ export default function RadioFields(props: FieldRendererProps) {
   } = props;
 
   const handleChange = (prop: string, value: any) => h(prop, value);
+
+  const PropertyOptions = [
+    { title: "id" },
+    { title: "description" },
+    { title: "metadata" },
+  ];
+
+  useEffect(() => {console.log("selectedOptions",selectedOptions)},[selectedOptions])
 
   // 1) Normalize your "options" (the radio/checkbox choices) into an array:
   const rawOptions = component.properties?.options;
@@ -91,54 +100,65 @@ export default function RadioFields(props: FieldRendererProps) {
 
 <Autocomplete
         multiple
-        options={propertyOptions}
+        id="checkboxes-tags-demo"
+        options={PropertyOptions}
         disableCloseOnSelect
-        getOptionLabel={(opt) => opt.title}
-        value={fieldValues}
-        onChange={(_, newValue) => setSelectedOptions(newValue)}
-        renderOption={(props, option, { selected }) => (
-          <li {...props}>
-            <Checkbox
-              icon={icon}
-              checkedIcon={checkedIcon}
-              style={{ marginRight: 8 }}
-              checked={selected}
-            />
-            {option.title}
-          </li>
-        )}
+        getOptionLabel={(option) => option.title}
+        onChange={(event, newValue) => {
+          setSelectedOptions(newValue);
+        }}
+        renderOption={(props, option, { selected }) => {
+          const { key, ...optionProps } = props;
+          return (
+            <li key={key} {...optionProps}>
+              <Checkbox
+                icon={icon}
+                checkedIcon={checkedIcon}
+                style={{ marginRight: 8 }}
+                checked={selected}
+              />
+              {option.title}
+            </li>
+          );
+        }}
         renderInput={(params) => (
           <TextField
             {...params}
             label="Properties (optional)"
+            
             size="small"
-          />
+            />
         )}
         fullWidth
       />
+            <Box>
+              <Typography variant="subtitle2" gutterBottom>
+                Options:
+              </Typography>
+              <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+                <TextField
+                  placeholder="Title"
+                  size="small"
+                  fullWidth
+                  value={component.properties?.newOption || ""}
+                  onChange={(e) => handleChange("newOption", e.target.value)}
+                />
+              </Stack>
+              
+            </Box>
+
 
       {/* === For each selected property, show ID / Description / Metadata checkbox === */}
       {selectedOptions.length > 0 && (
         <Box>
-          <Typography variant="subtitle2" gutterBottom>
-            Properties Details:
-          </Typography>
+         
           {selectedOptions.map((opt) => (
             <Box
               key={opt.title}
-              sx={{
-                mb: 2,
-                p: 2,
-                border: "1px solid rgba(0,0,0,0.1)",
-                borderRadius: 1,
-              }}
             >
-              <Typography variant="subtitle2" gutterBottom>
-                {opt.title}
-              </Typography>
 
               <TextField
-                label="ID"
+                label={opt.title}
                 size="small"
                 fullWidth
                 sx={{ mb: 1 }}
@@ -148,59 +168,20 @@ export default function RadioFields(props: FieldRendererProps) {
                 }
               />
 
-              <TextField
-                label="Description"
-                size="small"
-                fullWidth
-                sx={{ mb: 1 }}
-                value={fieldValues[`${opt.title}_description`] || ""}
-                onChange={(e) =>
-                  handleFieldChange(`${opt.title}_description`, e.target.value)
-                }
-              />
-
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={Boolean(fieldValues[`${opt.title}_metadata`])}
-                    onChange={(e) =>
-                      handleFieldChange(
-                        `${opt.title}_metadata`,
-                        e.target.checked
-                      )
-                    }
-                  />
-                }
-                label="Metadata"
-              />
+            
             </Box>
           ))}
+              <Button
+                variant="outlined"
+                onClick={() => handleOptionAdd("options")}
+                size="small"
+              >
+                Add
+              </Button>
         </Box>
       )}
 
       {/* === OPTIONS: add / list your actual radio options === */}
-      <Box>
-        <Typography variant="subtitle2" gutterBottom>
-          Options:
-        </Typography>
-        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-          <TextField
-            placeholder="Title"
-            size="small"
-            fullWidth
-            value={component.properties?.newOption || ""}
-            onChange={(e) => handleChange("newOption", e.target.value)}
-          />
-        </Stack>
-        <Button
-          variant="outlined"
-          onClick={() => handleOptionAdd("options")}
-          size="small"
-        >
-          Add
-        </Button>
-        
-      </Box>
 
       {/* === INIT VALUE DROPDOWN (only the user-added options) === */}
       <FormControl fullWidth size="small">
