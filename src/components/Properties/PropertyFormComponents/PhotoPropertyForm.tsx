@@ -5,6 +5,15 @@ import { FieldRendererProps } from "./FieldRendererProps";
 export default function PhotoPropertyForm({
   component, onPropertyChange: handleChange
 }: Pick<FieldRendererProps, "component"|"onPropertyChange">) {
+
+  const text = component.properties?.label || "";
+  const maxChars = 80;
+  const isOverLimit = text.length > maxChars;
+
+  const descriptionText = component.properties?.description || "";
+  const descriptionMaxChars = 300;
+  const isDescriptionOverLimit = descriptionText.length > descriptionMaxChars;
+
   return (
     <Stack spacing={2}>
       <TextField
@@ -14,6 +23,14 @@ export default function PhotoPropertyForm({
         value={component.properties?.label || ""}
         onChange={(e) => handleChange("label", e.target.value)}
         size="small"
+        error={isOverLimit}
+        helperText={`${text.length}/${maxChars} characters`}
+        FormHelperTextProps={{
+          sx: {
+            color: isOverLimit ? 'red' : 'text.secondary',
+            fontWeight: isOverLimit ? 600 : 400,
+          },
+        }}
       />
       <TextField
         label="Description (Optional)"
@@ -21,6 +38,14 @@ export default function PhotoPropertyForm({
         value={component.properties?.description || ""}
         onChange={(e) => handleChange("description", e.target.value)}
         size="small"
+        error={isDescriptionOverLimit}
+        helperText={`${descriptionText.length}/${descriptionMaxChars} characters`}
+        FormHelperTextProps={{
+          sx: {
+            color: isDescriptionOverLimit ? 'red' : 'text.secondary',
+            fontWeight: isDescriptionOverLimit ? 600 : 400,
+          },
+        }}
       />
       <TextField
         label="Output Variable"
