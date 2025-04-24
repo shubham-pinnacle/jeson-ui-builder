@@ -21,6 +21,7 @@ import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { FaTimes } from "react-icons/fa";
 import { FieldRendererProps } from "./FieldRendererProps";
 import { useEffect } from "react";
+import { PropertyOptions } from "../PropertiesFormStyles";
 
 export default function RadioFields(props: FieldRendererProps) {
   const {
@@ -36,13 +37,10 @@ export default function RadioFields(props: FieldRendererProps) {
 
   const handleChange = (prop: string, value: any) => h(prop, value);
 
-  const PropertyOptions = [
-    { title: "id" },
-    { title: "description" },
-    { title: "metadata" },
-  ];
 
-  useEffect(() => {console.log("selectedOptions",selectedOptions)},[selectedOptions])
+  useEffect(() => {console.log("selectedOptions",selectedOptions);
+    console.log("component.properties.options",component.properties.options)
+  })
 
   // 1) Normalize your "options" (the radio/checkbox choices) into an array:
   const rawOptions = component.properties?.options;
@@ -135,20 +133,17 @@ export default function RadioFields(props: FieldRendererProps) {
               <Typography variant="subtitle2" gutterBottom>
                 Options:
               </Typography>
-              <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+              <Stack direction="row" >
                 <TextField
                   placeholder="Title"
                   size="small"
                   fullWidth
+                  sx={{ mb: selectedOptions.length > 0 ?  1 : 0 }}
                   value={component.properties?.newOption || ""}
                   onChange={(e) => handleChange("newOption", e.target.value)}
                 />
               </Stack>
               
-            </Box>
-
-
-      {/* === For each selected property, show ID / Description / Metadata checkbox === */}
       {selectedOptions.length > 0 && (
         <Box>
          
@@ -180,6 +175,10 @@ export default function RadioFields(props: FieldRendererProps) {
               </Button>
         </Box>
       )}
+            </Box>
+
+
+      {/* === For each selected property, show ID / Description / Metadata checkbox === */}
 
       {/* === OPTIONS: add / list your actual radio options === */}
 
