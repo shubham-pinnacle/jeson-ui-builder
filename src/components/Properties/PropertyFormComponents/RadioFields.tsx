@@ -22,7 +22,11 @@ import { FaTimes } from "react-icons/fa";
 import { FieldRendererProps } from "./FieldRendererProps";
 import { useEffect } from "react";
 import { PropertyOptions } from "../PropertiesFormStyles";
+import { useDispatch } from 'react-redux';
+import { updateOption } from "../../../slices/optionSlice";
+import { useSelector } from "react-redux";
 
+import { RootState } from "../../../store";
 export default function RadioFields(props: FieldRendererProps) {
   const {
     component,
@@ -37,10 +41,44 @@ export default function RadioFields(props: FieldRendererProps) {
 
   const handleChange = (prop: string, value: any) => h(prop, value);
 
+  const dispatch = useDispatch();
+
+  const savedOptions = useSelector((state: RootState) => state.option.arr);
+
+useEffect(() => {
+  console.log("Saved in Redux:", savedOptions);
+}, [savedOptions]);
+
+const saveOptionsToRedux = () => {
+  const newOption: any = {
+    id: "",
+    title: "",
+    description: "",
+    metadata: "",
+  };
+
+  selectedOptions.forEach((opt) => {
+    const key = `${opt.title}_${opt.title}`;
+    newOption[opt.title] = fieldValues[key] || "";
+  });
+
+  newOption.title = newOption.id || "Option"; // fallback title if id is empty
+
+  dispatch(updateOption(newOption));
+  console.log("Dispatched option:", newOption);
+
+  // Clear out fields
+  selectedOptions.forEach((opt) => {
+    const key = `${opt.title}_${opt.title}`;
+    handleFieldChange(key, ""); // reset each field to empty string
+  });
+};
+
+
 
   useEffect(() => {console.log("selectedOptions",selectedOptions);
-    console.log("component.properties.options",component.properties.options)
-  })
+    // console.log("component.properties.options",component.properties.options)
+  },[selectedOptions])
 
   // 1) Normalize your "options" (the radio/checkbox choices) into an array:
   const rawOptions = component.properties?.options;
@@ -63,6 +101,8 @@ export default function RadioFields(props: FieldRendererProps) {
       ? { id: opt.id, title: opt.title }
       : { id: opt, title: opt }
   );
+
+
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -147,7 +187,7 @@ export default function RadioFields(props: FieldRendererProps) {
       {selectedOptions.length > 0 && (
         <Box>
          
-          {selectedOptions.map((opt) => (
+          {/* {selectedOptions.map((opt) => (
             <Box
               key={opt.title}
             >
@@ -165,16 +205,60 @@ export default function RadioFields(props: FieldRendererProps) {
 
             
             </Box>
-          ))}
+          ))} */}
+          {selectedOptions.map((opt) => (
+  <Box key={opt.title}>
+    {opt.title === "id" && (
+      <TextField
+        label="ID"
+        size="small"
+        fullWidth
+        sx={{ mb: 1 }}
+        value={fieldValues[`id_id`] || ""}
+        onChange={(e) =>
+          handleFieldChange(`id_id`, e.target.value)
+        }
+      />
+    )}
+
+    {opt.title === "description" && (
+      <TextField
+        label="Description"
+        size="small"
+        fullWidth
+        sx={{ mb: 1 }}
+        value={fieldValues[`description_description`] || ""}
+        onChange={(e) =>
+          handleFieldChange(`description_description`, e.target.value)
+        }
+      />
+    )}
+
+    {opt.title === "metadata" && (
+      <TextField
+        label="Metadata"
+        size="small"
+        fullWidth
+        sx={{ mb: 2 }}
+        value={fieldValues[`metadata_metadata`] || ""}
+        onChange={(e) =>
+          handleFieldChange(`metadata_metadata`, e.target.value)
+        }
+      />
+    )}
+  </Box>
+))}
+
+        </Box>
+      )}
               <Button
                 variant="outlined"
-                onClick={() => handleOptionAdd("options")}
+                onClick={saveOptionsToRedux}
                 size="small"
+                sx={{mt:1.5}}
               >
                 Add
               </Button>
-        </Box>
-      )}
             </Box>
 
 
