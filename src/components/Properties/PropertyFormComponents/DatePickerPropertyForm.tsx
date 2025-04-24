@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   LocalizationProvider,
   DatePicker,
@@ -18,82 +18,61 @@ import {
 import { parseISO, format, isBefore, isAfter } from "date-fns";
 import { FieldRendererProps } from "./FieldRendererProps";
 
-export default function DatePickerPropertyForm(props: FieldRendererProps) {
-  const { component, onPropertyChange: handleChange } = props;
+export default function DatePickerPropertyForm({
+  component, onPropertyChange: handleChange,
+}: Pick<FieldRendererProps, "component" | "onPropertyChange">) {
+  //const { component, onPropertyChange: handleChange } = props;
 
   const [initValueError, setInitValueError] = useState("");
   const [unavailableDateError, setUnavailableDateError] = useState("");
 
-  useEffect(() => {
-    if (component.type === "date-picker") {
-      const defaultProperties = {
-        label: "",
-        outputVariable: "",
-        initValue: "",
-        minDate: "",
-        maxDate: "",
-        unavailableDates: [] as string[],
-        required: "false",
-        visible: "true",
-        helperText: ""
-      };
-
-      if (
-        !component.properties ||
-        Object.keys(defaultProperties).some(
-          (key) => !(key in (component.properties || {}))
-        )
-      ) {
-        handleChange("properties", {
-          ...defaultProperties,
-          ...(component.properties || {})
-        });
-      }
-    }
-  }, [component.id, component.type]);
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
-  const unavailableDates: string[] =
-    (component.properties?.unavailableDates as string[]) || [];
-
   const DatePickerComponent = isMobile ? MobileDatePicker : DatePicker;
 
-  const minDate = component.properties?.minDate
-    ? parseISO(component.properties.minDate)
-    : null;
-  const maxDate = component.properties?.maxDate
-    ? parseISO(component.properties.maxDate)
-    : null;
+  // Ensure we have a string[] for unavailableDates
+  const unavailableDates: string[] = Array.isArray(component.properties?.unavailableDates)
+    ? component.properties.unavailableDates
+    : [];
 
   const isDateOutOfRange = (date: Date | null) => {
     if (!date) return false;
-    if (minDate && isBefore(date, minDate)) return true;
-    if (maxDate && isAfter(date, maxDate)) return true;
+    const min = component.properties?.minDate
+      ? parseISO(component.properties.minDate)
+      : null;
+    const max = component.properties?.maxDate
+      ? parseISO(component.properties.maxDate)
+      : null;
+
+    if (min && isBefore(date, min)) return true;
+    if (max && isAfter(date, max)) return true;
     return false;
   };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Stack spacing={2}>
+        {/* Label */}
         <TextField
           label="Label"
           required
           fullWidth
+          size="small"
           value={component.properties?.label || ""}
           onChange={(e) => handleChange("label", e.target.value)}
-          size="small"
         />
+
+        {/* Output Variable */}
         <TextField
           label="Output Variable"
           required
           fullWidth
+          size="small"
           value={component.properties?.outputVariable || ""}
           onChange={(e) => handleChange("outputVariable", e.target.value)}
-          size="small"
         />
 
+        {/* Initial Value */}
         <DatePickerComponent
           label="Initial Value (Optional)"
           value={
@@ -105,16 +84,20 @@ export default function DatePickerPropertyForm(props: FieldRendererProps) {
             if (newValue && isDateOutOfRange(newValue)) {
               setInitValueError(
                 `Initial value must be between ${
-                  minDate ? format(minDate, "yyyy-MM-dd") : "start"
+                  component.properties?.minDate
+                    ? component.properties.minDate
+                    : "start"
                 } and ${
-                  maxDate ? format(maxDate, "yyyy-MM-dd") : "end"
+                  component.properties?.maxDate
+                    ? component.properties.maxDate
+                    : "end"
                 } inclusive.`
               );
             } else {
               setInitValueError("");
               handleChange(
                 "initValue",
-                newValue ? format(newValue, "yyyy-MM-dd") : ""
+                newValue ? format(newValue, "yyyy-MM-dd") : null
               );
             }
           }}
@@ -145,9 +128,14 @@ export default function DatePickerPropertyForm(props: FieldRendererProps) {
           }}
         />
 
+        {/* Min Date */}
         <DatePickerComponent
           label="Min Date (Optional)"
-          value={minDate}
+          value={
+            component.properties?.minDate
+              ? parseISO(component.properties.minDate)
+              : null
+          }
           onChange={(newValue) =>
             handleChange(
               "minDate",
@@ -159,9 +147,14 @@ export default function DatePickerPropertyForm(props: FieldRendererProps) {
           }}
         />
 
+        {/* Max Date */}
         <DatePickerComponent
           label="Max Date (Optional)"
-          value={maxDate}
+          value={
+            component.properties?.maxDate
+              ? parseISO(component.properties.maxDate)
+              : null
+          }
           onChange={(newValue) =>
             handleChange(
               "maxDate",
@@ -173,6 +166,7 @@ export default function DatePickerPropertyForm(props: FieldRendererProps) {
           }}
         />
 
+        {/* Unavailable Dates */}
         <DatePickerComponent
           label="Add Unavailable Date (Optional)"
           value={null}
@@ -183,9 +177,9 @@ export default function DatePickerPropertyForm(props: FieldRendererProps) {
             if (isDateOutOfRange(newValue)) {
               setUnavailableDateError(
                 `Date must be between ${
-                  minDate ? format(minDate, "yyyy-MM-dd") : "start"
+                  component.properties?.minDate || "start"
                 } and ${
-                  maxDate ? format(maxDate, "yyyy-MM-dd") : "end"
+                  component.properties?.maxDate || "end"
                 } inclusive.`
               );
               return;
@@ -211,7 +205,7 @@ export default function DatePickerPropertyForm(props: FieldRendererProps) {
               helperText:
                 unavailableDateError ||
                 "Dates that users won’t be able to select",
-              readOnly: true
+              // readOnly: true
             },
             day: {
               sx: {
@@ -234,10 +228,11 @@ export default function DatePickerPropertyForm(props: FieldRendererProps) {
           }}
         />
 
+        {/* Enabled */}
         <FormControl fullWidth size="small">
           <InputLabel>Enabled (Optional)</InputLabel>
           <Select
-            value={component.properties?.enabled || "true"}
+            value={component.properties?.enabled ?? "true"}
             onChange={(e) => handleChange("enabled", e.target.value)}
             label="Enabled (Optional)"
           >
@@ -246,10 +241,11 @@ export default function DatePickerPropertyForm(props: FieldRendererProps) {
           </Select>
         </FormControl>
 
+        {/* Visible */}
         <FormControl fullWidth size="small">
           <InputLabel>Visible (Optional)</InputLabel>
           <Select
-            value={component.properties?.visible || "true"}
+            value={component.properties?.visible ?? "true"}
             onChange={(e) => handleChange("visible", e.target.value)}
             label="Visible (Optional)"
           >
@@ -258,12 +254,13 @@ export default function DatePickerPropertyForm(props: FieldRendererProps) {
           </Select>
         </FormControl>
 
+        {/* Helper Text */}
         <TextField
           label="Helper Text (Optional)"
           fullWidth
+          size="small"
           value={component.properties?.helperText || ""}
           onChange={(e) => handleChange("helperText", e.target.value)}
-          size="small"
         />
       </Stack>
     </LocalizationProvider>
