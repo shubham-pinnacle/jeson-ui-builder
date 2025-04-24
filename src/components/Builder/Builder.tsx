@@ -234,6 +234,7 @@ const Builder: React.FC<BuilderProps> = ({
           </ComponentContent>
         );
       case 'text-area':
+        return <ComponentContent>{component.properties?.label  || 'No Content'}</ComponentContent>;
       case 'check-box':
       case 'radio-button':
         return <ComponentContent>{component.properties?.label  || 'No Content'}</ComponentContent>;

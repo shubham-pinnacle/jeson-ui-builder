@@ -56,7 +56,7 @@ export default function TextInputPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Required (Optional)</InputLabel>
         <Select
-          value={component.properties?.required || null}
+          value={component.properties?.required || undefined}
           onChange={(e) => handleChange("required", e.target.value)}
           label="Required (Optional)"
         >
