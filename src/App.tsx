@@ -239,12 +239,12 @@ function App() {
     null
   );
 
-  useEffect(() => {
-    showToast({
-      message: 'Maximum of 50 components are allowed per screen.',
-      type: 'error',
-    });
-  }, []); 
+  // useEffect(() => {
+  //   showToast({
+  //     message: 'Maximum of 50 components are allowed per screen.',
+  //     type: 'error',
+  //   });
+  // }, []); 
   
   
   
@@ -495,10 +495,13 @@ function App() {
     const currentComponents = screens[activeScreenIndex]?.components || [];
 
       if (currentComponents.length >= 50) {
-        showToast({
-          message: 'Maximum of 50 components are allowed per screen.',
-          type: 'error',
-        });
+        // useEffect(() => {
+          showToast({
+            message: 'Maximum of 50 components are allowed per screen.',
+            type: 'error',
+          });
+        // }, []); 
+        
         return;
       }
         const newComponent: Component = {
