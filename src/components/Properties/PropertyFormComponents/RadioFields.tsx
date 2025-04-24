@@ -89,8 +89,7 @@ export default function RadioFields(props: FieldRendererProps) {
         onChange={(e) => handleChange("outputVariable", e.target.value)}
       />
 
-      {/* === PROPERTIES (OPTIONAL) Autocomplete for adding metadata sections === */}
-      <Autocomplete
+<Autocomplete
         multiple
         options={propertyOptions}
         disableCloseOnSelect
