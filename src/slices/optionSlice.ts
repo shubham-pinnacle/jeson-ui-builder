@@ -1,8 +1,9 @@
 // src/redux/optionSlice.ts
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export type Option = {
-  id: string; // use appropriate types (e.g., string or number)
+  id: string;
   title: string;
   description: string;
   metadata: string;
@@ -24,11 +25,15 @@ const optionSlice = createSlice({
     updateOption: (state, action: PayloadAction<Option>) => {
       const index = state.arr.findIndex(item => item.id === action.payload.id);
       if (index !== -1) {
-        // Option exists, so update its fields.
-        state.arr[index] = action.payload;
+        // Replace the item immutably to trigger UI updates
+        state.arr = [
+          ...state.arr.slice(0, index),
+          action.payload,
+          ...state.arr.slice(index + 1)
+        ];
       } else {
-        // Option doesn't exist, so add it.
-        state.arr.push(action.payload);
+        // Add new item immutably
+        state.arr = [...state.arr, action.payload];
       }
     },
   },
