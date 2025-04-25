@@ -94,3 +94,25 @@ export const StyledFormControl = styled(FormControl)`
   width: 100%;
   margin-bottom: 16px;
 `;
+
+export const FloatingLabelContainer = styled.div`
+  position: relative;
+  margin: 16px 0;
+  width: 100%;
+`;
+
+export const FloatingLabel = styled.label`
+  position: absolute;
+  left: 12px;
+  top: -9px;
+  background: white;
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #555;
+  z-index: 1;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px white;
+`;
