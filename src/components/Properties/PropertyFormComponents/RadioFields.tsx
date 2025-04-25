@@ -80,6 +80,9 @@ const saveOptionsToRedux = () => {
   const updatedDataSource = [...currentDataSource, newOption];
   h("data-source", updatedDataSource);
 
+  // Clear the title/newOption field
+  handleChange("newOption", "");
+
   // Only clear fields after successful addition
   selectedOptions.forEach((opt) => {
     const key = `${opt.title}_${opt.title}`;
