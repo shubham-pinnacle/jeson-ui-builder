@@ -25,10 +25,11 @@ import MetaJsonGenerator from "./components/MetaJsonGenerator";
 import ScreenDialog from "./components/ScreenDialog";
 import { Component } from "./types";
 import Dialog from "@mui/material/Dialog";
-import{ useSelector } from 'react-redux';
+import{ useSelector, useDispatch } from 'react-redux';
 import { RootState } from './store/index';
 
 import { useToast } from './components/ToastContext';
+import { id } from "date-fns/locale";
 
 
 
@@ -207,6 +208,7 @@ interface Screen {
 
 function App() {
   const { showToast } = useToast();
+  const dispatch = useDispatch();
   const [screens, setScreens] = useState<Screen[]>([
     {
       id: "WELCOME",
@@ -214,6 +216,7 @@ function App() {
       components: [],
     },
   ]);
+  const options = useSelector((state: RootState) => state.option.arr);
   const TextHeadingtext = useSelector((state: RootState) => state.text.value);
   const [activeScreenIndex, setActiveScreenIndex] = useState<number>(0);
   const [selectedComponent, setSelectedComponent] = useState<Component | null>(
@@ -249,14 +252,22 @@ function App() {
   
   
   useEffect(()=>{
-    console.log("asd",TextHeadingtext);
-  },[TextHeadingtext])
+    console.log("options",options);
+  },[options])
 
   // Update JSON editor when screens change
   useEffect(() => {
     const jsonString = JSON.stringify(generateJson(), null, 2);
     setEditValue(jsonString);
   }, [screens]);
+
+  const array = [
+    "Option 1",
+    "Option 2",
+    "Option 3",
+  ];
+
+  
 
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
@@ -346,13 +357,59 @@ function App() {
           case "radio-button":
           newComponent.properties = { 
             label: "",
-            description: "",
+            description:"",
             outputVariable: "",
-            options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
+            options: JSON.stringify(options),
             visible: true,
             required: false,
             enabled: true,
             initValue: "",
+
+          };
+          break;
+        case "drop-down":
+          newComponent.properties = { 
+            label: "",
+            description:"",
+            name: `dropdown_field_${Date.now()}`,
+            options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
+            visible: true,
+            required: false,
+            placeholder: "Select an option",
+            enabled: true,
+            outputVariable: "",
+          };
+          break;
+        case "footer-button":
+          newComponent.properties = {
+            label: "",
+            leftCaption: "",
+            centerCaption: "",
+            rightCaption: "",
+            enabled: null,
+            onClickAction: "",
+            screenName: "",
+          };
+          break;
+        case "embedded-link":
+          newComponent.properties = {
+            text: "",
+            visible: true,
+            onClickAction: "",
+            screenName: "",
+            url: ""
+          };
+          break;
+        case "opt-in":
+          newComponent.properties = {
+            label: "",
+            required: null,
+            visible: true,
+            outputVariable: "",
+            initValue: null,
+            onClickAction: "",
+            screenName: "",
+            url: ""
           };
           break;
         case "PhotoPicker":
@@ -382,23 +439,6 @@ function App() {
             visible: true,
             enabled: true,
             required: false,
-          };
-          break;
-        case "if-else":
-          newComponent.properties = {
-            conditionName: "",
-            condition1: "",
-            compareToVariable: "",
-            compareWithValue: "",
-            success: true,
-            failure: false,
-          };
-          break;
-        case "switch":
-          newComponent.properties = {
-            switchOn: "",
-            cases: ["default"],
-            compareToVariable: "",
           };
           break;
         case "image":
@@ -432,38 +472,6 @@ function App() {
             email: "",
             address: "",
             dateOfBirth: "",
-          };
-          break;
-        case "embedded-link":
-          newComponent.properties = { 
-            text: "",
-            visible: true,
-            onClickAction: "",
-            screenName: "",
-            url: "",
-          };
-          break;
-        case "opt-in":
-          newComponent.properties = { 
-            label: "",
-            required: null,
-            visible: true,
-            outputVariable: "",
-            initValue: null,
-            onClickAction: "",
-            screenName: "",
-            url: ""
-          };
-          break;
-        case "footer-button":
-          newComponent.properties = {
-            label: "",
-            leftCaption: "",
-            centerCaption: "",
-            rightCaption: "",
-            enabled: null,
-            onClickAction: "",
-            screenName: "",
           };
           break;
       }
@@ -580,7 +588,7 @@ function App() {
           label: "",
           description:"",
           outputVariable: "",
-          options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
+          options: JSON.stringify(options),
           visible: true,
           required: false,
           enabled: true,
@@ -790,6 +798,25 @@ function App() {
         return;
       }
 
+      // Extract all data-source options from radio buttons and checkboxes
+      const allDataSources: any[] = [];
+      parsedJson.screens.forEach((screen: any) => {
+        const layoutChildren = screen.layout?.children || [];
+        layoutChildren.forEach((child: any) => {
+          if ((child.type === "RadioButtonsGroup" || child.type === "CheckboxGroup") && 
+              Array.isArray(child["data-source"])) {
+            // Add each option to the Redux store
+            child["data-source"].forEach((option: any) => {
+              if (option && option.id && option.title) {
+                // Dispatch to Redux store
+                dispatch({ type: 'UPDATE_OPTION', payload: option });
+                allDataSources.push(option);
+              }
+            });
+          }
+        });
+      });
+
       const newScreens = parsedJson.screens.map((screen: any) => {
         const layoutChildren = screen.layout?.children || [];
         
@@ -881,19 +908,10 @@ function App() {
                     label: child.label || "",
                     description: child.description || "",
                     outputVariable: child.name || "",
-                    options: JSON.stringify(
-                      child["data-source"]?.map((opt: any) => opt.title) || [
-                        "Option 1",
-                        "Option 2",
-                        "Option 3",
-                      ]
-                    ),
+                    options: options,
                     visible: child.visible || true,
                     required: child.required || false,
                     enabled: child.enabled || true,
-                    // minSelectedItems: child.minSelectedItems || "",
-                    // maxSelectedItems: child.maxSelectedItems || "",
-
                     "min-selected-items":
                     child["min-selected-items"] !== undefined
                       ? Number(child["min-selected-items"])
@@ -911,22 +929,12 @@ function App() {
                     label: child.label || "",
                     description: child.description || "",
                     outputVariable: child.name || "",
-                    enabled,
-                    required,
-                    visible,
-                    "init-value": child.initValue || "",
-                    "data-source": child.options
-                      ? JSON.parse(child.options).map(
-                          (option: string) => ({
-                            id: option.toLowerCase().replace(/\s+/g, "_"),
-                            title: option,
-                          })
-                        )
-                      : [
-                          { id: "option_1", title: "Option 1" },
-                          { id: "option_2", title: "Option 2" },
-                          { id: "option_3", title: "Option 3" },
-                        ],
+                    enabled: child.enabled || true,
+                    required: child.required || false,
+                    visible: child.visible || true,
+                    initValue: child.initValue || "",
+                    options: options
+                    ,
                 };
                 break;
                 case "Dropdown":
@@ -1366,10 +1374,6 @@ function App() {
                       required,
                       visible,
                       enabled,
-                      // minSelectedItems:
-                      //   component.properties.minSelectedItems || "",
-                      // maxSelectedItems:
-                      //   component.properties.maxSelectedItems || "",
                       "min-selected-items":
                       component.properties.minSelectedItems !== undefined
                         ? Number(component.properties.minSelectedItems)
@@ -1378,18 +1382,7 @@ function App() {
                       component.properties.maxSelectedItems !== undefined
                         ? Number(component.properties.maxSelectedItems)
                         : 0,
-                      "data-source": component.properties.options
-                        ? JSON.parse(component.properties.options).map(
-                            (option: string) => ({
-                              id: option.toLowerCase().replace(/\s+/g, "_"),
-                              title: option,
-                            })
-                          )
-                        : [
-                            { id: "option_1", title: "Option 1" },
-                            { id: "option_2", title: "Option 2" },
-                            { id: "option_3", title: "Option 3" },
-                          ],
+                      "data-source": options,
                     };
                   case "embedded-link":
                     return {
@@ -1419,18 +1412,7 @@ function App() {
                       required,
                       visible,
                       "init-value": component.properties.initValue || "",
-                      "data-source": component.properties.options
-                        ? JSON.parse(component.properties.options).map(
-                            (option: string) => ({
-                              id: option.toLowerCase().replace(/\s+/g, "_"),
-                              title: option,
-                            })
-                          )
-                        : [
-                            { id: "option_1", title: "Option 1" },
-                            { id: "option_2", title: "Option 2" },
-                            { id: "option_3", title: "Option 3" },
-                          ],
+                      "data-source": options
                     };
                   case "drop-down":
                     return {
@@ -1442,18 +1424,7 @@ function App() {
                       enabled,
                       placeholder:
                         component.properties.placeholder || "Select an option",
-                      "data-source": component.properties.options
-                        ? JSON.parse(component.properties.options).map(
-                            (option: string) => ({
-                              id: option.toLowerCase().replace(/\s+/g, "_"),
-                              title: option,
-                            })
-                          )
-                        : [
-                            { id: "option_1", title: "Option 1" },
-                            { id: "option_2", title: "Option 2" },
-                            { id: "option_3", title: "Option 3" },
-                          ],
+                      "data-source": options
                     };
                   case "footer-button":
                   return {
@@ -1721,6 +1692,8 @@ function App() {
   const handleMetaGenerate = (metaJson: any) => {
     console.log("Meta JSON generated:", metaJson);
   };
+
+  
 
   const validateScreenName = (name: string) => {
     if (!name) {
