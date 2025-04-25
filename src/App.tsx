@@ -240,12 +240,12 @@ function App() {
     null
   );
 
-  useEffect(() => {
-    showToast({
-      message: 'Maximum of 50 components are allowed per screen.',
-      type: 'error',
-    });
-  }, []); 
+  // useEffect(() => {
+  //   showToast({
+  //     message: 'Maximum of 50 components are allowed per screen.',
+  //     type: 'error',
+  //   });
+  // }, []); 
   
   
   
@@ -447,15 +447,16 @@ function App() {
           newComponent.properties = { 
             label: "",
             outputVariable: "",
-            initValue: "",
+            initValue: null,
             visible: true,
             enabled: true,
-            minDate: "",
-            maxDate: "",
+            minDate: null,
+            maxDate: null,
             unavailableDates: [],
             helperText: "",
           };
           break;
+          
         case "user-details":
           newComponent.properties = { 
             name: "",
@@ -493,10 +494,13 @@ function App() {
     const currentComponents = screens[activeScreenIndex]?.components || [];
 
       if (currentComponents.length >= 50) {
-        showToast({
-          message: 'Maximum of 50 components are allowed per screen.',
-          type: 'error',
-        });
+        // useEffect(() => {
+          showToast({
+            message: 'Maximum of 50 components are allowed per screen.',
+            type: 'error',
+          });
+        // }, []); 
+        
         return;
       }
         const newComponent: Component = {
@@ -673,15 +677,17 @@ function App() {
           newComponent.properties = {
             label: "",
             outputVariable: "",
-            initValue: "",
+            initValue: null,
             visible: true,
             enabled: true,
-            minDate: "",
-            maxDate: "",
+            minDate: null,
+            maxDate: null,
             unavailableDates: [],
             helperText: "",
         };
         break;
+
+        
     }
 
     const updatedScreens = [...screens];
@@ -799,7 +805,7 @@ function App() {
                 case "TextHeading":
                   type = "text-heading";
                 properties = {
-                    text: TextHeadingtext,
+                    text: TextHeadingtext || "",
                     visible: child.visible || true,
                 };
                 break;
@@ -837,7 +843,7 @@ function App() {
                 case "TextInput":
                   type = "text-input";
                 properties = {
-                    label: child.label || '',
+                  label: child.label || '',
                     outputVariable: child.name || "",
                     required: child.required || undefined,
                     inputType: child['input-type'] || "text",
@@ -1012,26 +1018,18 @@ function App() {
                   };
                   break;
 
-                case "date-picker":
-                  type = "DatePicker";
+                case "DatePicker":
+                  type = "date-picker";
                   properties = {
                     label: child.label || "",
                     outputVariable: child.name || "",
-                    initValue: child["init-value"]
-                      ? new Date(child["init-value"])
-                      : null,
-                    minDate: child["min-date"]
-                      ? new Date(child["min-date"])
-                      : null,
-                    maxDate: child["max-date"]
-                      ? new Date(child["max-date"])
-                      : null,
-                    unavailableDates: Array.isArray(child["unavailable-dates"])
-                      ? child["unavailable-dates"].join(", ")
-                      : [],
-                    helperText: child["helper-text"] || "",
+                    initValue: child['init-value'] || null,
                     visible: child.visible ?? true,
                     enabled: child.enabled ?? true,
+                    minDate: child['min-date'] || null,
+                    maxDate: child['max-date'] || null,
+                    unavailableDates: child['unavailable-dates'] || [],
+                    helperText: child['helper-text'] || ""
                   };
                   break;
                 default:
@@ -1115,6 +1113,17 @@ function App() {
               activeScreenIndex
             ].components.find(
               (comp: Component) => comp.type === selectedComponent.type
+            );
+          }
+          else if (
+            ["date-picker"].includes(selectedComponent.type)
+          ) {
+            updatedSelectedComponent = newScreens[
+              activeScreenIndex
+            ].components.find(
+              (comp: Component) =>
+                comp.type === selectedComponent.type &&
+                comp.properties.name === selectedComponent.properties.name
             );
           }
           // For other components, find by type and name
@@ -1272,7 +1281,7 @@ function App() {
                   case "text-input":
                   return {
                     type: "TextInput",
-                      label: component.properties.label || '',
+                    label: component.properties.label || '',
                       name: component.properties.outputVariable || "",
                       ...(component.properties?.required
                         ? { "required": required }
@@ -1635,24 +1644,22 @@ function App() {
                     return {
                       type: "DatePicker",
                       label: component.properties.label || "",
-                      name: component.properties.outputVariable || '',
-                      ...(component.properties?.initValue
-                        ? { "init-value": component.properties.initValue }
-                        : {}),
+                      name: component.properties.outputVariable || "",
                       visible,
                       enabled,
                       ...(component.properties?.minDate
                         ? { "min-date": component.properties.minDate }
                         : {}),
+                      ...(component.properties?.initValue
+                        ? { "init-value": component.properties.initValue }
+                        : {}),
                       ...(component.properties?.maxDate
                         ? { "max-date": component.properties.maxDate }
                         : {}),
-                      ...(component.properties?.unavailableDates
-                        ? { "unavailable-dates": component.properties.unavailableDates }
-                        : {}),
+                      "unavailable-dates": component.properties.unavailableDates || [],
                       ...(component.properties?.helperText
                         ? { "helper-text": component.properties.helperText }
-                        : {}),
+                        : {})
                     };
 
                   case "user-details":
