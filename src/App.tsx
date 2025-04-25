@@ -25,7 +25,7 @@ import MetaJsonGenerator from "./components/MetaJsonGenerator";
 import ScreenDialog from "./components/ScreenDialog";
 import { Component } from "./types";
 import Dialog from "@mui/material/Dialog";
-import{ useSelector } from 'react-redux';
+import{ useSelector, useDispatch } from 'react-redux';
 import { RootState } from './store/index';
 
 import { useToast } from './components/ToastContext';
@@ -208,6 +208,7 @@ interface Screen {
 
 function App() {
   const { showToast } = useToast();
+  const dispatch = useDispatch();
   const [screens, setScreens] = useState<Screen[]>([
     {
       id: "WELCOME",
@@ -798,6 +799,25 @@ function App() {
         console.error("Invalid JSON: Missing or invalid screens array");
         return;
       }
+
+      // Extract all data-source options from radio buttons and checkboxes
+      const allDataSources: any[] = [];
+      parsedJson.screens.forEach((screen: any) => {
+        const layoutChildren = screen.layout?.children || [];
+        layoutChildren.forEach((child: any) => {
+          if ((child.type === "RadioButtonsGroup" || child.type === "CheckboxGroup") && 
+              Array.isArray(child["data-source"])) {
+            // Add each option to the Redux store
+            child["data-source"].forEach((option: any) => {
+              if (option && option.id && option.title) {
+                // Dispatch to Redux store
+                dispatch({ type: 'UPDATE_OPTION', payload: option });
+                allDataSources.push(option);
+              }
+            });
+          }
+        });
+      });
 
       const newScreens = parsedJson.screens.map((screen: any) => {
         const layoutChildren = screen.layout?.children || [];
