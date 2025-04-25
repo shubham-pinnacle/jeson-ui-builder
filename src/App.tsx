@@ -214,6 +214,7 @@ function App() {
       components: [],
     },
   ]);
+  const options = useSelector((state: RootState) => state.option.arr);
   const TextHeadingtext = useSelector((state: RootState) => state.text.value);
   const [activeScreenIndex, setActiveScreenIndex] = useState<number>(0);
   const [selectedComponent, setSelectedComponent] = useState<Component | null>(
@@ -249,8 +250,8 @@ function App() {
   
   
   useEffect(()=>{
-    console.log("asd",TextHeadingtext);
-  },[TextHeadingtext])
+    console.log("options",options);
+  },[options])
 
   // Update JSON editor when screens change
   useEffect(() => {
@@ -319,7 +320,7 @@ function App() {
           };
           break;
         case "text-area":
-          newComponent.properties = {
+          newComponent.properties = { 
             label: "",
             outputVariable: "",
             required: null,
@@ -346,13 +347,59 @@ function App() {
           case "radio-button":
             newComponent.properties = {
             label: "",
-            description: "",
+            description:"",
             outputVariable: "",
-            options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
+            options: JSON.stringify(options),
             visible: true,
             required: false,
             enabled: true,
             initValue: "",
+
+          };
+          break;
+        case "drop-down":
+          newComponent.properties = { 
+            label: "",
+            description:"",
+            name: `dropdown_field_${Date.now()}`,
+            options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
+            visible: true,
+            required: false,
+            placeholder: "Select an option",
+            enabled: true,
+            outputVariable: "",
+          };
+          break;
+        case "footer-button":
+          newComponent.properties = {
+            label: "",
+            leftCaption: "",
+            centerCaption: "",
+            rightCaption: "",
+            enabled: null,
+            onClickAction: "",
+            screenName: "",
+          };
+          break;
+        case "embedded-link":
+          newComponent.properties = {
+            text: "",
+            visible: true,
+            onClickAction: "",
+            screenName: "",
+            url: ""
+          };
+          break;
+        case "opt-in":
+          newComponent.properties = {
+            label: "",
+            required: null,
+            visible: true,
+            outputVariable: "",
+            initValue: null,
+            onClickAction: "",
+            screenName: "",
+            url: ""
           };
           break;
         case "PhotoPicker":
@@ -382,23 +429,6 @@ function App() {
             visible: true,
             enabled: true,
             required: false,
-          };
-          break;
-        case "if-else":
-          newComponent.properties = {
-            conditionName: "",
-            condition1: "",
-            compareToVariable: "",
-            compareWithValue: "",
-            success: true,
-            failure: false,
-          };
-          break;
-        case "switch":
-          newComponent.properties = {
-            switchOn: "",
-            cases: ["default"],
-            compareToVariable: "",
           };
           break;
         case "image":
@@ -432,38 +462,6 @@ function App() {
             email: "",
             address: "",
             dateOfBirth: "",
-          };
-          break;
-        case "embedded-link":
-          newComponent.properties = { 
-            text: "",
-            visible: true,
-            onClickAction: "",
-            screenName: "",
-            url: "",
-          };
-          break;
-        case "opt-in":
-          newComponent.properties = { 
-            label: "",
-            required: null,
-            visible: true,
-            outputVariable: "",
-            initValue: null,
-            onClickAction: "",
-            screenName: "",
-            url: ""
-          };
-          break;
-        case "footer-button":
-          newComponent.properties = {
-            label: "",
-            leftCaption: "",
-            centerCaption: "",
-            rightCaption: "",
-            enabled: null,
-            onClickAction: "",
-            screenName: "",
           };
           break;
       }
@@ -577,7 +575,7 @@ function App() {
           label: "",
           description:"",
           outputVariable: "",
-          options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
+          options: JSON.stringify(options),
           visible: true,
           required: false,
           enabled: true,
@@ -907,13 +905,9 @@ function App() {
                     required: child.required || false,
                     visible: child.visible || true,
                     initValue: child.initValue || "",
-                    options: JSON.stringify(
-                      child["data-source"]?.map((opt: any) => opt.title) || [
-                        "Option 1", 
-                        "Option 2", 
-                        "Option 3"
-                      ]
-                    ),
+                    options: 
+                    JSON.stringify(options)
+                    ,
                 };
                 break;
                 case "Dropdown":
@@ -1351,18 +1345,14 @@ function App() {
                       component.properties.maxSelectedItems !== undefined
                         ? Number(component.properties.maxSelectedItems)
                         : 0,
-                      "data-source": component.properties.options
+                      "data-source":   component.properties.options
                         ? JSON.parse(component.properties.options).map(
                             (option: string) => ({
                               id: option.toLowerCase().replace(/\s+/g, "_"),
                               title: option,
                             })
                           )
-                        : [
-                            { id: "option_1", title: "Option 1" },
-                            { id: "option_2", title: "Option 2" },
-                            { id: "option_3", title: "Option 3" },
-                          ],
+                        : options,
                     };
                   case "embedded-link":
                     return {
@@ -1392,7 +1382,14 @@ function App() {
                       required,
                       visible,
                       "init-value": component.properties.initValue || "",
-                      "data-source": component.properties.options
+                      "data-source":   component.properties.options
+                        ? JSON.parse(component.properties.options).map(
+                            (option: string) => ({
+                              id: option.toLowerCase().replace(/\s+/g, "_"),
+                              title: option,
+                            })
+                          )
+                        : options,
                     };
                   case "drop-down":
                     return {
@@ -1411,11 +1408,7 @@ function App() {
                               title: option,
                             })
                           )
-                        : [
-                            { id: "option_1", title: "Option 1" },
-                            { id: "option_2", title: "Option 2" },
-                            { id: "option_3", title: "Option 3" },
-                          ],
+                        : options,
                     };
                   case "footer-button":
                   return {
