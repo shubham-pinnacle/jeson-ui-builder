@@ -29,6 +29,7 @@ import{ useSelector } from 'react-redux';
 import { RootState } from './store/index';
 
 import { useToast } from './components/ToastContext';
+import { id } from "date-fns/locale";
 
 
 
@@ -258,6 +259,14 @@ function App() {
     const jsonString = JSON.stringify(generateJson(), null, 2);
     setEditValue(jsonString);
   }, [screens]);
+
+  const array = [
+    "Option 1",
+    "Option 2",
+    "Option 3",
+  ];
+
+  
 
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
@@ -881,15 +890,10 @@ function App() {
                     label: child.label || "",
                     description: child.description || "",
                     outputVariable: child.name || "",
-                    options: JSON.stringify(
-                      child["data-source"]?.map((opt: any) => opt.title)
-                    ),
+                    options: options,
                     visible: child.visible || true,
                     required: child.required || false,
                     enabled: child.enabled || true,
-                    // minSelectedItems: child.minSelectedItems || "",
-                    // maxSelectedItems: child.maxSelectedItems || "",
-
                     "min-selected-items":
                     child["min-selected-items"] !== undefined
                       ? Number(child["min-selected-items"])
@@ -911,8 +915,7 @@ function App() {
                     required: child.required || false,
                     visible: child.visible || true,
                     initValue: child.initValue || "",
-                    options: 
-                    JSON.stringify(options)
+                    options: options
                     ,
                 };
                 break;
@@ -1342,10 +1345,6 @@ function App() {
                       required,
                       visible,
                       enabled,
-                      // minSelectedItems:
-                      //   component.properties.minSelectedItems || "",
-                      // maxSelectedItems:
-                      //   component.properties.maxSelectedItems || "",
                       "min-selected-items":
                       component.properties.minSelectedItems !== undefined
                         ? Number(component.properties.minSelectedItems)
@@ -1354,14 +1353,7 @@ function App() {
                       component.properties.maxSelectedItems !== undefined
                         ? Number(component.properties.maxSelectedItems)
                         : 0,
-                      "data-source":   component.properties.options
-                        ? JSON.parse(component.properties.options).map(
-                            (option: string) => ({
-                              id: option.toLowerCase().replace(/\s+/g, "_"),
-                              title: option,
-                            })
-                          )
-                        : options,
+                      "data-source": options,
                     };
                   case "embedded-link":
                     return {
@@ -1391,14 +1383,7 @@ function App() {
                       required,
                       visible,
                       "init-value": component.properties.initValue || "",
-                      "data-source":   component.properties.options
-                        ? JSON.parse(component.properties.options).map(
-                            (option: string) => ({
-                              id: option.toLowerCase().replace(/\s+/g, "_"),
-                              title: option,
-                            })
-                          )
-                        : options,
+                      "data-source": options
                     };
                   case "drop-down":
                     return {
@@ -1410,14 +1395,7 @@ function App() {
                       enabled,
                       placeholder:
                         component.properties.placeholder || "Select an option",
-                      "data-source": component.properties.options
-                        ? JSON.parse(component.properties.options).map(
-                            (option: string) => ({
-                              id: option.toLowerCase().replace(/\s+/g, "_"),
-                              title: option,
-                            })
-                          )
-                        : options,
+                      "data-source": options
                     };
                   case "footer-button":
                   return {

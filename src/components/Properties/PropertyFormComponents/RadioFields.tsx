@@ -50,24 +50,37 @@ useEffect(() => {
 }, [savedOptions]);
 
 const saveOptionsToRedux = () => {
+  // Get values from form fields
+  const id = fieldValues[`id_id`] || "";
+  const description = fieldValues[`description_description`] || "";
+  const metadata = fieldValues[`metadata_metadata`] || "";
+  
+  // Check if at least ID field has a value
+  if (!id.trim()) {
+    // Don't add empty options to the array
+    console.log("ID is required. Option not added.");
+    return;
+  }
+  
   const newOption: any = {
-    id: "",
-    title: "",
-    description: "",
-    metadata: "",
+    id: id,
+    title: id, // Use ID as title
+    description: description,
+    metadata: metadata,
   };
-
-  selectedOptions.forEach((opt) => {
-    const key = `${opt.title}_${opt.title}`;
-    newOption[opt.title] = fieldValues[key] || "";
-  });
-
-  newOption.title = newOption.id || "Option"; // fallback title if id is empty
 
   dispatch(updateOption(newOption));
   console.log("Dispatched option:", newOption);
 
-  // Clear out fields
+  // Update the data-source property in the component
+  const currentDataSource = Array.isArray(component.properties?.["data-source"]) 
+    ? [...component.properties["data-source"]] 
+    : [];
+  
+  const updatedDataSource = [...currentDataSource, newOption];
+  h("data-source", updatedDataSource);
+
+  // Only clear fields after successful addition
   selectedOptions.forEach((opt) => {
     const key = `${opt.title}_${opt.title}`;
     handleFieldChange(key, ""); // reset each field to empty string
