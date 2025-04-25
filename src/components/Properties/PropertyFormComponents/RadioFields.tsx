@@ -45,29 +45,42 @@ export default function RadioFields(props: FieldRendererProps) {
   
   const savedOptions = useSelector((state: RootState) => state.option.arr);
 
+  const options = useSelector((state: RootState) => state.option.arr);
+
+  const initOptions = options.map(opt => opt.title);
+
 useEffect(() => {
   console.log("Saved in Redux:", savedOptions);
 }, [savedOptions]);
 
 const saveOptionsToRedux = () => {
   // Get values from form fields
+  const title = component.properties?.newOption || "";
   const id = fieldValues[`id_id`] || "";
   const description = fieldValues[`description_description`] || "";
   const metadata = fieldValues[`metadata_metadata`] || "";
   
-  // Check if at least ID field has a value
-  if (!id.trim()) {
+  // Check if at least title or ID field has a value
+  if (!title.trim() && !id.trim()) {
     // Don't add empty options to the array
-    console.log("ID is required. Option not added.");
+    console.log("Title or ID is required. Option not added.");
     return;
   }
   
+  // Create the new option with sanitized data
   const newOption: any = {
-    id: id,
-    title: id, // Use ID as title
-    description: description,
-    metadata: metadata,
+    id: id.trim() || title.trim().toLowerCase().replace(/\s+/g, "_"), // Use ID if provided, otherwise use sanitized title
+    title: title.trim() || id.trim(), // Use title if provided, otherwise use ID
   };
+  
+  // Only add non-empty values
+  if (description.trim()) {
+    newOption.description = description.trim();
+  }
+  
+  if (metadata.trim()) {
+    newOption.metadata = metadata.trim();
+  }
 
   dispatch(updateOption(newOption));
   console.log("Dispatched option:", newOption);
@@ -242,6 +255,7 @@ const saveOptionsToRedux = () => {
         label="Description"
         size="small"
         fullWidth
+        required
         sx={{ mb: 1 }}
         value={fieldValues[`description_description`] || ""}
         onChange={(e) =>
@@ -254,6 +268,7 @@ const saveOptionsToRedux = () => {
       <TextField
         label="Metadata"
         size="small"
+        
         fullWidth
         sx={{ mb: 2 }}
         value={fieldValues[`metadata_metadata`] || ""}
@@ -290,17 +305,20 @@ const saveOptionsToRedux = () => {
           onChange={(e) => handleChange("initValue", e.target.value)}
           label="Init Value (Optional)"
         >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          {optionsArray.map((opt, i) => {
-            const title = typeof opt === "object" ? opt.title : opt;
-            return (
-              <MenuItem key={i} value={title}>
-                {title}
-              </MenuItem>
-            );
-          })}
+          {initOptions.length === 0 ? (
+            <MenuItem value="">
+              <em></em>
+            </MenuItem>
+          ) : (
+            initOptions.map((opt, i) => {
+              const title = typeof opt === "object" ? opt.title : opt;
+              return (
+                <MenuItem key={i} value={title}>
+                  {title}
+                </MenuItem>
+              );
+            })
+          )}
         </Select>
       </FormControl>
 
