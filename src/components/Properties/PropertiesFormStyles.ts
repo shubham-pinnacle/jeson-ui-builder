@@ -15,11 +15,11 @@ export const StyledPopper = styled(Popper)(({ theme }) => ({
   }));
   
   
-export const PropertyOptions = [
-    { title: "id" },
-    { title: "description" },
-    { title: "metadata" },
-  ];
+  export const PropertyOptions = [
+      { title: "id" },
+      { title: "description" },
+      { title: "metadata" },
+    ];
 
 export const PropertiesPanel = styled(Paper)(({ theme }) => ({
     width: 300,
