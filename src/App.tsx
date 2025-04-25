@@ -319,7 +319,7 @@ function App() {
           };
           break;
         case "text-area":
-          newComponent.properties = {
+          newComponent.properties = { 
             label: "",
             outputVariable: "",
             required: null,
@@ -331,7 +331,7 @@ function App() {
           };
           break;
         case "check-box":
-          newComponent.properties = {
+          newComponent.properties = { 
             label: "",
             description: "",
             outputVariable: "",
@@ -344,7 +344,7 @@ function App() {
           };
           break;
           case "radio-button":
-            newComponent.properties = {
+          newComponent.properties = { 
             label: "",
             description: "",
             outputVariable: "",
@@ -356,7 +356,7 @@ function App() {
           };
           break;
         case "PhotoPicker":
-          newComponent.properties = {
+          newComponent.properties = { 
             label: "",
             description: "",
             outputVariable: "",
@@ -403,13 +403,12 @@ function App() {
           break;
         case "image":
           newComponent.properties = {
-            name: `input_field_${Date.now()}`,
             src: "",
-            width: null,
-            height: null,
+            width: "",
+            height: "",
             scaleType: "contain",
             altText: "",
-            aspectRatio: "",
+            aspectRatio: 1,
             base64Data: "",
           };
           break;
@@ -505,7 +504,7 @@ function App() {
         
         return;
       }
-        const newComponent: Component = {
+    const newComponent: Component = {
       id: `component_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       type,
       name: type.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
@@ -665,13 +664,12 @@ function App() {
         break;
       case "image":
         newComponent.properties = {
-          name: `input_field_${Date.now()}`,
           src: "",
-          width: null,
-          height: null,
+          width: "",
+          height: "",
           scaleType: "contain",
           altText: "",
-          aspectRatio: "",
+          aspectRatio: 1,
           base64Data: "",
         };
         break;
@@ -913,17 +911,22 @@ function App() {
                     label: child.label || "",
                     description: child.description || "",
                     outputVariable: child.name || "",
-                    enabled: child.enabled || true,
-                    required: child.required || false,
-                    visible: child.visible || true,
-                    initValue: child.initValue || "",
-                    options: JSON.stringify(
-                      child["data-source"]?.map((opt: any) => opt.title) || [
-                        "Option 1", 
-                        "Option 2", 
-                        "Option 3"
-                      ]
-                    ),
+                    enabled,
+                    required,
+                    visible,
+                    "init-value": child.initValue || "",
+                    "data-source": child.options
+                      ? JSON.parse(child.options).map(
+                          (option: string) => ({
+                            id: option.toLowerCase().replace(/\s+/g, "_"),
+                            title: option,
+                          })
+                        )
+                      : [
+                          { id: "option_1", title: "Option 1" },
+                          { id: "option_2", title: "Option 2" },
+                          { id: "option_3", title: "Option 3" },
+                        ],
                 };
                 break;
                 case "Dropdown":
@@ -983,13 +986,15 @@ function App() {
                 case "Image":
                   type = "image";
                   properties = {
+                    name: child.name || `image_${Date.now()}`,
+                    // Preserve base64Data or restore data URL prefix to src if needed
                     src: child.src || "",
-                    base64Data: child.base64Data || "",
-                    scaleType: child.scaleType || "contain",
-                    width: child.width || null,
-                    height: child.height || null,
-                    aspectRatio: child.aspectRatio || "1",
-                    altText: child.altText || "",
+                    base64Data: child.src ? `data:image/jpeg;base64,${child.src}` : "",
+                    width: child.width || "",
+                    height: child.height || "",
+                    scaleType: child['scale-type'] || "contain",
+                    altText: child['alt-text'] || "",
+                    aspectRatio: child['aspect-ratio'] || 1,
                     visible: child.visible ?? true,
                   };
                   break;
@@ -1001,14 +1006,14 @@ function App() {
                     outputVariable: child.name || "",
                     visible: child.visible ?? true,
                     enabled: child.enabled ?? true,
-                    allowedMimeTypes: Array.isArray(child["allowed-mime-types"])
-                      ? child["allowed-mime-types"]
-                      : ["image/jpeg", "application/pdf"], // default fallback
-                    minDocuments: child["min-uploaded-documents"]?.toString() || "1",
-                    maxDocuments: child["max-uploaded-documents"]?.toString() || "1",
-                    maxFileSize: child["max-file-size-kb"]
-                      ? (child["max-file-size-kb"] / 1024).toString()
-                      : "10", // in MB
+                    // "allowed-mime-types": component.properties.allowedMimeTypes || [],
+                    ...(child["allowed-mime-types"]
+                      ? { "allowed-mime-types": child["allowed-mime-types"] }
+                      : {}),
+                    "min-uploaded-documents": parseInt(child["min-uploaded-documents"]) || 0,
+                    "max-uploaded-documents": parseInt(child["max-uploaded-documents"]) || 30,
+                    "max-file-size-kb":
+                      parseInt(child["max-file-size-kb"]) || 10240,
                   };
                   break;
 
@@ -1019,10 +1024,10 @@ function App() {
                     description: child.description || "",
                     outputVariable: child.name || "",
                     photoSource: child["photo-source"] || "camera_gallery",
-                    minPhotos: child["min-uploaded-photos"]?.toString() || "0",
-                    maxPhotos: child["max-uploaded-photos"]?.toString() || "30",
+                    minPhotos: child["min-uploaded-photos"] || "0",
+                    maxPhotos: child["max-uploaded-photos"] || "30",
                     maxFileSize:
-                      (child["max-file-size-kb"] / 1024)?.toString() || "10", // Convert back to MB
+                      child["max-file-size-kb"] || "10", // Convert back to MB
                     visible: child.visible ?? true,
                     enabled: child.enabled ?? true,
                   };
@@ -1077,7 +1082,7 @@ function App() {
         // If not found by ID, try to find by type and properties
         if (!updatedSelectedComponent) {
           // For text components, find by type
-          if ( 
+          if (
             [
               "text-heading",
               "sub-heading",
@@ -1125,6 +1130,15 @@ function App() {
               (comp: Component) => comp.type === selectedComponent.type
             );
           }
+          // For image components
+          else if (selectedComponent.type === "image") {
+            updatedSelectedComponent = newScreens[
+              activeScreenIndex
+            ].components.find(
+              (comp: Component) => comp.type === selectedComponent.type
+            );
+          }
+          // For date-picker components
           else if (
             ["date-picker"].includes(selectedComponent.type)
           ) {
@@ -1405,7 +1419,18 @@ function App() {
                       required,
                       visible,
                       "init-value": component.properties.initValue || "",
-                      "data-source": options,
+                      "data-source": component.properties.options
+                        ? JSON.parse(component.properties.options).map(
+                            (option: string) => ({
+                              id: option.toLowerCase().replace(/\s+/g, "_"),
+                              title: option,
+                            })
+                          )
+                        : [
+                            { id: "option_1", title: "Option 1" },
+                            { id: "option_2", title: "Option 2" },
+                            { id: "option_3", title: "Option 3" },
+                          ],
                     };
                   case "drop-down":
                     return {
@@ -1468,45 +1493,26 @@ function App() {
                                 "data_exchange",
                             } : "",
                     };
-                  // case 'image':
-                  //   const imageSrc = component.properties.base64Data
-                  //     ? component.properties.base64Data
-                  //     : component.properties.src || '';
-                //   return {
-                  //     type: "Image",
-                  //     src: imageSrc,
-                  //     width: parseInt(component.properties.width) || 200,
-                  //     height: parseInt(component.properties.height) || 200,
-                  //     'scale-type': component.properties.scaleType || 'contain',
-                  //     'alt-text': component.properties.altText || 'image'
-                  //   };
                   case "image":
-                    let rawSrc =
-                      component.properties.base64Data ||
-                      component.properties.src ||
-                      "";
-                    // Remove 'data:image/...;base64,' prefix if present
-                    const imageSrc = rawSrc.replace(
-                      /^data:image\/[a-zA-Z]+;base64,/,
-                      ""
-                    );
+                    // Use base64Data if available, otherwise use src
+                    let rawSrc = component.properties.base64Data || component.properties.src || "";
+                    
+                    // If rawSrc starts with data:image prefix, remove it for JSON output
+                    const imageSrc = rawSrc.replace(/^data:image\/[a-zA-Z]+;base64,/, "");
 
-                  return {
+                    return {
                       type: "Image",
                       src: imageSrc,
-                      //width: parseInt(component.properties.width) || null,
                       ...(component.properties?.width
                         ? { "width": parseInt(component.properties.width) }
                         : {}),
                       ...(component.properties?.height
                         ? { "height": parseInt(component.properties.height) }
                         : {}),
-                      "aspect-ratio":
-                        parseFloat(component.properties.aspectRatio) || 1,
+                      "aspect-ratio": parseFloat(component.properties.aspectRatio) || 1,
                       "scale-type": component.properties.scaleType || "contain",
-                      ...(component.properties?.altText
-                        ? { "alt-text": component.properties.altText }
-                        : {}),
+                      "alt-text": component.properties.altText || "",
+                      visible: component.properties.visible === false ? false : true,
                     };
 
                   case "PhotoPicker":
