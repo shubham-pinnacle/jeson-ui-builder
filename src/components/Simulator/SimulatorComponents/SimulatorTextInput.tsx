@@ -1,23 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Component } from '../../types';
-import { Box, Typography } from '@mui/material';
 
 interface Props { component: Component; }
 
-const SimulatorTextInput: React.FC<Props> = ({ component }) => (
-  <Box sx={{ width: '100%' }}>
-    <Typography variant="subtitle2" sx={{ mb: 1 }} > 
-      {component.properties?.label}  
-    </Typography>
-    <Box 
-      sx={{
+const SimulatorTextInput: React.FC<Props> = ({ component }) => {
+  const [value, setValue] = useState('');
+  const label = component.properties?.label || '';
+
+  return (
+    <input
+      type="text"
+      value={value}
+      onChange={e => setValue(e.target.value)}
+      style={{
+        width: '100%',
+        padding: '16px 12px 8px 12px',
+        fontSize: '16px',
         border: '1px solid #ccc',
-        borderRadius: 1,
-        p: 1,
-        minHeight: '40px',
+        borderRadius: '6px',
+        background: 'white',
+        position: 'relative',
       }}
     />
-  </Box>
-);
+  );
+};
 
 export default SimulatorTextInput;
