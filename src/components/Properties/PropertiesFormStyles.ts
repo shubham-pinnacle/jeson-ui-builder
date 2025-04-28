@@ -21,31 +21,53 @@ export const StyledPopper = styled(Popper)(({ theme }) => ({
       { title: "metadata" },
     ];
 
+// export const PropertiesPanel = styled(Paper)(({ theme }) => ({
+//     width: 300,
+//     height: "100%",
+//     borderLeft: `1px solid ${theme.palette.divider}`,
+//     padding: theme.spacing(3),
+//     overflowY: "auto",
+//     display: "flex",
+//     flexDirection: "column",
+//     gap: theme.spacing(2),
+//     backgroundColor: theme.palette.background.paper,
+//     // Custom scrollbar styling for WebKit browsers
+//     "&::-webkit-scrollbar": {
+//       width: "8px",
+//     },
+//     "&::-webkit-scrollbar-track": {
+//       background: "#ffffff", // white track background
+//     },
+//     "&::-webkit-scrollbar-thumb": {
+//       backgroundColor: "lightgrey", // light grey scrollbar thumb
+//       borderRadius: "4px",
+//     },
+//     // Firefox scrollbar styling
+//     scrollbarWidth: "thin",
+//     scrollbarColor: "lightgrey #ffffff",
+//   }));
+
 export const PropertiesPanel = styled(Paper)(({ theme }) => ({
-    width: 300,
-    height: "100%",
-    borderLeft: `1px solid ${theme.palette.divider}`,
-    padding: theme.spacing(3),
-    overflowY: "auto",
-    display: "flex",
-    flexDirection: "column",
-    gap: theme.spacing(2),
-    backgroundColor: theme.palette.background.paper,
-    // Custom scrollbar styling for WebKit browsers
-    "&::-webkit-scrollbar": {
-      width: "8px",
-    },
-    "&::-webkit-scrollbar-track": {
-      background: "#ffffff", // white track background
-    },
-    "&::-webkit-scrollbar-thumb": {
-      backgroundColor: "lightgrey", // light grey scrollbar thumb
-      borderRadius: "4px",
-    },
-    // Firefox scrollbar styling
-    scrollbarWidth: "thin",
-    scrollbarColor: "lightgrey #ffffff",
-  }));
+  width: 300,
+  height: "100%",
+  borderLeft: `1px solid ${theme.palette.divider}`,
+  padding: theme.spacing(3),
+  overflowY: "auto",
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing(2),
+  backgroundColor: theme.palette.background.paper,
+
+  /* Hide scrollbar for Chrome, Safari, and Opera */
+  "&::-webkit-scrollbar": {
+    display: "none",
+  },
+
+  /* Hide scrollbar for IE, Edge, and Firefox */
+  msOverflowStyle: "none", // IE and Edge
+  scrollbarWidth: "none",  // Firefox
+}));
+
   
 export const Header = styled(Box)(({ theme }) => ({
     display: "flex",

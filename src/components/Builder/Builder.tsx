@@ -87,23 +87,39 @@ const BuilderContainer = styled('div')({
   overflow: 'hidden',
 });
 
+// const BuildArea = styled('div')({
+//   flex: 1,
+//   padding: '20px',
+//   overflowY: 'auto',
+//   '&::-webkit-scrollbar': {
+//     width: '8px',
+//   },
+//   '&::-webkit-scrollbar-track': {
+//     background: '#ffffff',
+//   },
+//   '&::-webkit-scrollbar-thumb': {
+//     backgroundColor: 'lightgrey',
+//     borderRadius: '4px',
+//   },
+//   scrollbarWidth: 'thin',
+//   scrollbarColor: 'lightgrey #ffffff',
+// });
+
 const BuildArea = styled('div')({
   flex: 1,
   padding: '20px',
   overflowY: 'auto',
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
   '&::-webkit-scrollbar': {
-    width: '8px',
+    display: 'none',
   },
-  '&::-webkit-scrollbar-track': {
-    background: '#ffffff',
-  },
-  '&::-webkit-scrollbar-thumb': {
-    backgroundColor: 'lightgrey',
-    borderRadius: '4px',
-  },
-  scrollbarWidth: 'thin',
-  scrollbarColor: 'lightgrey #ffffff',
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  msOverflowStyle: 'none', // IE and Edge
+  scrollbarWidth: 'none',   // Firefox
 });
+
 
 const ComponentsList = styled('div')({
   display: 'flex',
@@ -127,20 +143,48 @@ const ComponentWrapper = styled('div', {
   },
 }));
 
+// const ComponentHeader = styled('div')({
+//   display: 'flex',
+//   flexWrap: 'wrap',
+//   justifyContent: 'space-between',
+//   alignItems: 'center',
+//   marginBottom: '8px',
+//   gap: '8px',
+// });
+
+
+// const ComponentTitle = styled('div')({
+//   display: 'flex',
+//   flexWrap: 'wrap',
+//   alignItems: 'center',
+//   gap: '8px',
+//   fontWeight: 500,
+//   color: '#333',
+// });
+
 const ComponentHeader = styled('div')({
   display: 'flex',
+  flexWrap: 'wrap',
   justifyContent: 'space-between',
   alignItems: 'center',
   marginBottom: '8px',
+  gap: '8px',
 });
 
+
 const ComponentTitle = styled('div')({
+  flex: '1 1 auto',
+  minWidth: 0,
+  fontWeight: 600,
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
-  fontWeight: 500,
-  color: '#333',
+  gap: '6px',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 });
+
+
 
 const ComponentContent = styled('div', {
   shouldForwardProp: (prop) => !['$type', 'color', 'fontSize'].includes(prop as string),
@@ -329,38 +373,38 @@ const Builder: React.FC<BuilderProps> = ({
         />
       )}
 
-<StyledDialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-  <StyledDialogTitle>Confirm Delete</StyledDialogTitle>
-  <StyledDialogContent>
-    <StyledDialogContentText>
-      Are you sure you want to delete <strong>{componentToDelete?.name}</strong>?
-    </StyledDialogContentText>
-  </StyledDialogContent>
-  <StyledDialogActions>
-    <StyledButton
-      variant="outlined"
-      onClick={() => setDeleteDialogOpen(false)}
-    >
-      Cancel
-    </StyledButton>
-    <StyledButton
-      variant="contained"
-      color="error"
-      onClick={() => {
-        if (componentToDelete) {
-          onDeleteComponent(componentToDelete.id);
-          showToast({
-            message: `${componentToDelete.name} deleted successfully.`,
-            type: 'success',
-          });
-        }
-        setDeleteDialogOpen(false);
-      }}
-    >
-      Delete
-    </StyledButton>
-  </StyledDialogActions>
-</StyledDialog>
+      <StyledDialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <StyledDialogTitle>Confirm Delete</StyledDialogTitle>
+        <StyledDialogContent>
+          <StyledDialogContentText>
+            Are you sure you want to delete <strong>{componentToDelete?.name}</strong>?
+          </StyledDialogContentText>
+        </StyledDialogContent>
+        <StyledDialogActions>
+          <StyledButton
+            variant="outlined"
+            onClick={() => setDeleteDialogOpen(false)}
+          >
+            Cancel
+          </StyledButton>
+          <StyledButton
+            variant="contained"
+            color="error"
+            onClick={() => {
+              if (componentToDelete) {
+                onDeleteComponent(componentToDelete.id);
+                showToast({
+                  message: `${componentToDelete.name} deleted successfully.`,
+                  type: 'success',
+                });
+              }
+              setDeleteDialogOpen(false);
+            }}
+          >
+            Delete
+          </StyledButton>
+        </StyledDialogActions>
+      </StyledDialog>
 
       {/* <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>

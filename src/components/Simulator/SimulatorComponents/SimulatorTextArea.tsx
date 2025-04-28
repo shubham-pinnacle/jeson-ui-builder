@@ -4,20 +4,25 @@ import { Box, Typography } from '@mui/material';
 
 interface Props { component: Component; }
 
-const SimulatorTextArea: React.FC<Props> = ({ component }) => (
-  <Box sx={{ width: '100%' }}>
-    <Typography variant="subtitle2" sx={{ mb: 1 }}>
-      {component.properties?.label} {(component.properties?.required === 'true') && "*" }
-    </Typography>
-    <Box
-      sx={{
+const SimulatorTextArea: React.FC<Props> = ({ component }) => {
+  const [value, setValue] = React.useState('');
+  return (
+    <textarea
+      value={value}
+      onChange={e => setValue(e.target.value)}
+      style={{
+        width: '100%',
+        padding: '16px 12px 8px 12px',
+        fontSize: '16px',
         border: '1px solid #ccc',
-        borderRadius: 1,
-        p: 1,
+        borderRadius: '6px',
+        background: 'white',
         minHeight: '100px',
+        resize: 'vertical',
+        position: 'relative',
       }}
     />
-  </Box>
-);
+  );
+};
 
 export default SimulatorTextArea;

@@ -8,6 +8,8 @@ import {
   PreviewTitle,
   PreviewContent,
   FooterContainer,
+  FloatingLabelContainer,
+  FloatingLabel,
 } from './SimulatorStyles';
 
 import SimulatorTextHeading       from './SimulatorComponents/SimulatorTextHeading';
@@ -56,7 +58,21 @@ const Simulator: React.FC<SimulatorProps> = ({ components, screenTitle }) => {
   const renderComponent = (component: Component) => {
     if (component.properties?.visible === 'false') return null;
     const Renderer = componentMap[component.type];
-    return Renderer ? <Renderer key={component.id} component={component} /> : null;
+    
+    if (!Renderer) return null;
+    
+    // Wrap input components with floating labels
+    const inputComponents = ['text-input', 'text-area', 'drop-down', 'date-picker'];
+    if (inputComponents.includes(component.type) && component.properties?.label) {
+      return (
+        <FloatingLabelContainer key={component.id}>
+          <Renderer component={component} />
+          <FloatingLabel>{component.properties.label}</FloatingLabel>
+        </FloatingLabelContainer>
+      );
+    }
+    
+    return <Renderer key={component.id} component={component} />;
   };
 
   return (
