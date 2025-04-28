@@ -2,6 +2,31 @@ import React, { useMemo } from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, TextField } from '@mui/material';
 
+// const Container = styled(Box)({
+//   flex: 1,
+//   display: 'flex',
+//   flexDirection: 'column',
+//   backgroundColor: '#ffffff',
+//   height: '100%',
+//   gap: '16px',
+//   overflow: 'auto',
+
+//   /* Custom scrollbar styling for WebKit browsers */
+//   '&::-webkit-scrollbar': {
+//     width: '8px',
+//   },
+//   '&::-webkit-scrollbar-track': {
+//     background: '#ffffff',
+//   },
+//   '&::-webkit-scrollbar-thumb': {
+//     backgroundColor: 'lightgrey',
+//     borderRadius: '4px',
+//   },
+//   /* Firefox scrollbar styling */
+//   scrollbarWidth: 'thin',
+//   scrollbarColor: 'lightgrey #ffffff',
+// });
+
 const Container = styled(Box)({
   flex: 1,
   display: 'flex',
@@ -11,21 +36,16 @@ const Container = styled(Box)({
   gap: '16px',
   overflow: 'auto',
 
-  /* Custom scrollbar styling for WebKit browsers */
+  /* Hide scrollbar for Chrome, Safari and Opera */
   '&::-webkit-scrollbar': {
-    width: '8px',
+    display: 'none',
   },
-  '&::-webkit-scrollbar-track': {
-    background: '#ffffff',
-  },
-  '&::-webkit-scrollbar-thumb': {
-    backgroundColor: 'lightgrey',
-    borderRadius: '4px',
-  },
-  /* Firefox scrollbar styling */
-  scrollbarWidth: 'thin',
-  scrollbarColor: 'lightgrey #ffffff',
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  msOverflowStyle: 'none', // IE and Edge
+  scrollbarWidth: 'none',   // Firefox
 });
+
 
 // A horizontal row: gutter on the left, text area on the right
 const EditorContainer = styled(Box)({
