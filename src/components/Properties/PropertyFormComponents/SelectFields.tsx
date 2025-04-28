@@ -1,10 +1,11 @@
 import React from "react";
-import { Stack, TextField, FormControl, InputLabel, Select, MenuItem, List, ListItemText, ListItemSecondaryAction, IconButton, Button, Box, Typography } from "@mui/material";
+import { Stack, TextField, FormControl, InputLabel, Select, MenuItem, List, ListItemText, ListItemSecondaryAction, IconButton, Button, Box, Typography, Checkbox, Autocomplete } from "@mui/material";
 import { FieldRendererProps } from "./FieldRendererProps";
 import { OptionItem, PropertyOptions } from "../PropertiesFormStyles";
 import { FaTimes } from "react-icons/fa";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
+
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -44,7 +45,7 @@ export default function SelectFields(props: FieldRendererProps) {
       />
 
       {/* property‑selector */}
-      <FormControl fullWidth size="small">
+      {/* <FormControl fullWidth size="small">
         <InputLabel>Property</InputLabel>
         <Select
           value={component.properties?.property || ""}
@@ -55,7 +56,42 @@ export default function SelectFields(props: FieldRendererProps) {
           <MenuItem value="value1">Value 1</MenuItem>
           <MenuItem value="value2">Value 2</MenuItem>
         </Select>
-      </FormControl>
+      </FormControl> */}
+
+
+      <Autocomplete
+              multiple
+              id="checkboxes-tags-demo"
+              options={PropertyOptions}
+              disableCloseOnSelect
+              getOptionLabel={(option) => option.title}
+              onChange={(event, newValue) => {
+                setSelectedOptions(newValue);
+              }}
+              renderOption={(props, option, { selected }) => {
+                const { key, ...optionProps } = props;
+                return (
+                  <li key={key} {...optionProps}>
+                    <Checkbox
+                      icon={icon}
+                      checkedIcon={checkedIcon}
+                      style={{ marginRight: 8 }}
+                      checked={selected}
+                    />
+                    {option.title}
+                  </li>
+                );
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Properties (optional)"
+                  
+                  size="small"
+                  />
+              )}
+              fullWidth
+            />
 
       <Box sx={{ mt: 2 }}>
         <Typography variant="subtitle2">Options</Typography>
@@ -73,7 +109,7 @@ export default function SelectFields(props: FieldRendererProps) {
           >Add</Button>
         </Stack>
 
-        <List>
+        {/* <List>
           {(component.properties?.options || []).map((opt:string) => (
             <OptionItem key={opt}>
               <ListItemText primary={opt} />
@@ -84,10 +120,10 @@ export default function SelectFields(props: FieldRendererProps) {
               </ListItemSecondaryAction>
             </OptionItem>
           ))}
-        </List>
+        </List> */}
       </Box>
 
-      <FormControl fullWidth size="small">
+      {/* <FormControl fullWidth size="small">
         <InputLabel>Init Value</InputLabel>
         <Select
           value={component.properties?.initValue || ""}
@@ -99,7 +135,7 @@ export default function SelectFields(props: FieldRendererProps) {
             <MenuItem key={opt} value={opt}>{opt}</MenuItem>
           ))}
         </Select>
-      </FormControl>
+      </FormControl> */}
 
       {/* visible/enabled/required */}
       {["required","visible","enabled"].map(p => (
