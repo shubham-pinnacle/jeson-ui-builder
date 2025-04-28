@@ -33,7 +33,7 @@ export default function TextSubHeadingFields({
       <FormControl fullWidth size="small">
         <InputLabel>Visible</InputLabel>
         <Select
-          value={component.properties?.visible || "true"}
+          value={component.properties?.visible ?? true}
           onChange={e => h("visible", e.target.value)}
           label="Visible"
         >

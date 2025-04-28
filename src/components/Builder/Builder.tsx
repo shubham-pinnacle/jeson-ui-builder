@@ -289,17 +289,17 @@ const Builder: React.FC<BuilderProps> = ({
       case 'PhotoPicker':
       case 'DocumentPicker':
         return <ComponentContent>{component.properties?.label || component.properties?.text || 'No Content'}</ComponentContent>;
-        case 'image':
+      case 'image':
           return (
             <ComponentContent>
               {component.properties?.src ? (
                 <img
                   src={component.properties.src}
-                  alt={component.properties.altText || 'Image'}
+                  alt={component.properties.altText || ''}
                   style={{ maxWidth: '100%', height: 'auto', objectFit: 'contain' }}
                 />
               ) : (
-                'No Content'
+                ''
               )}
             </ComponentContent>
           );
