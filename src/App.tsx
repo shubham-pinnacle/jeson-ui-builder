@@ -8,7 +8,6 @@ import {
   Tab,
   Typography,
   IconButton,
-  Tooltip,
   Menu,
   MenuItem,
   TextField,
@@ -27,11 +26,7 @@ import { Component } from "./types";
 import Dialog from "@mui/material/Dialog";
 import{ useSelector, useDispatch } from 'react-redux';
 import { RootState } from './store/index';
-
 import { useToast } from './components/ToastContext';
-import { id } from "date-fns/locale";
-
-
 
 
 const AppContainer = styled("div")({
@@ -261,14 +256,6 @@ function App() {
     setEditValue(jsonString);
   }, [screens]);
 
-  const array = [
-    "Option 1",
-    "Option 2",
-    "Option 3",
-  ];
-
-  
-
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
@@ -361,8 +348,8 @@ function App() {
             outputVariable: "",
             options: JSON.stringify(options),
             visible: true,
-            required: false,
-            enabled: true,
+            required: "",
+            enabled: "",
             initValue: "",
 
           };
@@ -590,8 +577,8 @@ function App() {
           outputVariable: "",
           options: JSON.stringify(options),
           visible: true,
-          required: false,
-          enabled: true,
+          required: "",
+          enabled: "",
           initValue: "",
 
         };
@@ -840,7 +827,7 @@ function App() {
                   type = "sub-heading";
                 properties = {
                     text: child.text || "",
-                    visible: child.visible || true,
+                    visible: child.visible ?? true,
                 };
                 break;
                 case "TextBody":
@@ -923,18 +910,16 @@ function App() {
                 };
                 break;
                   case "RadioButtonsGroup":
-                    type = "radio-button";
-                    
+                    type = "radio-button"; 
                 properties = {
-                    label: child.label || "",
-                    description: child.description || "",
-                    outputVariable: child.name || "",
-                    enabled: child.enabled || true,
-                    required: child.required || false,
-                    visible: child.visible || true,
-                    initValue: child.initValue || "",
-                    options: options
-                    ,
+                        label: child.label || "",
+                        description: child.description || "",
+                        outputVariable: child.name || "",
+                        enabled: child.enabled || "",
+                        required: child.required || "",  
+                        visible: child.visible ?? true,
+                        initValue: child["init-value"] || "",
+                        options: options,
                 };
                 break;
                 case "Dropdown":
@@ -951,8 +936,8 @@ function App() {
                     ),
                     outputVariable: child.name || "",
                     enabled: child.enabled || true,
-                    visible: child.visible || true,
-                  required: child.required || false,
+                    visible: child.visible ?? true,
+                    required: child.required || false,
                     placeholder: child.placeholder || "Select an option",
                 };
                 break;
@@ -1233,7 +1218,7 @@ function App() {
                     : true;
 
                 const required =
-                  component.properties?.required === undefined ? undefined : 
+                component.properties?.required === null ? null : 
                   component.properties?.required === "false" ||
                   component.properties?.required === false
                     ? false
@@ -1276,11 +1261,7 @@ function App() {
                   return {
                     type: "TextSubheading",
                       text: component.properties.text || "",
-                      visible:
-                        component.properties?.visible === "false" ||
-                        component.properties?.visible === false
-                          ? false
-                          : true,
+                      visible
                     };
                   case "text-body":
                     return {
@@ -1405,13 +1386,28 @@ function App() {
                   case "radio-button":
                   return {
                     type: "RadioButtonsGroup",
-                      label: component.properties.label || "",
-                      description: component.properties.description || "",
+                      // label: component.properties.label || "",
+                      ...(component.properties?.label
+                        ? { label: component.properties.label }
+                        : {}),
+                      // description: component.properties.description || "",
+                      ...(component.properties?.description
+                        ? { description: component.properties.description }
+                        : {}),
                       name: component.properties.outputVariable || "",
-                      enabled,
-                      required,
+                      // enabled,
+                      // required,
+                      ...(component.properties?.required
+                        ? { required }
+                        : {}),
                       visible,
-                      "init-value": component.properties.initValue || "",
+                      ...(component.properties?.enabled
+                        ? { enabled }
+                        : {}),
+                      // "init-value": component.properties.initValue || "",
+                      ...(component.properties?.initValue
+                        ? {"init-value": component.properties.initValue }
+                        : {}),
                       "data-source": options
                     };
                   case "drop-down":
@@ -1513,7 +1509,7 @@ function App() {
 
                  
                   // case "DocumentPicker":
-                  //   return {
+                //   return {
                   //     type: "DocumentPicker",
                   //     label: component.properties.label || "",
                   //     name: "document_picker",
@@ -1535,7 +1531,7 @@ function App() {
                   //   };
 
                   case "DocumentPicker":
-                    return {
+                  return {
                       type: "DocumentPicker",
                       label: component.properties.label || "",
                       name: component.properties.outputVariable || "",
@@ -1557,7 +1553,7 @@ function App() {
 
 
                   case "if-else":
-                    return {
+                  return {
                       type: "If-Else",
                       "condition-name":
                         component.properties.conditionName || "",

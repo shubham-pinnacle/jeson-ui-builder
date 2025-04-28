@@ -18,16 +18,14 @@ import {
 } from "@mui/material";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import { FaTimes } from "react-icons/fa";
 import { FieldRendererProps } from "./FieldRendererProps";
 import { useEffect } from "react";
 import { PropertyOptions } from "../PropertiesFormStyles";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateOption } from "../../../slices/optionSlice";
-import { useSelector } from "react-redux";
-
 import { RootState } from "../../../store";
-export default function RadioFields(props: FieldRendererProps) {
+
+export default function RadioButtonPropertyForm(props: FieldRendererProps) {
   const {
     component,
     onPropertyChange: h,
@@ -40,76 +38,54 @@ export default function RadioFields(props: FieldRendererProps) {
   } = props;
 
   const handleChange = (prop: string, value: any) => h(prop, value);
-
   const dispatch = useDispatch();
-  
   const savedOptions = useSelector((state: RootState) => state.option.arr);
-
   const options = useSelector((state: RootState) => state.option.arr);
-
   const initOptions = options.map(opt => opt.title);
 
-useEffect(() => {
-  console.log("Saved in Redux:", savedOptions);
-}, [savedOptions]);
+  useEffect(() => {
+    console.log("Saved in Redux:", savedOptions);
+  }, [savedOptions]);
 
-const saveOptionsToRedux = () => {
-  // Get values from form fields
-  const title = component.properties?.newOption || "";
-  const id = fieldValues[`id_id`] || "";
-  const description = fieldValues[`description_description`] || "";
-  const metadata = fieldValues[`metadata_metadata`] || "";
-  
-  // Check if at least title or ID field has a value
-  if (!title.trim() && !id.trim()) {
-    // Don't add empty options to the array
-    console.log("Title or ID is required. Option not added.");
-    return;
-  }
-  
-  // Create the new option with sanitized data
-  const newOption: any = {
-    id: id.trim() || title.trim().toLowerCase().replace(/\s+/g, "_"), // Use ID if provided, otherwise use sanitized title
-    title: title.trim() || id.trim(), // Use title if provided, otherwise use ID
+  const saveOptionsToRedux = () => {
+    const title = component.properties?.newOption || "";
+    const id = fieldValues[`id_id`] || "";
+    const description = fieldValues[`description_description`] || "";
+    const metadata = fieldValues[`metadata_metadata`] || "";
+
+    if (!title.trim() && !id.trim()) {
+      console.log("Title or ID is required. Option not added.");
+      return;
+    }
+
+    const newOption: any = {
+      id: id.trim() || title.trim().toLowerCase().replace(/\s+/g, "_"),
+      title: title.trim() || id.trim(),
+    };
+    if (description.trim()) newOption.description = description.trim();
+    if (metadata.trim()) newOption.metadata = metadata.trim();
+
+    dispatch(updateOption(newOption));
+    console.log("Dispatched option:", newOption);
+
+    const currentDataSource = Array.isArray(component.properties?.["data-source"])
+      ? [...component.properties["data-source"]]
+      : [];
+    const updatedDataSource = [...currentDataSource, newOption];
+    h("data-source", updatedDataSource);
+
+    handleChange("newOption", "");
+    selectedOptions.forEach((opt) => {
+      const key = `${opt.title}_${opt.title}`;
+      handleFieldChange(key, "");
+    });
   };
-  
-  // Only add non-empty values
-  if (description.trim()) {
-    newOption.description = description.trim();
-  }
-  
-  if (metadata.trim()) {
-    newOption.metadata = metadata.trim();
-  }
 
-  dispatch(updateOption(newOption));
-  console.log("Dispatched option:", newOption);
+  useEffect(() => {
+    console.log("selectedOptions", selectedOptions);
+  }, [selectedOptions]);
 
-  // Update the data-source property in the component
-  const currentDataSource = Array.isArray(component.properties?.["data-source"]) 
-    ? [...component.properties["data-source"]] 
-    : [];
-  
-  const updatedDataSource = [...currentDataSource, newOption];
-  h("data-source", updatedDataSource);
-
-  // Clear the title/newOption field
-  handleChange("newOption", "");
-
-  // Only clear fields after successful addition
-  selectedOptions.forEach((opt) => {
-    const key = `${opt.title}_${opt.title}`;
-    handleFieldChange(key, ""); // reset each field to empty string
-  });
-};
-
-
-
-  useEffect(() => {console.log("selectedOptions",selectedOptions);
-    // console.log("component.properties.options",component.properties.options)
-  },[selectedOptions])
-
-  // 1) Normalize your "options" (the radio/checkbox choices) into an array:
+  // Normalize your "options" into an array:
   const rawOptions = component.properties?.options;
   const optionsArray: any[] = Array.isArray(rawOptions)
     ? rawOptions
@@ -123,15 +99,11 @@ const saveOptionsToRedux = () => {
         }
       })()
     : [];
-
-  // 2) Build an array of { id, title } for your Autocomplete:
   const propertyOptions = optionsArray.map((opt) =>
     typeof opt === "object"
       ? { id: opt.id, title: opt.title }
       : { id: opt, title: opt }
   );
-
-
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -141,7 +113,6 @@ const saveOptionsToRedux = () => {
       {/* Label, Description, Output Variable */}
       <TextField
         label="Label"
-        required
         fullWidth
         size="small"
         value={component.properties?.label || ""}
@@ -165,8 +136,10 @@ const saveOptionsToRedux = () => {
         onChange={(e) => handleChange("outputVariable", e.target.value)}
       />
 
-<Autocomplete
+      {/* ←── HERE is the only change: add `value={selectedOptions}` so it’s never null */}
+      <Autocomplete
         multiple
+        value={selectedOptions}
         id="checkboxes-tags-demo"
         options={PropertyOptions}
         disableCloseOnSelect
@@ -192,112 +165,86 @@ const saveOptionsToRedux = () => {
           <TextField
             {...params}
             label="Properties (optional)"
-            
             size="small"
-            />
+          />
         )}
         fullWidth
       />
-            <Box>
-              <Typography variant="subtitle2" gutterBottom>
-                Options:
-              </Typography>
-              <Stack direction="row" >
-                <TextField
-                  placeholder="Title"
-                  size="small"
-                  fullWidth
-                  sx={{ mb: selectedOptions.length > 0 ?  1 : 0 }}
-                  value={component.properties?.newOption || ""}
-                  onChange={(e) => handleChange("newOption", e.target.value)}
-                />
-              </Stack>
-              
-      {selectedOptions.length > 0 && (
-        <Box>
-         
-          {/* {selectedOptions.map((opt) => (
-            <Box
-              key={opt.title}
-            >
 
-              <TextField
-                label={opt.title}
-                size="small"
-                fullWidth
-                sx={{ mb: 1 }}
-                value={fieldValues[`${opt.title}_id`] || ""}
-                onChange={(e) =>
-                  handleFieldChange(`${opt.title}_id`, e.target.value)
-                }
-              />
+      <Box>
+        <Typography variant="subtitle2" gutterBottom>
+          Options *
+        </Typography>
+        <Stack direction="row">
+          <TextField
+            placeholder="Title"
+            size="small"
+            fullWidth
+            sx={{ mb: selectedOptions.length > 0 ? 1 : 0 }}
+            value={component.properties?.newOption || ""}
+            onChange={(e) => handleChange("newOption", e.target.value)}
+          />
+        </Stack>
 
-            
-            </Box>
-          ))} */}
-          {selectedOptions.map((opt) => (
-  <Box key={opt.title}>
-    {opt.title === "id" && (
-      <TextField
-        label="ID"
-        size="small"
-        fullWidth
-        sx={{ mb: 1 }}
-        value={fieldValues[`id_id`] || ""}
-        onChange={(e) =>
-          handleFieldChange(`id_id`, e.target.value)
-        }
-      />
-    )}
+        {selectedOptions.length > 0 && (
+          <Box>
+            {selectedOptions.map((opt) => (
+              <Box key={opt.title}>
+                {opt.title === "id" && (
+                  <TextField
+                    label="ID"
+                    size="small"
+                    required
+                    fullWidth
+                    sx={{ mb: 1 }}
+                    value={fieldValues[`id_id`] || ""}
+                    onChange={(e) =>
+                      handleFieldChange(`id_id`, e.target.value)
+                    }
+                  />
+                )}
+                {opt.title === "description" && (
+                  <TextField
+                    label="Description"
+                    size="small"
+                    fullWidth
+                    required
+                    sx={{ mb: 1 }}
+                    value={fieldValues[`description_description`] || ""}
+                    onChange={(e) =>
+                      handleFieldChange(`description_description`, e.target.value)
+                    }
+                  />
+                )}
+                {opt.title === "metadata" && (
+                  <TextField
+                    label="Metadata"
+                    size="small"
+                    required
+                    fullWidth
+                    sx={{ mb: 2 }}
+                    value={fieldValues[`metadata_metadata`] || ""}
+                    onChange={(e) =>
+                      handleFieldChange(`metadata_metadata`, e.target.value)
+                    }
+                  />
+                )}
+              </Box>
+            ))}
+          </Box>
+        )}
 
-    {opt.title === "description" && (
-      <TextField
-        label="Description"
-        size="small"
-        fullWidth
-        required
-        sx={{ mb: 1 }}
-        value={fieldValues[`description_description`] || ""}
-        onChange={(e) =>
-          handleFieldChange(`description_description`, e.target.value)
-        }
-      />
-    )}
+        <Button
+          variant="outlined"
+          onClick={saveOptionsToRedux}
+          size="small"
+          sx={{ mt: 1.5 }}
+        >
+          Add
+        </Button>
+      </Box>
 
-    {opt.title === "metadata" && (
-      <TextField
-        label="Metadata"
-        size="small"
-        
-        fullWidth
-        sx={{ mb: 2 }}
-        value={fieldValues[`metadata_metadata`] || ""}
-        onChange={(e) =>
-          handleFieldChange(`metadata_metadata`, e.target.value)
-        }
-      />
-    )}
-  </Box>
-))}
-
-        </Box>
-      )}
-              <Button
-                variant="outlined"
-                onClick={saveOptionsToRedux}
-                size="small"
-                sx={{mt:1.5}}
-              >
-                Add
-              </Button>
-            </Box>
-
-
-      {/* === For each selected property, show ID / Description / Metadata checkbox === */}
-
-      {/* === OPTIONS: add / list your actual radio options === */}
-
-      {/* === INIT VALUE DROPDOWN (only the user-added options) === */}
+      {/* INIT VALUE DROPDOWN */}
       <FormControl fullWidth size="small">
         <InputLabel>Init Value (Optional)</InputLabel>
         <Select
@@ -310,24 +257,21 @@ const saveOptionsToRedux = () => {
               <em></em>
             </MenuItem>
           ) : (
-            initOptions.map((opt, i) => {
-              const title = typeof opt === "object" ? opt.title : opt;
-              return (
-                <MenuItem key={i} value={title}>
-                  {title}
-                </MenuItem>
-              );
-            })
+            initOptions.map((opt, i) => (
+              <MenuItem key={i} value={opt}>
+                {opt}
+              </MenuItem>
+            ))
           )}
         </Select>
       </FormControl>
 
-      {/* === Standard toggles === */}
+      {/* Standard toggles */}
       <FormControl fullWidth size="small">
         <InputLabel>Required</InputLabel>
         <Select
           label="Required"
-          value={component.properties?.required || "false"}
+          value={component.properties?.required || true}
           onChange={(e) => handleChange("required", e.target.value)}
         >
           <MenuItem value="true">True</MenuItem>
@@ -339,7 +283,7 @@ const saveOptionsToRedux = () => {
         <InputLabel>Visible</InputLabel>
         <Select
           label="Visible"
-          value={component.properties?.visible || "true"}
+          value={component.properties?.visible ?? true}
           onChange={(e) => handleChange("visible", e.target.value)}
         >
           <MenuItem value="true">True</MenuItem>
@@ -351,7 +295,7 @@ const saveOptionsToRedux = () => {
         <InputLabel>Enabled</InputLabel>
         <Select
           label="Enabled"
-          value={component.properties?.enabled || "true"}
+          value={component.properties?.enabled || false}
           onChange={(e) => handleChange("enabled", e.target.value)}
         >
           <MenuItem value="true">True</MenuItem>
