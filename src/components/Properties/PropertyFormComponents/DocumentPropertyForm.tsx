@@ -133,7 +133,7 @@ export default function DocumentPropertyForm({
   <FormControl fullWidth size="small">
     <InputLabel>Visible (Optional)</InputLabel>
     <Select
-      value={component.properties?.visible || "true"}
+      value={component.properties?.visible || true}
       onChange={(e) => handleChange("visible", e.target.value)}
       label="Visible (Optional)"
     >
@@ -144,7 +144,7 @@ export default function DocumentPropertyForm({
   <FormControl fullWidth size="small">
     <InputLabel>Enabled (Optional)</InputLabel>
     <Select
-      value={component.properties?.enabled || "true"}
+      value={component.properties?.enabled || true}
       onChange={(e) => handleChange("enabled", e.target.value)}
       label="Enabled (Optional)"
     >
