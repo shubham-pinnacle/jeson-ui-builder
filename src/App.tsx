@@ -835,7 +835,7 @@ function App() {
                     text: child.text || "",
                     //color: child.color || '#666666',
                     //fontSize: child.fontSize || '14px',
-                    visible: child.visible || true,
+                    visible: child.visible ?? true,
                     fontWeight: child.fontWeight || "",
                     strikethrough: child.strikethrough || null,
                     markdown: child.markdown || false,
@@ -847,7 +847,7 @@ function App() {
                     text: child.text || "",
                     //color: child.color || '#999999',
                     //fontSize: child.fontSize || '12px',
-                    visible: child.visible || true,
+                    visible: child.visible ?? true,
                     fontWeight: child.fontWeight || "",
                     strikethrough: child.strikethrough || null,
                     markdown: child.markdown || false,
@@ -928,8 +928,8 @@ function App() {
                         label: child.label || "",
                         description: child.description || "",
                         outputVariable: child.name || "",
-                        enabled: child.enabled || "",
-                        required: child.required || "",  
+                        enabled: child.enabled ?? "",
+                        required: child.required ?? "",  
                         visible: child.visible ?? true,
                         initValue: child["init-value"] || "",
                         options: options,
@@ -970,7 +970,7 @@ function App() {
                   type = "embedded-link"
                 properties = {
                     text: child.text || "",
-                    visible: child.visible || true,
+                    visible: child.visible ?? true,
                     onClickAction: child["on-click-action"]?.name || "",
                     screenName: child["on-click-action"]?.next?.name || "",
                     url: child["url"]?.url || ""
@@ -982,7 +982,7 @@ function App() {
                     label: child.label || "",
                     outputVariable: child.name || "",
                     required: child.required || null,
-                    visible: child.visible || true,
+                    visible: child.visible ?? true,
                     initValue: child.initValue || null,
                     onClickAction: child["on-click-action"]?.name || "",
                     screenName: child["on-click-action"]?.next?.name || "",
@@ -1231,7 +1231,7 @@ function App() {
                     : true;
 
                 const required =
-                component.properties?.required === null ? null : 
+                component.properties?.required === "" ? "" : 
                   component.properties?.required === "false" ||
                   component.properties?.required === false
                     ? false
@@ -1250,14 +1250,14 @@ function App() {
                     : true;
 
                 const enabled =
-                  component.properties?.enabled === null ? null : 
+                  component.properties?.enabled === "" ? "" : 
                   component.properties?.enabled === "false" ||
                   component.properties?.enabled === false
                     ? false
                     : true;
 
                 const intiValueOptIn = 
-                component.properties?.initValue === null ? null :
+                component.properties?.initValue === null ? "" :
                 component.properties?.initValue === "false" ||
                 component.properties?.enabled === false
                   ? false
