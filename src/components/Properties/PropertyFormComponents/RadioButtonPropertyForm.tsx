@@ -260,14 +260,14 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
             placeholder="Title"
             size="small"
             fullWidth
-            sx={{ mb: selectedOptions.length > 0 ? 1 : 0 }}
+            // sx={{ mb: selectedOptions.length > 0 ? 1 : 0 }}
             value={component.properties?.newOption || ""}
             onChange={(e) => handleChange("newOption", e.target.value)}
           />
         </Stack>
         
         {/* Render property fields only when they are selected in Autocomplete */}
-        <Box sx={{ mt: 2, mb: 2 }}>
+        <Box sx={{ mt: 1 }}>
           {["id", "description", "metadata"].map((field) =>
             selectedOptions.find((opt) => opt.title === field) ? (
               <TextField
@@ -290,7 +290,7 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
           variant="outlined"
           onClick={saveOptionsToRedux}
           size="small"
-          sx={{ mt: 1.5 }}
+          sx={{ mt: 1}}
         >
           Add
         </Button>
