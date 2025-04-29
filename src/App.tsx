@@ -451,7 +451,6 @@ function App() {
             unavailableDates: [],
             helperText: "",
           };
-          break;
           
         case "user-details":
           newComponent.properties = { 
@@ -859,16 +858,21 @@ function App() {
                 properties = {
                   label: child.label || '',
                     outputVariable: child.name || "",
-                    required: child.required || undefined,
+                    ...(child.required !== undefined
+                      ? { required: child.required }
+                      : {}),
                     inputType: child['input-type'] || "text",
-                    initValue: child['init-value'] || "",
-                    helperText: child['helper-text'] || "",
+                    ...(child['init-value'] !== undefined
+                      ? { "init-value": child['init-value'] }
+                      : {}),
+                    ...(child['helper-text'] !== undefined
+                      ? { "helper-text": child['helper-text'] }
+                      : {}),
                     visible: child.visible || true,
-                    minChars:
-                      child["min-chars"] !== undefined
-                        ? Number(child["min-chars"])
-                        : null,
-                    maxChars:
+                    ...(child["min-chars"] !== undefined
+                      ? { "min-chars": Number(child["min-chars"]) }
+                      : {}),
+                    "max-chars":
                       child['max-chars'] !== undefined
                         ? Number(child['max-chars'])
                         : 80,
@@ -879,14 +883,23 @@ function App() {
                 properties = {
                   label: child.label || '',
                     outputVariable: child.name || "",
-                    required: child.required || null,
-                    initValue: child['init-value'] || '',
-                    helperText: child['helper-text'] || '',
+                    ...(child.required !== undefined
+                      ? { required: child.required }
+                      : {}),
+                    ...(child['init-value'] !== undefined
+                      ? { "init-value": child['init-value'] }
+                      : {}),
+                    ...(child['helper-text'] !== undefined
+                      ? { "helper-text": child['helper-text'] }
+                      : {}),
                     visible: child.visible || true,
-                    maxLength: child['max-length'] !== undefined
-                      ? Number(child['max-length'])
-                      : 600,
-                    enabled: child.enabled || null
+                    "max-length":
+                      child['max-length'] !== undefined
+                        ? Number(child['max-length'])
+                        : 600,
+                    ...(child.enabled !== undefined
+                      ? { enabled: child.enabled }
+                      : {}),
                 };
                 break;
                 case "CheckboxGroup":
@@ -1296,8 +1309,8 @@ function App() {
                     type: "TextInput",
                     label: component.properties.label || '',
                       name: component.properties.outputVariable || "",
-                      ...(component.properties?.required
-                        ? { "required": required }
+                      ...(component.properties?.required !== undefined
+                        ? { required }
                         : {}),
                       "input-type": component.properties.inputType || "text",
                       ...(component.properties?.initValue
@@ -1335,7 +1348,7 @@ function App() {
                         ? { "helper-text": component.properties.helperText }
                         : {}),
                       visible,
-                      ...(component.properties?.required
+                      ...(component.properties?.required !== undefined
                         ? { required }
                         : {}),
                       "max-length":
