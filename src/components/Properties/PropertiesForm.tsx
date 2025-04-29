@@ -21,7 +21,9 @@ import TextHeadingPropertyForm from './PropertyFormComponents/TextHeadingPropert
 import TextSubHeadingPropertyForm from './PropertyFormComponents/TextSubHeadingPropertyForm';
 import TextInputPropertyForm from './PropertyFormComponents/TextInputPropertyForm'
 import TextAreaPropertyForm from './PropertyFormComponents/TextAreaPropertyForm'
-import SelectFields           from "./PropertyFormComponents/CheckboxPropertyForm";
+// import SelectFields           from "./PropertyFormComponents/CheckboxPropertyForm";
+import CheckboxPropertyForm from "./PropertyFormComponents/CheckboxPropertyForm";
+import DropdownPropertyForm from "./PropertyFormComponents/DropdownPropertyForm";
 import RadioButtonPropertyForm from "./PropertyFormComponents/RadioButtonPropertyForm"
 import FooterButtonPropertyForm from "./PropertyFormComponents/FooterButtonPropertyForm";
 import OptInPropertyForm from "./PropertyFormComponents/OptInPropertyForm";
@@ -50,8 +52,8 @@ const fieldComponentMap: Record<string, React.FC<any>> = {
   "rich-text":     TextInputPropertyForm,
   "text-input":    TextInputPropertyForm,
   "text-area":     TextAreaPropertyForm,
-  "check-box":     SelectFields,
-  "drop-down":     SelectFields,
+  "check-box":     CheckboxPropertyForm,
+  "drop-down":     DropdownPropertyForm,
   "radio-button":  RadioButtonPropertyForm,
   "footer-button": FooterButtonPropertyForm,
   "opt-in":        OptInPropertyForm,
