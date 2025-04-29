@@ -203,11 +203,11 @@ export default function DropdownPropertyForm(props: FieldRendererProps) {
         size="small"
         value={component.properties?.label || ""}
         onChange={e => {
-          console.log("Label changed:", e.target.value);
+          
           handleChange("label", e.target.value);
         }}
       />
-      {component.type !== "drop-down" && (
+      
         <TextField
           label="Description"
           fullWidth
@@ -218,7 +218,7 @@ export default function DropdownPropertyForm(props: FieldRendererProps) {
             handleChange("description", e.target.value);
           }}
         />
-      )}
+     
       <TextField
         label="Output Variable"
         required
@@ -356,16 +356,7 @@ export default function DropdownPropertyForm(props: FieldRendererProps) {
         </FormControl>
       ))}
 
-      {component.type === "check-box" && (
-        <Stack spacing={2}>
-          <TextField label="Min-Selected-Items" type="number" fullWidth
-            value={component.properties?.minSelectedItems || ""}
-            onChange={e => h("minSelectedItems", e.target.value)} size="small" />
-          <TextField label="Max-Selected-Items" type="number" fullWidth
-            value={component.properties?.maxSelectedItems || ""}
-            onChange={e => h("maxSelectedItems", e.target.value)} size="small" />
-        </Stack>
-      )}
+     
     </Stack>
   );
 }
