@@ -1116,7 +1116,7 @@ function App() {
         // If not found by ID, try to find by type and properties
         if (!updatedSelectedComponent) {
           // For text components, find by type
-          if (
+
           if (
             [
               "text-heading",

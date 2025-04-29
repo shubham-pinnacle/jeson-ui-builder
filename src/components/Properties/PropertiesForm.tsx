@@ -22,7 +22,7 @@ import TextSubHeadingPropertyForm from './PropertyFormComponents/TextSubHeadingP
 import TextInputPropertyForm from './PropertyFormComponents/TextInputPropertyForm'
 import TextAreaPropertyForm from './PropertyFormComponents/TextAreaPropertyForm'
 import SelectFields           from "./PropertyFormComponents/CheckboxPropertyForm";
-import RadioFields            from "./PropertyFormComponents/RadioFields";
+import RadioButtonPropertyForm from "./PropertyFormComponents/RadioButtonPropertyForm"
 import FooterButtonPropertyForm from "./PropertyFormComponents/FooterButtonPropertyForm";
 import OptInPropertyForm from "./PropertyFormComponents/OptInPropertyForm";
 import PhotoPropertyForm from "./PropertyFormComponents/PhotoPropertyForm";
