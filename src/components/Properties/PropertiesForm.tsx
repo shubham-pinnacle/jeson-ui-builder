@@ -27,7 +27,7 @@ import TextHeadingPropertyForm from './PropertyFormComponents/TextHeadingPropert
 import TextSubHeadingPropertyForm from './PropertyFormComponents/TextSubHeadingPropertyForm';
 import TextInputPropertyForm from './PropertyFormComponents/TextInputPropertyForm'
 import TextAreaPropertyForm from './PropertyFormComponents/TextAreaPropertyForm'
-import SelectFields           from "./PropertyFormComponents/SelectFields";
+import SelectFields           from "./PropertyFormComponents/CheckboxPropertyForm";
 import RadioFields            from "./PropertyFormComponents/RadioFields";
 import FooterButtonPropertyForm from "./PropertyFormComponents/FooterButtonPropertyForm";
 import OptInPropertyForm from "./PropertyFormComponents/OptInPropertyForm";
