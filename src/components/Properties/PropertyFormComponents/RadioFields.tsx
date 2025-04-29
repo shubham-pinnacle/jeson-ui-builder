@@ -310,7 +310,7 @@ export default function RadioFields(props: FieldRendererProps) {
             </MenuItem>
           ) : (
             initOptions.map((opt, index) => {
-              const title = typeof opt === "object" ? opt.title : opt;
+             const title = typeof opt === "object" ? opt.title : opt;
               return (
                 <MenuItem key={index} value={title}>
                   {title}
