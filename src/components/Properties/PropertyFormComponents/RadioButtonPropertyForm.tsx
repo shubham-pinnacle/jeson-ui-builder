@@ -326,7 +326,7 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
         <InputLabel>Required</InputLabel>
         <Select
           label="Required"
-          value={component.properties?.required || true}
+          value={component.properties?.required ?? ""}
           onChange={(e) => handleChange("required", e.target.value)}
         >
           <MenuItem value="true">True</MenuItem>
@@ -350,7 +350,7 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
         <InputLabel>Enabled</InputLabel>
         <Select
           label="Enabled"
-          value={component.properties?.enabled || false}
+          value={component.properties?.enabled || ""}
           onChange={(e) => handleChange("enabled", e.target.value)}
         >
           <MenuItem value="true">True</MenuItem>
