@@ -87,23 +87,39 @@ const BuilderContainer = styled('div')({
   overflow: 'hidden',
 });
 
+// const BuildArea = styled('div')({
+//   flex: 1,
+//   padding: '20px',
+//   overflowY: 'auto',
+//   '&::-webkit-scrollbar': {
+//     width: '8px',
+//   },
+//   '&::-webkit-scrollbar-track': {
+//     background: '#ffffff',
+//   },
+//   '&::-webkit-scrollbar-thumb': {
+//     backgroundColor: 'lightgrey',
+//     borderRadius: '4px',
+//   },
+//   scrollbarWidth: 'thin',
+//   scrollbarColor: 'lightgrey #ffffff',
+// });
+
 const BuildArea = styled('div')({
   flex: 1,
   padding: '20px',
   overflowY: 'auto',
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
   '&::-webkit-scrollbar': {
-    width: '8px',
+    display: 'none',
   },
-  '&::-webkit-scrollbar-track': {
-    background: '#ffffff',
-  },
-  '&::-webkit-scrollbar-thumb': {
-    backgroundColor: 'lightgrey',
-    borderRadius: '4px',
-  },
-  scrollbarWidth: 'thin',
-  scrollbarColor: 'lightgrey #ffffff',
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  msOverflowStyle: 'none', // IE and Edge
+  scrollbarWidth: 'none',   // Firefox
 });
+
 
 const ComponentsList = styled('div')({
   display: 'flex',
@@ -273,17 +289,17 @@ const Builder: React.FC<BuilderProps> = ({
       case 'PhotoPicker':
       case 'DocumentPicker':
         return <ComponentContent>{component.properties?.label || component.properties?.text || 'No Content'}</ComponentContent>;
-        case 'image':
+      case 'image':
           return (
             <ComponentContent>
               {component.properties?.src ? (
                 <img
                   src={component.properties.src}
-                  alt={component.properties.altText || 'Image'}
+                  alt={component.properties.altText || ''}
                   style={{ maxWidth: '100%', height: 'auto', objectFit: 'contain' }}
                 />
               ) : (
-                'No Content'
+                ''
               )}
             </ComponentContent>
           );

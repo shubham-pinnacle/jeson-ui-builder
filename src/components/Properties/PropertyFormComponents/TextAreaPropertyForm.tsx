@@ -1,5 +1,5 @@
 import React from "react";
-import { Stack, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Stack, TextField, FormControl, InputLabel, Select, MenuItem,Typography } from "@mui/material";
 import { FieldRendererProps } from "./FieldRendererProps";
 
 export default function TextAreaPropertyForm({
@@ -17,6 +17,9 @@ export default function TextAreaPropertyForm({
     const value = component.properties?.[field] || "";
     return value.length > limit;
   };
+
+  const maxLength = component.properties?.maxLength || 0;
+  const isMaxLengthExceeded = maxLength > 600;
 
   return (
     <Stack spacing={2}>
@@ -57,7 +60,11 @@ export default function TextAreaPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Required (Optional)</InputLabel>
         <Select
-          value={component.properties?.required || null}
+          value={
+            component.properties?.required !== undefined
+              ? String(component.properties.required)
+              : ""
+          }
           onChange={(e) => handleChange("required", e.target.value)}
           label="Required (Optional)"
         >
@@ -91,6 +98,8 @@ export default function TextAreaPropertyForm({
         </Select>
       </FormControl>
 
+     
+     
       <TextField
         label="Max-Length (Optional)"
         type="number"
@@ -99,7 +108,14 @@ export default function TextAreaPropertyForm({
         onChange={(e) => handleChange("maxLength", e.target.value)}
         size="small"
       />
-     
+      
+      {/* Message to show when maxLength exceeds 600 */}
+      {isMaxLengthExceeded && (
+        <Typography color="error" variant="body2">
+          Max Length cannot exceed 600 characters.
+        </Typography>
+      )}
+
 
       <TextField
         label="Helper Text (Optional)"

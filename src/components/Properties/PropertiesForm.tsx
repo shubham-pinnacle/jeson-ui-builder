@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -13,13 +13,7 @@ import { IoMdInformationCircleOutline } from "react-icons/io";
 import { Component } from "../types";
 import { useDispatch } from "react-redux";
 import { updateOption } from "../../slices/optionSlice";
-import {
-  StyledPopper,
-  PropertyOptions,
-  PropertiesPanel,
-  Header
-} from "./PropertiesFormStyles";
-
+import { PropertiesPanel, Header } from "./PropertiesFormStyles";
 import { FieldRendererProps } from "./PropertyFormComponents/FieldRendererProps";
 import TextCaptionPropertyForm from './PropertyFormComponents/TextCaptionPropertyForm'
 import TextBodyPropertyForm from './PropertyFormComponents/TextBodyPropertyForm'
@@ -58,7 +52,7 @@ const fieldComponentMap: Record<string, React.FC<any>> = {
   "text-area":     TextAreaPropertyForm,
   "check-box":     SelectFields,
   "drop-down":     SelectFields,
-  "radio-button":  RadioFields,
+  "radio-button":  RadioButtonPropertyForm,
   "footer-button": FooterButtonPropertyForm,
   "opt-in":        OptInPropertyForm,
   PhotoPicker:     PhotoPropertyForm,
