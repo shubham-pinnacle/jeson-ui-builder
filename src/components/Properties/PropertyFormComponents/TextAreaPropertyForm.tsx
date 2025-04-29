@@ -60,7 +60,11 @@ export default function TextAreaPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Required (Optional)</InputLabel>
         <Select
-          value={component.properties?.required || null}
+          value={
+            component.properties?.required !== undefined
+              ? String(component.properties.required)
+              : ""
+          }
           onChange={(e) => handleChange("required", e.target.value)}
           label="Required (Optional)"
         >
