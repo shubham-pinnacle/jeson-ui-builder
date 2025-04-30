@@ -804,114 +804,138 @@ function App() {
       });
 
       const newScreens = parsedJson.screens.map((screen: any) => {
+        const prevScreen = screens.find(s => s.id === screen.id);
         const layoutChildren = screen.layout?.children || [];
         
         return {
-          id: screen.id || `SCREEN_${Date.now()}`,
-          title: screen.title || "Untitled Screen",
+          id: screen.id,
+          title: screen.title,
           components: layoutChildren
             .map((child: any) => {
               let type = "";
-            let properties: Record<string, any> = {};
+              let properties: Record<string, any> = {};
+              
+              // Generate a stable component ID at the beginning
+              // Don't include name in ID to prevent breaking component identification when name changes
+              const componentId = child.id || 
+                `component_${child.type || ''}${child.label || ''}${child.text || ''}`;
+                
+              // PRIORITY 1: If child has explicit ID, use that to find component
+              let prevComponent = child.id ? 
+                prevScreen?.components.find((c: any) => c.id === child.id) : null;
+                
+              // Store original ID to ensure we maintain component identity
+              const originalId = child.id;
+              
+              // PRIORITY 2: If not found by ID, try finding by generated ID
+              if (!prevComponent) {
+                prevComponent = prevScreen?.components.find(
+                  (c: any) => c.id === componentId
+                );
+              }
+              
+              // PRIORITY 3: If not found and component has name, try finding by name
+              if (!prevComponent && child.name) {
+                prevComponent = prevScreen?.components.find((c: any) => 
+                  (c.properties.outputVariable === child.name || c.properties.name === child.name) &&
+                  c.type === child.type
+                );
+              }
+              
+              // PRIORITY 4: If still not found, try matching by position/index in the layout
+              // This helps maintain identities when the component is completely renamed
+              if (!prevComponent && prevScreen?.components && layoutChildren) {
+                const index = layoutChildren.indexOf(child);
+                if (index >= 0 && index < prevScreen.components.length) {
+                  const sameTypeAtIndex = prevScreen.components.filter(c => c.type === child.type);
+                  if (sameTypeAtIndex.length > 0) {
+                    const indexInType = layoutChildren.filter(c => c.type === child.type).indexOf(child);
+                    if (indexInType >= 0 && indexInType < sameTypeAtIndex.length) {
+                      prevComponent = sameTypeAtIndex[indexInType];
+                    }
+                  }
+                }
+              }
 
-            switch (child.type) {
+              switch (child.type) {
                 case "TextHeading":
                   type = "text-heading";
-                properties = {
-                    text: TextHeadingtext || "",
-                    visible: child.visible || true,
-                };
-                break;
+                  properties = {
+                    ...prevComponent?.properties,
+                    ...(child.text !== undefined && { text: child.text }),
+                    ...(child.visible !== undefined && { visible: child.visible }),
+                  };
+                  break;
                 case "TextSubheading":
                   type = "sub-heading";
-                properties = {
-                    text: child.text || "",
-                    visible: child.visible ?? true,
-                };
-                break;
+                  properties = {
+                    ...prevComponent?.properties,
+                    ...(child.text !== undefined && { text: child.text }),
+                    ...(child.visible !== undefined && { visible: child.visible }),
+                  };
+                  break;
                 case "TextBody":
                   type = "text-body";
-                properties = {
-                    text: child.text || "",
-                    //color: child.color || '#666666',
-                    //fontSize: child.fontSize || '14px',
-                    visible: child.visible || true,
-                    fontWeight: child.fontWeight || "",
-                    strikethrough: child.strikethrough || null,
-                    markdown: child.markdown || false,
-                };
-                break;
+                  properties = {
+                    ...prevComponent?.properties,
+                    ...(child.text !== undefined && { text: child.text }),
+                    ...(child.visible !== undefined && { visible: child.visible }),
+                    ...(child.fontWeight !== undefined && { fontWeight: child.fontWeight }),
+                    ...(child.strikethrough !== undefined && { strikethrough: child.strikethrough }),
+                    ...(child.markdown !== undefined && { markdown: child.markdown }),
+                  };
+                  break;
                 case "TextCaption":
                   type = "text-caption";
-                properties = {
-                    text: child.text || "",
-                    //color: child.color || '#999999',
-                    //fontSize: child.fontSize || '12px',
-                    visible: child.visible || true,
-                    fontWeight: child.fontWeight || "",
-                    strikethrough: child.strikethrough || null,
-                    markdown: child.markdown || false,
-                };
-                break;
+                  properties = {
+                    ...prevComponent?.properties,
+                    ...(child.text !== undefined && { text: child.text }),
+                    ...(child.visible !== undefined && { visible: child.visible }),
+                    ...(child.fontWeight !== undefined && { fontWeight: child.fontWeight }),
+                    ...(child.strikethrough !== undefined && { strikethrough: child.strikethrough }),
+                    ...(child.markdown !== undefined && { markdown: child.markdown }),
+                  };
+                  break;
                 case "TextInput":
                   type = "text-input";
-                properties = {
-                  label: child.label || '',
-                    outputVariable: child.name || "",
-                    ...(child.required !== undefined
-                      ? { required: child.required }
-                      : {}),
-                    inputType: child['input-type'] || "text",
-                    ...(child['init-value'] !== undefined
-                      ? { "init-value": child['init-value'] }
-                      : {}),
-                    ...(child['helper-text'] !== undefined
-                      ? { "helper-text": child['helper-text'] }
-                      : {}),
-                    visible: child.visible || true,
-                    ...(child["min-chars"] !== undefined
-                      ? { "min-chars": Number(child["min-chars"]) }
-                      : {}),
-                    "max-chars":
-                      child['max-chars'] !== undefined
-                        ? Number(child['max-chars'])
-                        : 80,
-                };
-                break;
+                  properties = {
+                    ...prevComponent?.properties,
+                    ...(child.label !== undefined && { label: child.label }),
+                    ...(child.name !== undefined && { outputVariable: child.name, name: child.name }),
+                    ...(child.required !== undefined && { required: child.required }),
+                    ...(child['input-type'] !== undefined && { inputType: child['input-type'] }),
+                    ...(child['init-value'] !== undefined && { initValue: child['init-value'] }),
+                    ...(child['helper-text'] !== undefined && {  helperText: child['helper-text'] }),
+                    ...(child.visible !== undefined && { visible: child.visible }),
+                    ...(child['min-chars'] !== undefined && { 'min-chars': Number(child['min-chars']) }),
+                    ...(child['max-chars'] !== undefined && { 'max-chars': Number(child['max-chars']) }),
+                  };
+                  break;
                 case "TextArea":
                   type = "text-area";
-                properties = {
-                  label: child.label || '',
-                    outputVariable: child.name || "",
-                    ...(child.required !== undefined
-                      ? { required: child.required }
-                      : {}),
-                    ...(child['init-value'] !== undefined
-                      ? { "init-value": child['init-value'] }
-                      : {}),
-                    ...(child['helper-text'] !== undefined
-                      ? { "helper-text": child['helper-text'] }
-                      : {}),
-                    visible: child.visible || true,
-                    "max-length":
-                      child['max-length'] !== undefined
-                        ? Number(child['max-length'])
-                        : 600,
-                    ...(child.enabled !== undefined
-                      ? { enabled: child.enabled }
-                      : {}),
-                };
-                break;
+                  properties = {
+                    ...prevComponent?.properties,
+                    ...(child.label !== undefined && { label: child.label }),
+                    ...(child.name !== undefined && { outputVariable: child.name, name: child.name }),
+                    ...(child.required !== undefined && { required: child.required }),
+                    ...(child['init-value'] !== undefined && { 'init-value': child['init-value'], initValue: child['init-value'] }),
+                    ...(child['helper-text'] !== undefined && { 'helper-text': child['helper-text'], helperText: child['helper-text'] }),
+                    ...(child.visible !== undefined && { visible: child.visible }),
+                    ...(child['max-length'] !== undefined && { 'max-length': Number(child['max-length']) }),
+                    ...(child.enabled !== undefined && { enabled: child.enabled }),
+                  };
+                  break;
                 case "CheckboxGroup":
                   type = "check-box";
                 properties = {
-                    label: child.label || "",
-                    description: child.description || "",
-                    outputVariable: child.name || "",
-                    options: options,
-                    visible: child.visible || true,
-                    required: child.required || false,
-                    enabled: child.enabled || true,
+                    ...prevComponent?.properties,
+                    ...(child.label !== undefined && { label: child.label }),
+                    ...(child.description !== undefined && { description: child.description }),
+                    ...(child.name !== undefined && { outputVariable: child.name, name: child.name }),
+                    ...(options !== undefined && { options: options }),
+                    ...(child.visible !== undefined && { visible: child.visible }),
+                    ...(child.required !== undefined && { required: child.required }),
+                    ...(child.enabled !== undefined && { enabled: child.enabled }),
                     "min-selected-items":
                     child["min-selected-items"] !== undefined
                       ? Number(child["min-selected-items"])
@@ -923,57 +947,57 @@ function App() {
                 };
                 break;
                   case "RadioButtonsGroup":
-                    type = "radio-button"; 
+                    type = "radio-button";
                 properties = {
-                        label: child.label || "",
-                        description: child.description || "",
-                        outputVariable: child.name || "",
-                        enabled: child.enabled || "",
-                        required: child.required || "",  
-                        visible: child.visible ?? true,
-                        initValue: child["init-value"] || "",
-                        options: options,
+                        ...prevComponent?.properties,
+                        ...(child.label !== undefined && { label: child.label }),
+                        ...(child.description !== undefined && { description: child.description }),
+                        ...(child.name !== undefined && { outputVariable: child.name, name: child.name }),
+                        ...(child.enabled !== undefined && { enabled: child.enabled }),
+                        ...(child.required !== undefined && { required: child.required }),
+                        ...(child.visible !== undefined && { visible: child.visible }),
+                        ...(child["init-value"] !== undefined && { initValue: child["init-value"] }),
+                        ...(options !== undefined && { options: options }),
                 };
                 break;
                 case "Dropdown":
                   type = "drop-down";
+                  const dropdownOptions = child["data-source"] ? JSON.stringify(
+                    child["data-source"]?.map((opt: any) => opt.title)
+                  ) : undefined;
                 properties = {
-                    label: child.label || "",
-                    name: child.name || `dropdown_field_${Date.now()}`,
-                    options: JSON.stringify(
-                      child["data-source"]?.map((opt: any) => opt.title) || [
-                        "Option 1",
-                        "Option 2",
-                        "Option 3",
-                      ]
-                    ),
-                    outputVariable: child.name || "",
-                    enabled: child.enabled || true,
-                    visible: child.visible ?? true,
-                    required: child.required || false,
-                    placeholder: child.placeholder || "Select an option",
+                    ...prevComponent?.properties,
+                    ...(child.label !== undefined && { label: child.label }),
+                    ...(child.name !== undefined && { name: child.name, outputVariable: child.name }),
+                    ...(dropdownOptions !== undefined && { options: dropdownOptions }),
+                    ...(child.enabled !== undefined && { enabled: child.enabled }),
+                    ...(child.visible !== undefined && { visible: child.visible }),
+                    ...(child.required !== undefined && { required: child.required }),
+                    ...(child.placeholder !== undefined && { placeholder: child.placeholder }),
                 };
                 break;
                 case "Footer":
                   type = "footer-button";
                 properties = {
-                    buttonText: child.label || "",
-                    leftCaption: child["left-caption"] || "",
-                    centerCaption: child["center-caption"] || "",
-                    rightCaption: child["right-caption"] || "",
-                    enabled: child.enabled || null,
-                    onClickAction: child["on-click-action"]?.name || "",
-                    screenName: child["on-click-action"]?.next?.name || "",
+                    ...prevComponent?.properties,
+                    ...(child.label !== undefined && { label: child.label }),
+                    ...(child["left-caption"] !== undefined && { leftCaption: child["left-caption"] }),
+                    ...(child["center-caption"] !== undefined && { centerCaption: child["center-caption"] }),
+                    ...(child["right-caption"] !== undefined && { rightCaption: child["right-caption"] }),
+                    ...(child.enabled !== undefined && { enabled: child.enabled }),
+                    ...(child["on-click-action"]?.name !== undefined && { onClickAction: child["on-click-action"]?.name }),
+                    ...(child["on-click-action"]?.next?.name !== undefined && { screenName: child["on-click-action"]?.next?.name }),
                 };
                 break;
                 case "EmbeddedLink":
                   type = "embedded-link"
                 properties = {
-                    text: child.text || "",
-                    visible: child.visible || true,
-                    onClickAction: child["on-click-action"]?.name || "",
-                    screenName: child["on-click-action"]?.next?.name || "",
-                    url: child["url"]?.url || ""
+                    ...prevComponent?.properties,
+                    ...(child.text !== undefined && { text: child.text }),
+                    ...(child.visible !== undefined && { visible: child.visible }),
+                    ...(child["on-click-action"]?.name !== undefined && { onClickAction: child["on-click-action"]?.name }),
+                    ...(child["on-click-action"]?.next?.name !== undefined && { screenName: child["on-click-action"]?.next?.name }),
+                    ...(child["url"]?.url !== undefined && { url: child["url"]?.url })
                 };
                 break;
                 case "OptIn":
@@ -1016,8 +1040,10 @@ function App() {
                     ...(child["allowed-mime-types"]
                       ? { "allowed-mime-types": child["allowed-mime-types"] }
                       : {}),
-                    "min-uploaded-documents": parseInt(child["min-uploaded-documents"]) || 0,
-                    "max-uploaded-documents": parseInt(child["max-uploaded-documents"]) || 30,
+                    "min-uploaded-documents":
+                      parseInt(child["min-uploaded-documents"]) || 0,
+                    "max-uploaded-documents":
+                      parseInt(child["max-uploaded-documents"]) || 30,
                     "max-file-size-kb":
                       parseInt(child["max-file-size-kb"]) || 10240,
                   };
@@ -1053,16 +1079,23 @@ function App() {
                     helperText: child['helper-text'] || ""
                   };
                   break;
+                case "user-details":
+                  type = "user-details";
+                  properties = {
+                    name: child.name || "",
+                    email: child.email || "",
+                    address: child.address || "",
+                    dateOfBirth: child.dateOfBirth || "",
+                  };
+                  break;
                 default:
                   return null;
             }
 
+            // Use the stable ID generated at the beginning or preserve original ID
+            
             return {
-                id:
-                  child.id ||
-                  `component_${Date.now()}_${Math.random()
-                    .toString(36)
-                    .substr(2, 9)}`,
+                id: originalId || componentId,
               type,
                 name: type
                   .replace(/-/g, " ")
@@ -1231,7 +1264,7 @@ function App() {
                     : true;
 
                 const required =
-                component.properties?.required === null ? null : 
+                component.properties?.required === undefined ? undefined : 
                   component.properties?.required === "false" ||
                   component.properties?.required === false
                     ? false
@@ -1266,18 +1299,21 @@ function App() {
               switch (component.type) {
                   case "text-heading":
                   return {
+                    id: component.id,
                     type: "TextHeading",
-                      text: TextHeadingtext || "",
+                      text: component.properties.text || "",
                       visible,
                     };
                   case "sub-heading":
                   return {
+                    id: component.id,
                     type: "TextSubheading",
                       text: component.properties.text || "",
                       visible
                     };
                   case "text-body":
                     return {
+                      id: component.id,
                       type: "TextBody",
                       text: component.properties.text || "",
                       visible,
@@ -1291,6 +1327,7 @@ function App() {
                     };
                   case "text-caption":
                   return {
+                    id: component.id,
                     type: "TextCaption",
                       text: component.properties.text || "",
                       visible,
@@ -1306,19 +1343,16 @@ function App() {
                     };
                   case "text-input":
                   return {
+                    id: component.id,
                     type: "TextInput",
-                    label: component.properties.label || '',
-                      name: component.properties.outputVariable || "",
+                    label: component.properties.label ?? "",
+                      name: component.properties.outputVariable || component.properties.name || "",
                       ...(component.properties?.required !== undefined
                         ? { required }
                         : {}),
                       "input-type": component.properties.inputType || "text",
-                      ...(component.properties?.initValue
-                        ? { "init-value": component.properties.initValue }
-                        : {}),
-                      ...(component.properties?.helperText
-                        ? { "helper-text": component.properties.helperText }
-                        : {}),
+                      "init-value": component.properties["init-value"] || component.properties.initValue || "",
+                      "helper-text": component.properties["helper-text"] || component.properties.helperText || "",
                       visible,
                       // "min-chars":
                       //   component.properties.minChars !== undefined
@@ -1338,15 +1372,12 @@ function App() {
 
                   case "text-area":
                   return {
+                    id: component.id,
                     type: "TextArea",
-                      name: component.properties.outputVariable || "",
-                      label: component.properties.label || "",
-                      ...(component.properties?.initValue
-                        ? { "init-value": component.properties.initValue }
-                        : {}),
-                      ...(component.properties?.helperText
-                        ? { "helper-text": component.properties.helperText }
-                        : {}),
+                      name: component.properties.outputVariable || component.properties.name || "",
+                      label: component.properties.label ?? "",
+                      "init-value": component.properties["init-value"] || component.properties.initValue || "",
+                      "helper-text": component.properties["helper-text"] || component.properties.helperText || "",
                       visible,
                       ...(component.properties?.required !== undefined
                         ? { required }
@@ -1654,9 +1685,7 @@ function App() {
                         ? { "max-date": component.properties.maxDate }
                         : {}),
                       "unavailable-dates": component.properties.unavailableDates || [],
-                      ...(component.properties?.helperText
-                        ? { "helper-text": component.properties.helperText }
-                        : {})
+                      "helper-text": component.properties["helper-text"] || component.properties.helperText || "",
                     };
 
                   case "user-details":

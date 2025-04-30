@@ -48,7 +48,7 @@ export default function TextInputPropertyForm({
       <TextField
         label="Init Value (Optional)"
         fullWidth
-        value={component.properties?.initValue || ""}
+        value={component.properties?.initValue ?? ""}
         onChange={(e) => handleChange("initValue", e.target.value)}
         size="small"
       />
@@ -56,7 +56,7 @@ export default function TextInputPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Required (Optional)</InputLabel>
         <Select
-          value={component.properties?.required || undefined}
+          value={component.properties?.required ?? undefined}
           onChange={(e) => handleChange("required", e.target.value)}
           label="Required (Optional)"
         >
@@ -86,7 +86,7 @@ export default function TextInputPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>
         <Select
-          value={component.properties?.visible || "true"}
+          value={component.properties?.visible ?? true}
           onChange={(e) => handleChange("visible", e.target.value)}
           label="Visible (Optional)"
         >
@@ -109,7 +109,7 @@ export default function TextInputPropertyForm({
           label="Max-Chars (Optional)"
           type="number"
           fullWidth
-          value={component.properties?.maxChars || 0}
+          value={component.properties?.maxChars || 80}
           onChange={(e) => handleChange("maxChars", e.target.value)}
           size="small"
         />
@@ -118,7 +118,7 @@ export default function TextInputPropertyForm({
       <TextField
         label="Helper Text (Optional)"
         fullWidth
-        value={component.properties?.helperText || ""}
+        value={component.properties?.helperText ?? ""}
         onChange={(e) => handleChange("helperText", e.target.value)}
         size="small"
         error={isOverLimit("helperText", 80)}
