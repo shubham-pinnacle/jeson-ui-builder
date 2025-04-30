@@ -934,7 +934,7 @@ function App() {
                   properties = {
                     ...prevComponent?.properties,
                     ...(child.label !== undefined && { label: child.label }),
-                    ...(child.name !== undefined && { outputVariable: child.name, name: child.name }),
+                    ...(child.name !== undefined && { outputVariable: child.name }),
                     ...(child.required !== undefined && { required: child.required }),
                     ...(child['input-type'] !== undefined && { inputType: child['input-type'] }),
                     ...(child['init-value'] !== undefined && { initValue: child['init-value'] }),
