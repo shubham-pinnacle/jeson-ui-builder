@@ -7,9 +7,11 @@ import {
   Tabs,
   Tab,
   Box,
-  Typography
+  Typography,
+  Button
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import AddIcon from '@mui/icons-material/Add';
 
 export interface SettingsDialogProps {
   open: boolean;
@@ -29,17 +31,21 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
       open={open}
       onClose={onClose}
       fullWidth
-      maxWidth="md"
+      maxWidth="xl"
       PaperProps={{
         sx: {
-          width: '900px',
-          maxHeight: '85vh',
-          borderRadius: 2
+          width: '76vw',
+          height: '78vh',
+          borderRadius: 5,
+          px: 3,
+          pt: 1,
         }
       }}
     >
       <DialogTitle sx={{ m: 0, p: 2 }}>
-        <Typography variant="h6">Settings</Typography>
+        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+          Settings
+        </Typography>
         <IconButton
           aria-label="close"
           onClick={onClose}
@@ -47,14 +53,22 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
             position: 'absolute',
             right: 8,
             top: 8,
-            color: (theme) => theme.palette.grey[500]
+            color: (theme) => theme.palette.grey[500],
           }}
         >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent dividers sx={{ p: 0 }}>
+      <DialogContent
+        dividers
+        sx={{
+          p: 0,
+          overflowY: 'auto',
+          scrollbarWidth: 'none', // Firefox
+          '&::-webkit-scrollbar': { display: 'none' }, // Chrome, Safari
+        }}
+      >
         {/* Tabs */}
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs
@@ -64,19 +78,61 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
             indicatorColor="primary"
           >
             {TAB_LABELS.map((label) => (
-              <Tab key={label} label={label} />
+              <Tab
+                key={label}
+                label={label}
+                sx={{ textTransform: 'none', fontSize: 15 }}
+              />
             ))}
           </Tabs>
         </Box>
 
         {/* Tab panels */}
-        <Box sx={{ p: 3, minHeight: '200px' }}>
+        <Box sx={{ p: 3, minHeight: 'calc(78vh - 120px)' }}>
           {tabIndex === 0 && (
             <Typography>No Screens Found.</Typography>
           )}
+
           {tabIndex === 1 && (
-            <Typography> {/* TODO: dynamic var content */} </Typography>
+            <>
+              {/* Header row */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 2
+                }}
+              >
+                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                  Dynamic Variables
+                </Typography>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<AddIcon />}
+                  disabled
+                >
+                  Create Variables
+                </Button>
+              </Box>
+
+              {/* Content area */}
+              <Box
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                <Typography color="text.secondary">
+                  No variables found
+                </Typography>
+              </Box>
+            </>
           )}
+
           {tabIndex === 2 && (
             <Typography> {/* TODO: configuration content */} </Typography>
           )}

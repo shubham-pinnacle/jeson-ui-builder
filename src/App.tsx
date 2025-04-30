@@ -1937,45 +1937,45 @@ function App() {
           </BuilderContainer>
 
           <JsonEditorContainer>
-        <ButtonGroupContainer>
-          <StyledButton
-            variant="outlined"
-            size="small"
-            onClick={openSettings}
-            startIcon={<SettingsIcon />}
-            sx={{ mr: 1 }}
-          >
-            Settings
-          </StyledButton>
+            <ButtonGroupContainer>
+              <StyledButton
+                variant="outlined"
+                size="small"
+                onClick={openSettings}
+                startIcon={<SettingsIcon />}
+                sx={{ mr: 1 }}
+              >
+                Settings
+              </StyledButton>
 
-          <StyledButton
-            variant="contained"
-            size="small"
-            
-            startIcon={<SaveIcon />}
-            sx={{ mr: 2 }}
-          >
-            Save
-          </StyledButton>
+              <StyledButton
+                variant="contained"
+                size="small"
+                
+                startIcon={<SaveIcon />}
+                sx={{ mr: 2 }}
+              >
+                Save
+              </StyledButton>
 
-          <StyledButton
-            variant="outlined"
-            size="small"
-            onClick={handleCopyJson}
-            startIcon={<ContentCopyIcon />}
-          >
-            Copy JSON
-          </StyledButton>
-        </ButtonGroupContainer>
+              <StyledButton
+                variant="outlined"
+                size="small"
+                onClick={handleCopyJson}
+                startIcon={<ContentCopyIcon />}
+              >
+                Copy JSON
+              </StyledButton>
+            </ButtonGroupContainer>
 
-        <MetaJsonGenerator
-          jsonInput={editValue}
-          onJsonChange={handleJsonChange}
-          onMetaGenerate={handleMetaGenerate}
-        />
-      </JsonEditorContainer>
+            <MetaJsonGenerator
+              jsonInput={editValue}
+              onJsonChange={handleJsonChange}
+              onMetaGenerate={handleMetaGenerate}
+            />
+          </JsonEditorContainer>
 
-      <SettingsDialog open={settingsOpen} onClose={closeSettings} />
+          <SettingsDialog open={settingsOpen} onClose={closeSettings} />
           <PreviewContainer isVisible={showPreview}>
             <Simulator
               components={screens[activeScreenIndex].components}
