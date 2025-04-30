@@ -289,8 +289,8 @@ function App() {
           newComponent.properties = {
             text: "",
             visible: true,
-            fontWeight: "",
             strikethrough: null,
+            fontWeight: "",
             markdown: false,
           };
           break;
@@ -298,8 +298,8 @@ function App() {
           newComponent.properties = {
             text: "",
             visible: true,
-            fontWeight: "",
             strikethrough: null,
+            fontWeight: "",
             markdown: false,
           };
           break;
@@ -668,7 +668,7 @@ function App() {
         };
         break;
       case "date-picker":
-          newComponent.properties = {
+          newComponent.properties = { 
             label: "",
             outputVariable: "",
             initValue: null,
@@ -760,8 +760,13 @@ function App() {
   };
 
   const handleCopyJson = () => {
-    const jsonString = JSON.stringify(generateJson(), null, 2);
-    navigator.clipboard.writeText(jsonString);
+    // Export JSON without id fields
+    const jsonObj = generateJson();
+    const jsonNoId = JSON.parse(
+      JSON.stringify(jsonObj),
+      (key, value) => (key === 'id' ? undefined : value)
+    );
+    navigator.clipboard.writeText(JSON.stringify(jsonNoId, null, 2));
   };
 
   const handleJsonChange = (newJson: string) => {
@@ -865,7 +870,14 @@ function App() {
                     ...(child.text !== undefined && { text: child.text }),
                     ...(child.visible !== undefined && { visible: child.visible }),
                   };
-                  break;
+                  return {
+                    id: prevComponent?.id || componentId,
+                    type,
+                    name: type
+                      .replace(/-/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase()),
+                    properties,
+                  };
                 case "TextSubheading":
                   type = "sub-heading";
                   properties = {
@@ -873,7 +885,14 @@ function App() {
                     ...(child.text !== undefined && { text: child.text }),
                     ...(child.visible !== undefined && { visible: child.visible }),
                   };
-                  break;
+                  return {
+                    id: prevComponent?.id || componentId,
+                    type,
+                    name: type
+                      .replace(/-/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase()),
+                    properties,
+                  };
                 case "TextBody":
                   type = "text-body";
                   properties = {
@@ -884,7 +903,14 @@ function App() {
                     ...(child.strikethrough !== undefined && { strikethrough: child.strikethrough }),
                     ...(child.markdown !== undefined && { markdown: child.markdown }),
                   };
-                  break;
+                  return {
+                    id: prevComponent?.id || componentId,
+                    type,
+                    name: type
+                      .replace(/-/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase()),
+                    properties,
+                  };
                 case "TextCaption":
                   type = "text-caption";
                   properties = {
@@ -895,7 +921,14 @@ function App() {
                     ...(child.strikethrough !== undefined && { strikethrough: child.strikethrough }),
                     ...(child.markdown !== undefined && { markdown: child.markdown }),
                   };
-                  break;
+                  return {
+                    id: prevComponent?.id || componentId,
+                    type,
+                    name: type
+                      .replace(/-/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase()),
+                    properties,
+                  };
                 case "TextInput":
                   type = "text-input";
                   properties = {
@@ -907,10 +940,17 @@ function App() {
                     ...(child['init-value'] !== undefined && { initValue: child['init-value'] }),
                     ...(child['helper-text'] !== undefined && {  helperText: child['helper-text'] }),
                     ...(child.visible !== undefined && { visible: child.visible }),
-                    ...(child['min-chars'] !== undefined && { 'min-chars': Number(child['min-chars']) }),
-                    ...(child['max-chars'] !== undefined && { 'max-chars': Number(child['max-chars']) }),
+                    ...(child['min-chars'] !== undefined && { minChars: Number(child['min-chars']) }),
+                    ...(child['max-chars'] !== undefined && { maxChars: Number(child['max-chars']) }),
                   };
-                  break;
+                  return {
+                    id: prevComponent?.id || componentId,
+                    type,
+                    name: type
+                      .replace(/-/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase()),
+                    properties,
+                  };
                 case "TextArea":
                   type = "text-area";
                   properties = {
@@ -924,7 +964,14 @@ function App() {
                     ...(child['max-length'] !== undefined && { 'max-length': Number(child['max-length']) }),
                     ...(child.enabled !== undefined && { enabled: child.enabled }),
                   };
-                  break;
+                  return {
+                    id: prevComponent?.id || componentId,
+                    type,
+                    name: type
+                      .replace(/-/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase()),
+                    properties,
+                  };
                 case "CheckboxGroup":
                   type = "check-box";
                 properties = {
@@ -945,7 +992,14 @@ function App() {
                       ? Number(child["max-selected-items"])
                       : 0,
                 };
-                break;
+                return {
+                  id: prevComponent?.id || componentId,
+                  type,
+                  name: type
+                    .replace(/-/g, " ")
+                    .replace(/\b\w/g, (l) => l.toUpperCase()),
+                  properties,
+                };
                   case "RadioButtonsGroup":
                     type = "radio-button";
                 properties = {
@@ -959,7 +1013,14 @@ function App() {
                         ...(child["init-value"] !== undefined && { initValue: child["init-value"] }),
                         ...(options !== undefined && { options: options }),
                 };
-                break;
+                return {
+                  id: prevComponent?.id || componentId,
+                  type,
+                  name: type
+                    .replace(/-/g, " ")
+                    .replace(/\b\w/g, (l) => l.toUpperCase()),
+                  properties,
+                };
                 case "Dropdown":
                   type = "drop-down";
                   const dropdownOptions = child["data-source"] ? JSON.stringify(
@@ -975,7 +1036,14 @@ function App() {
                     ...(child.required !== undefined && { required: child.required }),
                     ...(child.placeholder !== undefined && { placeholder: child.placeholder }),
                 };
-                break;
+                return {
+                  id: prevComponent?.id || componentId,
+                  type,
+                  name: type
+                    .replace(/-/g, " ")
+                    .replace(/\b\w/g, (l) => l.toUpperCase()),
+                  properties,
+                };
                 case "Footer":
                   type = "footer-button";
                 properties = {
@@ -988,7 +1056,14 @@ function App() {
                     ...(child["on-click-action"]?.name !== undefined && { onClickAction: child["on-click-action"]?.name }),
                     ...(child["on-click-action"]?.next?.name !== undefined && { screenName: child["on-click-action"]?.next?.name }),
                 };
-                break;
+                return {
+                  id: prevComponent?.id || componentId,
+                  type,
+                  name: type
+                    .replace(/-/g, " ")
+                    .replace(/\b\w/g, (l) => l.toUpperCase()),
+                  properties,
+                };
                 case "EmbeddedLink":
                   type = "embedded-link"
                 properties = {
@@ -999,7 +1074,14 @@ function App() {
                     ...(child["on-click-action"]?.next?.name !== undefined && { screenName: child["on-click-action"]?.next?.name }),
                     ...(child["url"]?.url !== undefined && { url: child["url"]?.url })
                 };
-                break;
+                return {
+                  id: prevComponent?.id || componentId,
+                  type,
+                  name: type
+                    .replace(/-/g, " ")
+                    .replace(/\b\w/g, (l) => l.toUpperCase()),
+                  properties,
+                };
                 case "OptIn":
                   type = "opt-in"
                   properties = {
@@ -1012,7 +1094,14 @@ function App() {
                     screenName: child["on-click-action"]?.next?.name || "",
                     url: child["url"]?.url || ""
                   };
-                  break;
+                  return {
+                    id: prevComponent?.id || componentId,
+                    type,
+                    name: type
+                      .replace(/-/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase()),
+                    properties,
+                  };
                 case "Image":
                   type = "image";
                   properties = {
@@ -1027,7 +1116,14 @@ function App() {
                     aspectRatio: child['aspect-ratio'] || 1,
                     visible: child.visible ?? true,
                   };
-                  break;
+                  return {
+                    id: prevComponent?.id || componentId,
+                    type,
+                    name: type
+                      .replace(/-/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase()),
+                    properties,
+                  };
                 case "DocumentPicker":
                   type = "DocumentPicker";
                   properties = {
@@ -1047,7 +1143,14 @@ function App() {
                     "max-file-size-kb":
                       parseInt(child["max-file-size-kb"]) || 10240,
                   };
-                  break;
+                  return {
+                    id: prevComponent?.id || componentId,
+                    type,
+                    name: type
+                      .replace(/-/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase()),
+                    properties,
+                  };
 
                 case "PhotoPicker":
                   type = "PhotoPicker";
@@ -1063,7 +1166,14 @@ function App() {
                     visible: child.visible ?? true,
                     enabled: child.enabled ?? true,
                   };
-                  break;
+                  return {
+                    id: prevComponent?.id || componentId,
+                    type,
+                    name: type
+                      .replace(/-/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase()),
+                    properties,
+                  };
 
                 case "DatePicker":
                   type = "date-picker";
@@ -1078,16 +1188,31 @@ function App() {
                     unavailableDates: child['unavailable-dates'] || [],
                     helperText: child['helper-text'] || ""
                   };
-                  break;
-                case "user-details":
-                  type = "user-details";
-                  properties = {
-                    name: child.name || "",
-                    email: child.email || "",
-                    address: child.address || "",
-                    dateOfBirth: child.dateOfBirth || "",
+                  return {
+                    id: prevComponent?.id || componentId,
+                    type,
+                    name: type
+                      .replace(/-/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase()),
+                    properties,
                   };
-                  break;
+
+                  case "user-details":
+                    type = "user-details";
+                    properties = {
+                      name: child.name || "",
+                      email: child.email || "",
+                      address: child.address || "",
+                      dateOfBirth: child.dateOfBirth || "",
+                    };
+                    return {
+                      id: prevComponent?.id || componentId,
+                      type,
+                      name: type
+                        .replace(/-/g, " ")
+                        .replace(/\b\w/g, (l) => l.toUpperCase()),
+                      properties,
+                    };
                 default:
                   return null;
             }
@@ -1095,115 +1220,36 @@ function App() {
             // Use the stable ID generated at the beginning or preserve original ID
             
             return {
-                id: originalId || componentId,
-              type,
+                type,
                 name: type
                   .replace(/-/g, " ")
                   .replace(/\b\w/g, (l) => l.toUpperCase()),
                 properties,
               };
             })
-            .filter(Boolean),
-        };
+            .filter((c): c is Component => c !== null),
+          };
       });
 
-      setScreens(newScreens);
-      
-      // Update the selected component if it exists in the new screens
+      // Ensure each component gets an id (existing or generated)
+      const screensWithIds = newScreens.map((screen: any) => ({
+        ...screen,
+        components: screen.components.map((comp: any, idx: number) => ({
+          id: comp.id || `component_${screen.id}_${idx}`,
+          ...comp,
+        })),
+      }));
+      setScreens(screensWithIds);
+      // Sync selectedComponent by matching type and name
       if (selectedComponent && activeScreenIndex < newScreens.length) {
-        // First try to find by ID
-        let updatedSelectedComponent = newScreens[
-          activeScreenIndex
-        ].components.find(
-          (comp: Component) => comp.id === selectedComponent.id
+        const comps = newScreens[activeScreenIndex].components;
+        const updated = comps.find(c =>
+          c.type === selectedComponent.type &&
+          (selectedComponent.properties.name
+            ? c.properties.name === selectedComponent.properties.name
+            : true)
         );
-
-        // If not found by ID, try to find by type and properties
-        if (!updatedSelectedComponent) {
-          // For text components, find by type
-          if (
-            [
-              "text-heading",
-              "sub-heading",
-              "text-body",
-              "text-caption",
-            ].includes(selectedComponent.type)
-          ) {
-            updatedSelectedComponent = newScreens[
-              activeScreenIndex
-            ].components.find(
-              (comp: Component) => comp.type === selectedComponent.type
-            );
-          }
-          // For input components, find by type and name
-          else if (
-            ["text-input", "text-area", "drop-down"].includes(
-              selectedComponent.type
-            )
-          ) {
-            updatedSelectedComponent = newScreens[
-              activeScreenIndex
-            ].components.find(
-              (comp: Component) =>
-                comp.type === selectedComponent.type &&
-                comp.properties.name === selectedComponent.properties.name
-            );
-          }
-          // For radio-button and check-box components, find by type and name
-          else if (
-            ["radio-button", "check-box"].includes(selectedComponent.type)
-          ) {
-            updatedSelectedComponent = newScreens[
-              activeScreenIndex
-            ].components.find(
-              (comp: Component) =>
-                comp.type === selectedComponent.type &&
-                comp.properties.name === selectedComponent.properties.name
-            );
-          }
-          // For footer-button components, find by type and buttonText
-          else if (selectedComponent.type === "footer-button") {
-            updatedSelectedComponent = newScreens[
-              activeScreenIndex
-            ].components.find(
-              (comp: Component) => comp.type === selectedComponent.type
-            );
-          }
-          // For image components
-          else if (selectedComponent.type === "image") {
-            updatedSelectedComponent = newScreens[
-              activeScreenIndex
-            ].components.find(
-              (comp: Component) => comp.type === selectedComponent.type
-            );
-          }
-          // For date-picker components
-          else if (
-            ["date-picker"].includes(selectedComponent.type)
-          ) {
-            updatedSelectedComponent = newScreens[
-              activeScreenIndex
-            ].components.find(
-              (comp: Component) =>
-                comp.type === selectedComponent.type &&
-                comp.properties.name === selectedComponent.properties.name
-            );
-          }
-          // For other components, find by type and name
-          else {
-            updatedSelectedComponent = newScreens[
-              activeScreenIndex
-            ].components.find(
-              (comp: Component) =>
-                comp.type === selectedComponent.type &&
-                comp.properties.name === selectedComponent.properties.name
-            );
-          }
-        }
-        
-        if (updatedSelectedComponent) {
-          setSelectedComponent(updatedSelectedComponent);
-        }
+        if (updated) setSelectedComponent(updated);
       }
     } catch (error) {
       if (error instanceof SyntaxError) {
@@ -1299,21 +1345,18 @@ function App() {
               switch (component.type) {
                   case "text-heading":
                   return {
-                    id: component.id,
                     type: "TextHeading",
                       text: component.properties.text || "",
                       visible,
                     };
                   case "sub-heading":
                   return {
-                    id: component.id,
                     type: "TextSubheading",
                       text: component.properties.text || "",
                       visible
                     };
                   case "text-body":
                     return {
-                      id: component.id,
                       type: "TextBody",
                       text: component.properties.text || "",
                       visible,
@@ -1327,7 +1370,6 @@ function App() {
                     };
                   case "text-caption":
                   return {
-                    id: component.id,
                     type: "TextCaption",
                       text: component.properties.text || "",
                       visible,
@@ -1343,7 +1385,6 @@ function App() {
                     };
                   case "text-input":
                   return {
-                    id: component.id,
                     type: "TextInput",
                     label: component.properties.label ?? "",
                       name: component.properties.outputVariable || component.properties.name || "",
@@ -1372,7 +1413,6 @@ function App() {
 
                   case "text-area":
                   return {
-                    id: component.id,
                     type: "TextArea",
                       name: component.properties.outputVariable || component.properties.name || "",
                       label: component.properties.label ?? "",
@@ -1387,7 +1427,7 @@ function App() {
                           ? Number(component.properties.maxLength)
                           : 600,
                       ...(component.properties?.enabled
-                        ? { enabled}
+                        ? { enabled: enabled }
                         : {}),
                     };
                   case "check-box":
