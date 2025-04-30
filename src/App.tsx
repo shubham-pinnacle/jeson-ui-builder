@@ -17,6 +17,8 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import SettingsIcon from '@mui/icons-material/Settings';
+import SaveIcon from '@mui/icons-material/Save';
 import Sidebar from "./components/Sidebar/Sidebar";
 import Builder from "./components/Builder/Builder";
 import Simulator from "./components/Simulator/Simulator";
@@ -26,7 +28,8 @@ import { Component } from "./types";
 import Dialog from "@mui/material/Dialog";
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from './store/index';
-import { useToast } from './components/ToastContext';
+import { useToast } from './components/ToastContext';;
+import SettingsDialog from "./components/Settings/SettingsDialog"
 
 
 const AppContainer = styled("div")({
@@ -237,6 +240,11 @@ function App() {
   const [selectedScreenIndex, setSelectedScreenIndex] = useState<number | null>(
     null
   );
+
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  const openSettings = () => setSettingsOpen(true);
+  const closeSettings = () => setSettingsOpen(false);
 
   // useEffect(() => {
   //   showToast({
@@ -1929,24 +1937,45 @@ function App() {
           </BuilderContainer>
 
           <JsonEditorContainer>
-            <ButtonGroupContainer>
-              <StyledButton
-                variant="outlined"
-                size="small"
-                onClick={handleCopyJson}
-                startIcon={<ContentCopyIcon />}
-              >
-                Copy JSON
-              </StyledButton>
-            </ButtonGroupContainer>
-            <MetaJsonGeneratorContainer>
-              <MetaJsonGenerator
-                jsonInput={editValue}
-                onJsonChange={handleJsonChange}
-                onMetaGenerate={handleMetaGenerate}
-              />
-            </MetaJsonGeneratorContainer>
-          </JsonEditorContainer>
+        <ButtonGroupContainer>
+          <StyledButton
+            variant="outlined"
+            size="small"
+            onClick={openSettings}
+            startIcon={<SettingsIcon />}
+            sx={{ mr: 1 }}
+          >
+            Settings
+          </StyledButton>
+
+          <StyledButton
+            variant="contained"
+            size="small"
+            
+            startIcon={<SaveIcon />}
+            sx={{ mr: 2 }}
+          >
+            Save
+          </StyledButton>
+
+          <StyledButton
+            variant="outlined"
+            size="small"
+            onClick={handleCopyJson}
+            startIcon={<ContentCopyIcon />}
+          >
+            Copy JSON
+          </StyledButton>
+        </ButtonGroupContainer>
+
+        <MetaJsonGenerator
+          jsonInput={editValue}
+          onJsonChange={handleJsonChange}
+          onMetaGenerate={handleMetaGenerate}
+        />
+      </JsonEditorContainer>
+
+      <SettingsDialog open={settingsOpen} onClose={closeSettings} />
           <PreviewContainer isVisible={showPreview}>
             <Simulator
               components={screens[activeScreenIndex].components}
