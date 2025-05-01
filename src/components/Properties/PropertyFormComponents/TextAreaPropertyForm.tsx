@@ -1,4 +1,3 @@
-import React from "react";
 import { Stack, TextField, FormControl, InputLabel, Select, MenuItem,Typography } from "@mui/material";
 import { FieldRendererProps } from "./FieldRendererProps";
 
@@ -61,11 +60,11 @@ export default function TextAreaPropertyForm({
         <InputLabel>Required (Optional)</InputLabel>
         <Select
           value={
-            component.properties?.required !== undefined
-              ? String(component.properties.required)
-              : ""
+            component.properties?.required === undefined
+              ? ""
+              : String(component.properties.required)
           }
-          onChange={(e) => handleChange("required", e.target.value)}
+          onChange={(e) => handleChange("required", e.target.value === "true")}
           label="Required (Optional)"
         >
           <MenuItem value="true">True</MenuItem>
@@ -76,7 +75,7 @@ export default function TextAreaPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>
         <Select
-          value={component.properties?.visible || "true"}
+          value={component.properties?.visible ?? "true"}
           onChange={(e) => handleChange("visible", e.target.value)}
           label="Visible (Optional)"
         >
@@ -89,8 +88,8 @@ export default function TextAreaPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Enabled (Optional)</InputLabel>
         <Select
-          value={component.properties?.enabled || null}
-          onChange={(e) => handleChange("enabled", e.target.value)}
+          value={component.properties?.enabled === undefined ? "" : String(component.properties.enabled)}
+          onChange={(e) => handleChange("enabled", e.target.value === "true")}
           label="Enabled (Optional)"
         >
           <MenuItem value="true">True</MenuItem>
@@ -104,7 +103,7 @@ export default function TextAreaPropertyForm({
         label="Max-Length (Optional)"
         type="number"
         fullWidth
-        value={component.properties?.maxLength || ""}
+        value={component.properties?.maxLength === undefined ? 80 : component.properties.maxLength}
         onChange={(e) => handleChange("maxLength", e.target.value)}
         size="small"
       />

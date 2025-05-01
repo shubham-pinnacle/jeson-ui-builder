@@ -320,12 +320,12 @@ function App() {
           newComponent.properties = { 
             label: "",
             outputVariable: "",
-            required: null,
+            required: undefined,
             initValue: "",
             helperText: "",
             visible: true,
             maxLength: 600,
-            enabled: null,
+            enabled: undefined,
           };
           break;
         case "check-box":
@@ -548,12 +548,12 @@ function App() {
         newComponent.properties = { 
           label: "",
           outputVariable: "",
-          required: null,
+          required: undefined,
           initValue: "",
           helperText: "",
           visible: true,
           maxLength: 600,
-          enabled: null,
+          enabled: undefined,
         };
         break;
       case "check-box":
@@ -956,12 +956,12 @@ function App() {
                   properties = {
                     ...prevComponent?.properties,
                     ...(child.label !== undefined && { label: child.label }),
-                    ...(child.name !== undefined && { outputVariable: child.name, name: child.name }),
+                    ...(child.name !== undefined && { outputVariable: child.name }),
                     ...(child.required !== undefined && { required: child.required }),
-                    ...(child['init-value'] !== undefined && { 'init-value': child['init-value'], initValue: child['init-value'] }),
-                    ...(child['helper-text'] !== undefined && { 'helper-text': child['helper-text'], helperText: child['helper-text'] }),
+                    ...(child['init-value'] !== undefined && {  initValue: child['init-value'] }),
+                    ...(child['helper-text'] !== undefined && {  helperText: child['helper-text'] }),
                     ...(child.visible !== undefined && { visible: child.visible }),
-                    ...(child['max-length'] !== undefined && { 'max-length': Number(child['max-length']) }),
+                    ...(child['max-length'] !== undefined && { maxLength: Number(child['max-length']) }),
                     ...(child.enabled !== undefined && { enabled: child.enabled }),
                   };
                   return {
@@ -1329,7 +1329,7 @@ function App() {
                     : true;
 
                 const enabled =
-                  component.properties?.enabled === null ? null : 
+                  component.properties?.enabled === undefined ? undefined : 
                   component.properties?.enabled === "false" ||
                   component.properties?.enabled === false
                     ? false
@@ -1426,8 +1426,8 @@ function App() {
                         component.properties.maxLength !== undefined
                           ? Number(component.properties.maxLength)
                           : 600,
-                      ...(component.properties?.enabled
-                        ? { enabled: enabled }
+                      ...(component.properties?.enabled !== undefined
+                        ? { enabled }
                         : {}),
                     };
                   case "check-box":
