@@ -301,7 +301,7 @@ export default function CheckboxPropertyForm(props: FieldRendererProps) {
       {["required","visible","enabled"].map(p => (
         <FormControl fullWidth size="small" key={p}>
           <InputLabel>{p.charAt(0).toUpperCase()+p.slice(1)}</InputLabel>
-          <Select value={component.properties?.[p]?.toString() ?? 'false'} onChange={e => h(p, e.target.value)} label={p}>
+          <Select value={component.properties?.[p] || 'false'} onChange={e => h(p, e.target.value)} label={p}>
             <MenuItem value="true">True</MenuItem>
             <MenuItem value="false">False</MenuItem>
           </Select>
