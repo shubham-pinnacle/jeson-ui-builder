@@ -1416,8 +1416,14 @@ function App() {
                     type: "TextArea",
                       name: component.properties.outputVariable || component.properties.name || "",
                       label: component.properties.label ?? "",
-                      "init-value": component.properties["init-value"] || component.properties.initValue || "",
-                      "helper-text": component.properties["helper-text"] || component.properties.helperText || "",
+                      // "init-value": component.properties["init-value"] || component.properties.initValue || "",
+
+                      ...(component.properties?.initValue !== undefined
+                        ? { "init-value": component.properties["init-value"] || component.properties.initValue || "",}
+                        : {}),
+                      ...(component.properties?.helperText !== undefined
+                        ? { "helper-text": component.properties["helper-text"] || component.properties.helperText || "",}
+                        : {}),
                       visible,
                       ...(component.properties?.required !== undefined
                         ? { required }
