@@ -25,6 +25,7 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import { useToast } from '../ToastContext';
 
 // Interface for component props
 interface AddDynamicVariableDialogProps {
@@ -49,7 +50,8 @@ export type VariableType = 'String' | 'Boolean' | 'Number' | 'Array';
 export interface DynamicVariable {
   name: string;
   type: VariableType;
-  value?: any;
+  value?: string; // Display value
+  screen?: string; // Screen name
   sample?: string; // For string variables
   booleanValue?: boolean; // For boolean variables
   numberValue?: number; // For number variables
@@ -62,6 +64,7 @@ const AddDynamicVariableDialog: React.FC<AddDynamicVariableDialogProps> = ({
   onClose,
   onAddVariable,
 }) => {
+  const { showToast } = useToast();
   const [variableName, setVariableName] = useState('');
   const [variableType, setVariableType] = useState<VariableType | ''>('');
   const [sampleValue, setSampleValue] = useState('');
@@ -78,10 +81,33 @@ const AddDynamicVariableDialog: React.FC<AddDynamicVariableDialogProps> = ({
   const [numberError, setNumberError] = useState('');
   const [arrayItemErrors, setArrayItemErrors] = useState<{id?: string, title?: string, description?: string, metadata?: string}>({});
 
+  // Default screen set to WELCOME
+  const [screen] = useState('WELCOME');
+
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setVariableName(e.target.value);
-    if (e.target.value.trim() === '') {
+    const value = e.target.value;
+    
+    // Check if the user tried to enter a space
+    if (value.includes(' ')) {
+      // Show toast/snackbar notification
+      showToast({
+        message: 'variableName can only contain underscores and alphanumeric characters',
+        type: 'error',
+        duration: 3000
+      });
+      
+      // Remove spaces for the actual value
+      const cleanValue = value.replace(/\s/g, '');
+      setVariableName(cleanValue);
+      return;
+    }
+    
+    setVariableName(value);
+    
+    if (value.trim() === '') {
       setNameError('Variable name is required');
+    } else if (!/^[a-zA-Z0-9_]*$/.test(value)) {
+      setNameError('variableName can only contain underscores and alphanumeric characters');
     } else {
       setNameError('');
     }
@@ -162,47 +188,51 @@ const AddDynamicVariableDialog: React.FC<AddDynamicVariableDialogProps> = ({
   };
 
   const handleSave = () => {
-    let hasError = false;
+    // Validate required fields
+    let isValid = true;
     
     if (variableName.trim() === '') {
       setNameError('Variable name is required');
-      hasError = true;
+      isValid = false;
     }
-
-    if (!variableType) {
-      hasError = true;
-      return; // Prevent saving if no type is selected
+    
+    if (variableType === '') {
+      isValid = false;
     }
     
     if (variableType === 'String' && sampleValue.trim() === '') {
       setSampleError('Sample value is required for String type');
-      hasError = true;
-    }
-
-    if (variableType === 'Number' && (isNaN(parseFloat(numberValue)) || numberValue === undefined)) {
-      setNumberError('Valid number is required');
-      hasError = true;
+      isValid = false;
     }
     
-    if (hasError) {
-      return;
+    if (variableType === 'Number' && numberValue.trim() === '') {
+      setNumberError('Number value is required');
+      isValid = false;
     }
-
+    
+    if (!isValid) return;
+    
+    // Create variable object
     const variable: DynamicVariable = {
       name: variableName,
       type: variableType as VariableType,
+      screen: screen,
     };
-
-    // Add type-specific values
+    
+    // Add type-specific properties
     if (variableType === 'String') {
       variable.sample = sampleValue;
+      variable.value = sampleValue; // Set the display value
     } else if (variableType === 'Boolean') {
       variable.booleanValue = booleanValue;
+      variable.value = booleanValue ? 'true' : 'false'; // Set the display value
     } else if (variableType === 'Number') {
-      variable.numberValue = parseFloat(numberValue);
+      variable.numberValue = Number(numberValue);
+      variable.value = numberValue; // Set the display value
     } else if (variableType === 'Array') {
       variable.arraySamples = arraySamples;
       variable.selectedProperties = selectedProperties;
+      variable.value = `[${arraySamples.length} items]`; // Set the display value
     }
 
     onAddVariable(variable);
@@ -335,7 +365,7 @@ const AddDynamicVariableDialog: React.FC<AddDynamicVariableDialogProps> = ({
           </Typography>
           {variableType && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="h6" sx={{ fontWeight: 'medium', fontSize: '0.95rem' }}>
+              <Typography variant="h6" sx={{ fontWeight: 'medium', fontSize: '0.95rem' ,backgroundColor: "#f57c00", padding:"2px 5px"  ,borderRadius:"5px"}}>
                 {variableType}
               </Typography>
             </Box>
@@ -354,7 +384,7 @@ const AddDynamicVariableDialog: React.FC<AddDynamicVariableDialogProps> = ({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ p: 2.5, pt: 5,mt:2 }}>
+      <DialogContent sx={{ p: 2.5, pt: 5, mt: 2 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <Box sx={{ mt: 2 }}>
             <TextField

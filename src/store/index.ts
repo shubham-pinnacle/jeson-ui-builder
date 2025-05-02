@@ -4,6 +4,7 @@ import optionReducer from "../slices/optionSlice";
 import textReducer from '../slices/TextHeading/textSlice';
 import checkboxOptionReducer from '../slices/checkboxOptionSlice';
 import componentOptionsReducer from '../slices/componentOptionsSlice';
+import dynamicVariableReducer from '../slices/dynamicVariableSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,8 +13,9 @@ export const store = configureStore({
     text: textReducer,
     checkboxOption: checkboxOptionReducer,
     componentOptions: componentOptionsReducer,
+    dynamicVariable: dynamicVariableReducer,
   },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch; 
+export type AppDispatch = typeof store.dispatch;
