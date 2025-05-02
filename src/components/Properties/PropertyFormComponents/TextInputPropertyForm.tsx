@@ -56,8 +56,8 @@ export default function TextInputPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Required (Optional)</InputLabel>
         <Select
-          value={component.properties?.required || undefined}
-          onChange={(e) => handleChange("required", e.target.value)}
+          value={component.properties?.required === undefined ? "" : String(component.properties.required)}
+          onChange={(e) => handleChange("required", e.target.value === "true")}
           label="Required (Optional)"
         >
           <MenuItem value="true">True</MenuItem>
@@ -86,8 +86,8 @@ export default function TextInputPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>
         <Select
-          value={component.properties?.visible ?? true}
-          onChange={(e) => handleChange("visible", e.target.value)}
+          value={String(component.properties?.visible ?? "true")}
+          onChange={(e) => handleChange("visible", e.target.value === "true")}
           label="Visible (Optional)"
         >
           <MenuItem value="true">True</MenuItem>
@@ -100,8 +100,8 @@ export default function TextInputPropertyForm({
           label="Min-Chars (Optional)"
           type="number"
           fullWidth
-          value={component.properties?.minChars || null}
-          onChange={(e) => handleChange("minChars", e.target.value)}
+          value={component.properties?.minChars === undefined ? "" : component.properties.minChars}
+          onChange={(e) => handleChange("minChars", Number(e.target.value))}
           size="small"
         />
 
@@ -109,8 +109,8 @@ export default function TextInputPropertyForm({
           label="Max-Chars (Optional)"
           type="number"
           fullWidth
-          value={component.properties?.maxChars || 0}
-          onChange={(e) => handleChange("maxChars", e.target.value)}
+          value={component.properties?.maxChars === undefined ? 80 : component.properties.maxChars}
+          onChange={(e) => handleChange("maxChars", Number(e.target.value))}
           size="small"
         />
         
