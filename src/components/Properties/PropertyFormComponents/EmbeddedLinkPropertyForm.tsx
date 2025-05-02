@@ -66,7 +66,7 @@ export default function EmbeddedLinkFields({
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>
         <Select
-          value={component.properties?.visible || "true"}
+          value={component.properties?.visible ?? true}
           onChange={(e) => handleChange("visible", e.target.value)}
           label="Visible (Optional)"
         >

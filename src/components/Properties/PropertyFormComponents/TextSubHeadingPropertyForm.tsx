@@ -31,11 +31,11 @@ export default function TextSubHeadingFields({
         }}
       />
       <FormControl fullWidth size="small">
-        <InputLabel>Visible</InputLabel>
+        <InputLabel>Visible (Optional)</InputLabel>
         <Select
           value={component.properties?.visible ?? true}
           onChange={e => h("visible", e.target.value)}
-          label="Visible"
+          label="Visible (Optional)"
         >
           <MenuItem value="true">True</MenuItem>
           <MenuItem value="false">False</MenuItem>

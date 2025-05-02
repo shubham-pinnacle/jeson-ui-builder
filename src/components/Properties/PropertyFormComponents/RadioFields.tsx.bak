@@ -7,12 +7,18 @@ import {
   MenuItem,
   Autocomplete,
   Checkbox,
+  FormControlLabel,
   Box,
   Typography,
   Button,
+  List,
+  ListItemText,
+  ListItemSecondaryAction,
+  IconButton,
 } from "@mui/material";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import { FaTimes } from "react-icons/fa";
 import { FieldRendererProps } from "./FieldRendererProps";
 import { useEffect, useState } from "react";
 import { PropertyOptions } from "../PropertiesFormStyles";
@@ -20,7 +26,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from "../../../store";
 import { Option, PropertyOption, addOption, setOptions, setSelectedProperties, initComponentState } from "../../../slices/componentOptionsSlice";
 
-export default function RadioButtonPropertyForm(props: FieldRendererProps) {
+export default function RadioFields(props: FieldRendererProps) {
   const { component, fieldValues, handleFieldChange, onPropertyChange } = props;
   
   // Define a shorter name for onPropertyChange for convenience
@@ -28,6 +34,8 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
   
   // Initialize options display state - this is just used for rendering the dropdown
   const [initOptions, setInitOptions] = useState<string[]>([]);
+  
+  // Using PropertyOption imported from componentOptionsSlice.ts
   
   const dispatch = useDispatch();
   
@@ -124,7 +132,7 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
     
     // Create the new option with sanitized data
     const newOption: Option = {
-      id: id.trim() || title.trim().toLowerCase().replace(/\\s+/g, "_"), // Use ID if provided, otherwise use sanitized title
+      id: id.trim() || title.trim().toLowerCase().replace(/\s+/g, "_"), // Use ID if provided, otherwise use sanitized title
       title: title.trim() || id.trim(), // Use title if provided, otherwise use ID
     };
     
@@ -164,20 +172,29 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
     // selectedOptions are now component-specific and maintained in Redux
   }, [component.id, selectedOptions]);
 
-  // Normalize your "options" (the radio/checkbox choices) into an array:
+  // 1) Normalize your "options" (the radio/checkbox choices) into an array:
   const rawOptions = component.properties?.options;
-  const normalizedOptions = Array.isArray(rawOptions)
+  const optionsArray: any[] = Array.isArray(rawOptions)
     ? rawOptions
     : typeof rawOptions === "string"
-    ? rawOptions.split(",").map((opt) => opt.trim())
+    ? (() => {
+        try {
+          const p = JSON.parse(rawOptions);
+          return Array.isArray(p) ? p : [];
+        } catch {
+          return [];
+        }
+      })()
     : [];
 
-  // Map them to objects with id & title to make it easier to render
-  const mappedOptions = normalizedOptions.map((opt) =>
+  // 2) Build an array of { id, title } for your Autocomplete:
+  const propertyOptions = optionsArray.map((opt) =>
     typeof opt === "object"
       ? { id: opt.id, title: opt.title }
       : { id: opt, title: opt }
   );
+
+
 
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
   const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -187,22 +204,21 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
       {/* Label, Description, Output Variable */}
       <TextField
         label="Label"
+        required
         fullWidth
         size="small"
         value={component.properties?.label || ""}
         onChange={(e) => handleChange("label", e.target.value)}
       />
-      
-      {component.type !== "switch" && (
+      {component.type !== "drop-down" && (
         <TextField
-          label="Description"
+          label="Description (Optional)"
           fullWidth
           size="small"
           value={component.properties?.description || ""}
           onChange={(e) => handleChange("description", e.target.value)}
         />
       )}
-      
       <TextField
         label="Output Variable"
         required
@@ -212,9 +228,8 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
         onChange={(e) => handleChange("outputVariable", e.target.value)}
       />
 
-      <Autocomplete
+<Autocomplete
         multiple
-        value={selectedOptions}
         id="checkboxes-tags-demo"
         options={PropertyOptions}
         disableCloseOnSelect
@@ -244,57 +259,12 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
           <TextField
             {...params}
             label="Properties (optional)"
+            
             size="small"
-          />
-        )}
-        fullWidth
-        value={selectedOptions}
-      />
-      
-      <Box>
-        <Typography variant="subtitle2" gutterBottom>
-          Options:
-        </Typography>
-        <Stack direction="row">
-          <TextField
-            placeholder="Title"
-            size="small"
-            fullWidth
-            // sx={{ mb: selectedOptions.length > 0 ? 1 : 0 }}
-            value={component.properties?.newOption || ""}
-            onChange={(e) => handleChange("newOption", e.target.value)}
-          />
-        </Stack>
-        
-        {/* Render property fields only when they are selected in Autocomplete */}
-        <Box sx={{ mt: 1 }}>
-          {["id", "description", "metadata"].map((field) =>
-            selectedOptions.find((opt) => opt.title === field) ? (
-              <TextField
-                key={field}
-                label={field.charAt(0).toUpperCase() + field.slice(1)}
-                size="small"
-                fullWidth
-                sx={{ mb: 1 }}
-                required={field === "id" || field === "description"}
-                value={fieldValues[`${field}_${field}`] || ""}
-                onChange={(e) =>
-                  handleFieldChange(`${field}_${field}`, e.target.value)
-                }
-              />
-            ) : null
-          )}
-        </Box>
-        
-        <Button
-          variant="outlined"
-          onClick={saveOptionsToRedux}
-          size="small"
-          sx={{ mt: 1}}
-        >
-          Add
-        </Button>
-      </Box>
+
+      {/* === For each selected property, show ID / Description / Metadata checkbox === */}
+
+      {/* === OPTIONS: add / list your actual radio options === */}
 
       {/* === INIT VALUE DROPDOWN (only the user-added options) === */}
       <FormControl fullWidth size="small">
@@ -309,8 +279,8 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
               <em></em>
             </MenuItem>
           ) : (
-            initOptions.map((opt, index) => {
-             const title = typeof opt === "object" ? opt.title : opt;
+            initOptions.map((opt: any, index: number) => {
+              const title = typeof opt === "object" ? opt.title : opt;
               return (
                 <MenuItem key={index} value={title}>
                   {title}
@@ -321,12 +291,12 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
         </Select>
       </FormControl>
 
-      {/* Standard toggles */}
+      {/* === Standard toggles === */}
       <FormControl fullWidth size="small">
         <InputLabel>Required</InputLabel>
         <Select
           label="Required"
-          value={component.properties?.required ?? ""}
+          value={component.properties?.required || "false"}
           onChange={(e) => handleChange("required", e.target.value)}
         >
           <MenuItem value="true">True</MenuItem>
@@ -338,7 +308,7 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
         <InputLabel>Visible</InputLabel>
         <Select
           label="Visible"
-          value={component.properties?.visible ?? true}
+          value={component.properties?.visible || "true"}
           onChange={(e) => handleChange("visible", e.target.value)}
         >
           <MenuItem value="true">True</MenuItem>
@@ -350,7 +320,7 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
         <InputLabel>Enabled</InputLabel>
         <Select
           label="Enabled"
-          value={component.properties?.enabled || ""}
+          value={component.properties?.enabled || "true"}
           onChange={(e) => handleChange("enabled", e.target.value)}
         >
           <MenuItem value="true">True</MenuItem>

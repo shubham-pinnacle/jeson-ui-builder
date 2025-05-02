@@ -17,6 +17,8 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import SettingsIcon from '@mui/icons-material/Settings';
+import SaveIcon from '@mui/icons-material/Save';
 import Sidebar from "./components/Sidebar/Sidebar";
 import Builder from "./components/Builder/Builder";
 import Simulator from "./components/Simulator/Simulator";
@@ -24,9 +26,10 @@ import MetaJsonGenerator from "./components/MetaJsonGenerator";
 import ScreenDialog from "./components/ScreenDialog";
 import { Component } from "./types";
 import Dialog from "@mui/material/Dialog";
-import{ useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from './store/index';
-import { useToast } from './components/ToastContext';
+import { useToast } from './components/ToastContext';;
+import SettingsDialog from "./components/Settings/SettingsDialog"
 
 
 const AppContainer = styled("div")({
@@ -212,6 +215,7 @@ function App() {
     },
   ]);
   const options = useSelector((state: RootState) => state.option.arr);
+  const CheckBoxOptions = useSelector((state: RootState) => state.checkboxOption.arr);
   const TextHeadingtext = useSelector((state: RootState) => state.text.value);
   const [activeScreenIndex, setActiveScreenIndex] = useState<number>(0);
   const [selectedComponent, setSelectedComponent] = useState<Component | null>(
@@ -237,18 +241,23 @@ function App() {
     null
   );
 
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  const openSettings = () => setSettingsOpen(true);
+  const closeSettings = () => setSettingsOpen(false);
+
   // useEffect(() => {
   //   showToast({
   //     message: 'Maximum of 50 components are allowed per screen.',
   //     type: 'error',
   //   });
   // }, []); 
-  
-  
-  
-  useEffect(()=>{
-    console.log("options",options);
-  },[options])
+
+
+
+  useEffect(() => {
+    console.log("options", options);
+  }, [options])
 
   // Update JSON editor when screens change
   useEffect(() => {
@@ -304,7 +313,7 @@ function App() {
           };
           break;
         case "text-input":
-          newComponent.properties = { 
+          newComponent.properties = {
             label: "",
             outputVariable: "",
             required: undefined,
@@ -317,7 +326,7 @@ function App() {
           };
           break;
         case "text-area":
-          newComponent.properties = { 
+          newComponent.properties = {
             label: "",
             outputVariable: "",
             required: undefined,
@@ -333,7 +342,8 @@ function App() {
             label: "",
             description: "",
             outputVariable: "",
-            options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
+            options: JSON.stringify(CheckBoxOptions),
+            initValue: "",
             visible: true,
             required: false,
             enabled: true,
@@ -344,27 +354,27 @@ function App() {
           case "radio-button":
           newComponent.properties = { 
             label: "",
-            description:"",
+            description: "",
             outputVariable: "",
-            options: JSON.stringify(options),
+            "data-source": [],
             visible: true,
             required: "",
             enabled: "",
             initValue: "",
-
           };
           break;
         case "drop-down":
-          newComponent.properties = { 
+          newComponent.properties = {
             label: "",
-            description:"",
+            description: "",
             name: `dropdown_field_${Date.now()}`,
-            options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
+            // Initialize with an empty data-source array instead of global options
+            "data-source": [],
+            outputVariable: "",
+            enabled: true,
             visible: true,
             required: false,
             placeholder: "Select an option",
-            enabled: true,
-            outputVariable: "",
           };
           break;
         case "footer-button":
@@ -419,7 +429,7 @@ function App() {
             label: "",
             description: "",
             outputVariable: "",
-            allowedMimeTypes: [], 
+            allowedMimeTypes: [],
             minDocuments: "0",
             maxDocuments: "",
             maxFileSize: "25",
@@ -440,7 +450,7 @@ function App() {
           };
           break;
         case "date-picker":
-          newComponent.properties = { 
+          newComponent.properties = {
             label: "",
             outputVariable: "",
             initValue: null,
@@ -451,9 +461,10 @@ function App() {
             unavailableDates: [],
             helperText: "",
           };
-          
+          break;
+
         case "user-details":
-          newComponent.properties = { 
+          newComponent.properties = {
             name: "",
             email: "",
             address: "",
@@ -488,16 +499,16 @@ function App() {
 
     const currentComponents = screens[activeScreenIndex]?.components || [];
 
-      if (currentComponents.length >= 50) {
-        // useEffect(() => {
-          showToast({
-            message: 'Maximum of 50 components are allowed per screen.',
-            type: 'error',
-          });
-        // }, []); 
-        
-        return;
-      }
+    if (currentComponents.length >= 50) {
+      // useEffect(() => {
+      showToast({
+        message: 'Maximum of 50 components are allowed per screen.',
+        type: 'error',
+      });
+      // }, []); 
+
+      return;
+    }
     const newComponent: Component = {
       id: `component_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       type,
@@ -532,7 +543,7 @@ function App() {
         };
         break;
       case "text-input":
-        newComponent.properties = { 
+        newComponent.properties = {
           label: "",
           outputVariable: "",
           required: undefined,
@@ -545,7 +556,7 @@ function App() {
         };
         break;
       case "text-area":
-        newComponent.properties = { 
+        newComponent.properties = {
           label: "",
           outputVariable: "",
           required: undefined,
@@ -557,11 +568,12 @@ function App() {
         };
         break;
       case "check-box":
-        newComponent.properties = { 
+        newComponent.properties = {
           label: "",
           description: "",
           outputVariable: "",
-          options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
+          options: JSON.stringify(CheckBoxOptions),
+          initValue: "",
           visible: true,
           required: false,
           enabled: true,
@@ -570,29 +582,30 @@ function App() {
         };
         break;
       case "radio-button":
-        newComponent.properties = { 
+        newComponent.properties = {
           label: "",
-          description:"",
+          description: "",
           outputVariable: "",
-          options: JSON.stringify(options),
+          // Initialize with an empty data-source array instead of global options
+          "data-source": [],
           visible: true,
           required: "",
           enabled: "",
           initValue: "",
-
         };
         break;
       case "drop-down":
-        newComponent.properties = { 
+        newComponent.properties = {
           label: "",
-          description:"",
+          description: "",
           name: `dropdown_field_${Date.now()}`,
-          options: JSON.stringify(["Option 1", "Option 2", "Option 3"]),
+          // Initialize with an empty data-source array instead of global options
+          "data-source": [],
+          outputVariable: "",
+          enabled: true,
           visible: true,
           required: false,
           placeholder: "Select an option",
-          enabled: true,
-          outputVariable: "",
         };
         break;
       case "footer-button":
@@ -607,14 +620,14 @@ function App() {
         };
         break;
       case "embedded-link":
-          newComponent.properties = {
-            text: "",
-            visible: true,
-            onClickAction: "",
-            screenName: "",
-            url: ""
-          };
-          break;
+        newComponent.properties = {
+          text: "",
+          visible: true,
+          onClickAction: "",
+          screenName: "",
+          url: ""
+        };
+        break;
       case "opt-in":
         newComponent.properties = {
           label: "",
@@ -647,7 +660,7 @@ function App() {
           label: "",
           description: "",
           outputVariable: "",
-          allowedMimeTypes: [], 
+          allowedMimeTypes: [],
           minDocuments: "0",
           maxDocuments: "",
           maxFileSize: "25",
@@ -681,7 +694,7 @@ function App() {
         };
         break;
 
-        
+
     }
 
     const updatedScreens = [...screens];
@@ -694,7 +707,18 @@ function App() {
   };
 
   const handleComponentSelect = (component: Component | null) => {
-    setSelectedComponent(component);
+    // Ensure we're properly retrieving the component with all its current properties
+    if (component) {
+      // Find the most up-to-date version of this component from the screens state
+      const updatedComponent = screens[activeScreenIndex].components.find(
+        (comp) => comp.id === component.id
+      );
+      
+      // Use the updated component with all its properties if available
+      setSelectedComponent(updatedComponent || component);
+    } else {
+      setSelectedComponent(null);
+    }
   };
 
   const handlePropertyChange = (
@@ -702,18 +726,33 @@ function App() {
     property: string,
     value: any
   ) => {
+    console.log(`Property change for component ${componentId}, property: ${property}`);
+    
+    // Special handling for data-source to ensure we're making a deep copy
+    const processedValue = property === 'data-source' && Array.isArray(value) 
+      ? JSON.parse(JSON.stringify(value)) // Deep clone the array to break all references
+      : value;
+      
     const updatedScreens = screens.map((screen, index) => {
       if (index === activeScreenIndex) {
         return {
           ...screen,
           components: screen.components.map((component) => {
             if (component.id === componentId) {
+              // Create a deep copy of the component's properties
+              const updatedProperties = { ...component.properties };
+              
+              // Update the specific property
+              updatedProperties[property] = processedValue;
+              
+              // Log the update for debugging
+              if (property === 'data-source') {
+                console.log(`Updating data-source for component ${componentId}:`, processedValue);
+              }
+              
               return {
                 ...component,
-                properties: {
-                  ...component.properties,
-                  [property]: value,
-                },
+                properties: updatedProperties,
               };
             }
             return component;
@@ -724,7 +763,7 @@ function App() {
     });
 
     setScreens(updatedScreens);
-    
+
     // Update the selected component if it's the one being changed
     if (selectedComponent?.id === componentId) {
       const updatedSelectedComponent = updatedScreens[
@@ -734,7 +773,7 @@ function App() {
         setSelectedComponent(updatedSelectedComponent);
       }
     }
-    
+
     // Update the JSON editor with the new components
     const jsonString = JSON.stringify(generateJson(), null, 2);
     setEditValue(jsonString);
@@ -794,8 +833,8 @@ function App() {
       parsedJson.screens.forEach((screen: any) => {
         const layoutChildren = screen.layout?.children || [];
         layoutChildren.forEach((child: any) => {
-          if ((child.type === "RadioButtonsGroup" || child.type === "CheckboxGroup") && 
-              Array.isArray(child["data-source"])) {
+          if ((child.type === "RadioButtonsGroup" || child.type === "CheckboxGroup") &&
+            Array.isArray(child["data-source"])) {
             // Add each option to the Redux store
             child["data-source"].forEach((option: any) => {
               if (option && option.id && option.title) {
@@ -811,7 +850,7 @@ function App() {
       const newScreens = parsedJson.screens.map((screen: any) => {
         const prevScreen = screens.find(s => s.id === screen.id);
         const layoutChildren = screen.layout?.children || [];
-        
+
         return {
           id: screen.id,
           title: screen.title,
@@ -1082,13 +1121,14 @@ function App() {
                     .replace(/\b\w/g, (l) => l.toUpperCase()),
                   properties,
                 };
+
                 case "OptIn":
                   type = "opt-in"
                   properties = {
                     label: child.label || "",
                     outputVariable: child.name || "",
                     required: child.required || null,
-                    visible: child.visible || true,
+                    visible: child.visible ?? true,
                     initValue: child.initValue || null,
                     onClickAction: child["on-click-action"]?.name || "",
                     screenName: child["on-click-action"]?.next?.name || "",
@@ -1215,11 +1255,16 @@ function App() {
                     };
                 default:
                   return null;
-            }
+              }
+
 
             // Use the stable ID generated at the beginning or preserve original ID
-            
-            return {
+              return {
+                id:
+                  child.id ||
+                  `component_${Date.now()}_${Math.random()
+                    .toString(36)
+                    .substr(2, 9)}`,
                 type,
                 name: type
                   .replace(/-/g, " ")
@@ -1230,6 +1275,7 @@ function App() {
             .filter((c): c is Component => c !== null),
           };
       });
+
 
       // Ensure each component gets an id (existing or generated)
       const screensWithIds = newScreens.map((screen: any) => ({
@@ -1266,7 +1312,7 @@ function App() {
       title: `Screen ${screens.length + 1}`,
       components: [],
     };
-    
+
     setScreens([...screens, newScreen]);
     setActiveScreenIndex(screens.length);
     setSelectedComponent(null);
@@ -1305,7 +1351,7 @@ function App() {
               .map((component) => {
                 const visible =
                   component.properties?.visible === "false" ||
-                  component.properties?.visible === false
+                    component.properties?.visible === false
                     ? false
                     : true;
 
@@ -1317,14 +1363,14 @@ function App() {
                     : true;
 
                 const strikethrough =
-                  component.properties?.strikethrough === null ? null : 
-                  component.properties?.strikethrough === false || component.properties?.strikethrough === "false"
-                    ? false
-                    : true;
+                  component.properties?.strikethrough === null ? null :
+                    component.properties?.strikethrough === false || component.properties?.strikethrough === "false"
+                      ? false
+                      : true;
 
                 const markdown =
-                component.properties?.markdown === null ? null : component.properties?.markdown === "false" ||
-                  component.properties?.markdown === false
+                  component.properties?.markdown === null ? null : component.properties?.markdown === "false" ||
+                    component.properties?.markdown === false
                     ? false
                     : true;
 
@@ -1350,8 +1396,8 @@ function App() {
                       visible,
                     };
                   case "sub-heading":
-                  return {
-                    type: "TextSubheading",
+                    return {
+                      type: "TextSubheading",
                       text: component.properties.text || "",
                       visible
                     };
@@ -1369,8 +1415,8 @@ function App() {
                       markdown
                     };
                   case "text-caption":
-                  return {
-                    type: "TextCaption",
+                    return {
+                      type: "TextCaption",
                       text: component.properties.text || "",
                       visible,
                       ...(component.properties?.fontWeight
@@ -1400,11 +1446,13 @@ function App() {
                       //     ? Number(component.properties.minChars)
                       //     : null,
                       ...(component.properties?.minChars
-                            ? { "min-chars":
-                        component.properties.minChars !== undefined
-                          ? Number(component.properties.minChars)
-                          : null }
-                            : {}),
+                        ? {
+                          "min-chars":
+                            component.properties.minChars !== undefined
+                              ? Number(component.properties.minChars)
+                              : null
+                        }
+                        : {}),
                       "max-chars":
                         component.properties.maxChars !== undefined
                           ? Number(component.properties.maxChars)
@@ -1437,23 +1485,21 @@ function App() {
                         : {}),
                     };
                   case "check-box":
-                  return {
-                    type: "CheckboxGroup",
+                    return {
+                      type: "CheckboxGroup",
                       description: component.properties.description || "",
                       name: component.properties.outputVariable || "",
                       label: component.properties.label || "",
                       required,
                       visible,
                       enabled,
+                      "init-value": component.properties.initValue || "",
                       "min-selected-items":
-                      component.properties.minSelectedItems !== undefined
-                        ? Number(component.properties.minSelectedItems)
-                        : 0,
-                    "max-selected-items":
-                      component.properties.maxSelectedItems !== undefined
-                        ? Number(component.properties.maxSelectedItems)
-                        : 0,
-                      "data-source": options,
+                        parseInt(component.properties.minSelectedItems) || 0,
+                      "max-selected-items":
+                        parseInt(component.properties.maxSelectedItems) || 0,
+                      // Use component-specific data-source instead of global CheckBoxOptions
+                      "data-source": component.properties["data-source"] || [],
                     };
                   case "embedded-link":
                     return {
@@ -1474,16 +1520,10 @@ function App() {
                       }
                     };
                   case "radio-button":
-                  return {
-                    type: "RadioButtonsGroup",
-                      // label: component.properties.label || "",
-                      ...(component.properties?.label
-                        ? { label: component.properties.label }
-                        : {}),
-                      // description: component.properties.description || "",
-                      ...(component.properties?.description
-                        ? { description: component.properties.description }
-                        : {}),
+                    return {
+                      type: "RadioButtonsGroup",
+                      label: component.properties.label || "",
+                      description: component.properties.description || "",
                       name: component.properties.outputVariable || "",
                       // enabled,
                       // required,
@@ -1491,14 +1531,9 @@ function App() {
                         ? { required }
                         : {}),
                       visible,
-                      ...(component.properties?.enabled
-                        ? { enabled }
-                        : {}),
-                      // "init-value": component.properties.initValue || "",
-                      ...(component.properties?.initValue
-                        ? {"init-value": component.properties.initValue }
-                        : {}),
-                      "data-source": options
+                      "init-value": component.properties.initValue || "",
+                      // Use component-specific data-source instead of global options
+                      "data-source": component.properties["data-source"] || []
                     };
                   case "drop-down":
                     return {
@@ -1510,20 +1545,21 @@ function App() {
                       enabled,
                       placeholder:
                         component.properties.placeholder || "Select an option",
-                      "data-source": options
+                      // Use component-specific data-source
+                      "data-source": component.properties["data-source"] || []
                     };
                   case "footer-button":
-                  return {
-                    type: "Footer",
+                    return {
+                      type: "Footer",
                       label: component.properties?.buttonText || "",
                       ...(component.properties?.leftCaption
                         ? { "left-caption": component.properties.leftCaption }
                         : {}),
                       ...(component.properties?.centerCaption
                         ? {
-                            "center-caption":
-                              component.properties.centerCaption,
-                          }
+                          "center-caption":
+                            component.properties.centerCaption,
+                        }
                         : {}),
                       ...(component.properties?.rightCaption
                         ? { "right-caption": component.properties.rightCaption }
@@ -1534,21 +1570,21 @@ function App() {
                       "on-click-action":
                         component.properties?.onClickAction === "navigate"
                           ? {
-                              name: "navigate",
-                        next: {
-                          type: "screen",
-                                name: component.properties?.screenName || "",
-                              },
-                            }
+                            name: "navigate",
+                            next: {
+                              type: "screen",
+                              name: component.properties?.screenName || "",
+                            },
+                          }
                           : component.properties?.onClickAction === "complete" ? {
-                              name:
-                                component.properties?.onClickAction ||
-                                "complete",
-                            } : component.properties?.onClickAction === "data_exchange" ? {
-                              name:
-                                component.properties?.onClickAction ||
-                                "data_exchange",
-                            } : "",
+                            name:
+                              component.properties?.onClickAction ||
+                              "complete",
+                          } : component.properties?.onClickAction === "data_exchange" ? {
+                            name:
+                              component.properties?.onClickAction ||
+                              "data_exchange",
+                          } : "",
                     };
                   case "image":
                     // Use base64Data if available, otherwise use src
@@ -1573,7 +1609,7 @@ function App() {
                     };
 
                   case "PhotoPicker":
-                  return {
+                    return {
                       type: "PhotoPicker",
                       label: component.properties.label || "",
                       name: component.properties.outputVariable || "",
@@ -1597,7 +1633,7 @@ function App() {
                         10240,
                     };
 
-                 
+
                   // case "DocumentPicker":
                 //   return {
                   //     type: "DocumentPicker",
@@ -1639,7 +1675,7 @@ function App() {
                       "max-file-size-kb":
                         parseInt(component.properties.maxFileSize) * 1024 || 10240,
                     };
-                  
+
 
 
                   case "if-else":
@@ -1777,7 +1813,7 @@ function App() {
     console.log("Meta JSON generated:", metaJson);
   };
 
-  
+
 
   const validateScreenName = (name: string) => {
     if (!name) {
@@ -1812,7 +1848,7 @@ function App() {
     if (isNameValid && isIdValid) {
       const screenId =
         newScreenId || newScreenName.toUpperCase().replace(/\s+/g, "_");
-      
+
       if (screens.some((screen) => screen.id === screenId)) {
         setScreenIdError("Screen ID must be unique");
         return;
@@ -1823,7 +1859,7 @@ function App() {
         title: newScreenName,
         components: [],
       };
-      
+
       setScreens([...screens, newScreen]);
       setActiveScreenIndex(screens.length);
       setSelectedComponent(null);
@@ -1915,15 +1951,15 @@ function App() {
     }
   };
 
-  
+
 
   return (
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <AppContainer>
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <AppContainer>
         <SidebarContainer>
           <Sidebar onAddComponent={handleAddComponent} />
         </SidebarContainer>
-        
+
         <MainContent>
           <BuilderContainer isPreviewVisible={showPreview}>
             <ButtonGroupContainer>
@@ -1938,17 +1974,17 @@ function App() {
                 {showPreview ? "Hide Preview" : "Show Preview"}
               </StyledButton>
             </ButtonGroupContainer>
-            
+
             <ScreenTabsContainer>
-              <Tabs 
-                value={activeScreenIndex} 
+              <Tabs
+                value={activeScreenIndex}
                 onChange={handleScreenChange}
                 variant="scrollable"
                 scrollButtons="auto"
               >
                 {screens.map((screen, index) => (
-                  <ScreenTab 
-                    key={screen.id} 
+                  <ScreenTab
+                    key={screen.id}
                     label={
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         <ScreenTitle>{screen.title}</ScreenTitle>
@@ -1971,7 +2007,7 @@ function App() {
                 <AddIcon />
               </AddScreenButton>
             </ScreenTabsContainer>
-            
+
             <Builder
               components={screens[activeScreenIndex].components}
               selectedComponent={selectedComponent}
@@ -1989,23 +2025,44 @@ function App() {
               <StyledButton
                 variant="outlined"
                 size="small"
+                onClick={openSettings}
+                startIcon={<SettingsIcon />}
+                sx={{ mr: 1 }}
+              >
+                Settings
+              </StyledButton>
+
+              <StyledButton
+                variant="contained"
+                size="small"
+                
+                startIcon={<SaveIcon />}
+                sx={{ mr: 2 }}
+              >
+                Save
+              </StyledButton>
+
+              <StyledButton
+                variant="outlined"
+                size="small"
                 onClick={handleCopyJson}
                 startIcon={<ContentCopyIcon />}
               >
                 Copy JSON
               </StyledButton>
             </ButtonGroupContainer>
-            <MetaJsonGeneratorContainer>
+
             <MetaJsonGenerator
               jsonInput={editValue}
               onJsonChange={handleJsonChange}
               onMetaGenerate={handleMetaGenerate}
             />
-            </MetaJsonGeneratorContainer>
           </JsonEditorContainer>
+
+          <SettingsDialog open={settingsOpen} onClose={closeSettings} />
           <PreviewContainer isVisible={showPreview}>
             <Simulator
-              components={screens[activeScreenIndex].components} 
+              components={screens[activeScreenIndex].components}
               screenTitle={screens[activeScreenIndex].title}
             />
           </PreviewContainer>
@@ -2030,8 +2087,8 @@ function App() {
           initialData={selectedScreenForEdit || undefined}
           existingScreenIds={screens.map((screen) => screen.id)}
         />
-          </AppContainer>
-        </DragDropContext>
+      </AppContainer>
+    </DragDropContext>
   );
 }
 
