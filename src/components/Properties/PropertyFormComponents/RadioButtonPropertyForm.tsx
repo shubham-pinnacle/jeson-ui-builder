@@ -338,7 +338,7 @@ export default function RadioButtonPropertyForm(props: FieldRendererProps) {
         <InputLabel>Visible</InputLabel>
         <Select
           label="Visible"
-          value={component.properties?.visible? ?? true}
+          value={component.properties?.visible ?? true}
           onChange={(e) => handleChange("visible", e.target.value)}
         >
           <MenuItem value="true">True</MenuItem>
