@@ -8,16 +8,14 @@ export const convertDynamicVariablesToJson = (
   // Filter variables for this screen
   const screenVariables = variables.filter(v => v.screen === screenName);
   
-  // Create the data object structure
-  const dataObject: Record<string, any> = {
-    "extraDetails": ""
-  };
+  // Create a data object to hold all variables
+  const dataObject: Record<string, any> = {};
   
-  // Add each variable to the data object based on its type
+  // Process each variable based on its type
   screenVariables.forEach(variable => {
-    switch (variable.type) {
+    switch(variable.type) {
       case 'String':
-        dataObject[variable.name] = variable.sample || "";
+        dataObject[variable.name] = variable.sample || '';
         break;
       case 'Boolean':
         dataObject[variable.name] = variable.booleanValue || false;
@@ -27,7 +25,13 @@ export const convertDynamicVariablesToJson = (
         break;
       case 'Array':
         if (variable.arraySamples && variable.arraySamples.length > 0) {
-          dataObject[variable.name] = variable.arraySamples;
+          // Map the array samples to the expected format
+          dataObject[variable.name] = variable.arraySamples.map(item => ({
+            id: item.id || '',
+            title: item.title || '',
+            description: item.description || '',
+            metadata: item.metadata || ''
+          }));
         } else {
           dataObject[variable.name] = [];
         }
@@ -38,7 +42,8 @@ export const convertDynamicVariablesToJson = (
   // Create the final JSON structure
   const jsonStructure = {
     "screen": screenName,
-    "data": dataObject
+    "data": dataObject,
+    "extraDetails": ""
   };
   
   return JSON.stringify(jsonStructure, null, 2);

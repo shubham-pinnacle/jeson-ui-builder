@@ -13,7 +13,7 @@ export const store = configureStore({
     text: textReducer,
     checkboxOption: checkboxOptionReducer,
     componentOptions: componentOptionsReducer,
-    dynamicVariable: dynamicVariableReducer,
+    dynamicVariables: dynamicVariableReducer
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -16,12 +16,11 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Tooltip,
   Popover,
   List,
   ListItem,
+  ListItemButton,
   ListItemText,
-  Divider,
   TextField,
   DialogActions
 } from '@mui/material';
@@ -30,7 +29,14 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import CodeIcon from '@mui/icons-material/Code';
+import SaveIcon from '@mui/icons-material/Save';
+import AceEditor from 'react-ace';
+
+// Import ace editor themes and modes
+import 'ace-builds/src-noconflict/mode-json';
+import 'ace-builds/src-noconflict/theme-github';
+import 'ace-builds/src-noconflict/theme-monokai';
+import 'ace-builds/src-noconflict/ext-language_tools';
 import AddDynamicVariableDialog, { DynamicVariable } from './AddDynamicVariableDialog';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -42,6 +48,9 @@ export interface SettingsDialogProps {
   onClose: () => void;
 }
 
+// Mock screen data
+const SCREENS = ['WELCOME', 'SCREEN'];
+
 const TAB_LABELS = ['Screen Variable', 'Dynamic Variable', 'Configuration'];
 
 const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
@@ -51,10 +60,120 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
   const [popoverContent, setPopoverContent] = useState<string>('');
   const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
   const [selectedScreen, setSelectedScreen] = useState('WELCOME');
+  const [activeScreen, setActiveScreen] = useState('WELCOME');
   const [jsonPayload, setJsonPayload] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [editorValue, setEditorValue] = useState<string>('');
+  const [editorError, setEditorError] = useState<string>('');
 
   const dispatch = useDispatch();
-  const dynamicVariables = useSelector((state: RootState) => state.dynamicVariable.variables);
+  const dynamicVariables = useSelector((state: RootState) => state.dynamicVariables.variables);
+
+  // Keep JSON updated whenever variables change
+  useEffect(() => {
+    if (activeScreen) {
+      const json = convertDynamicVariablesToJson(activeScreen, dynamicVariables);
+      setJsonPayload(json);
+    }
+  }, [dynamicVariables, activeScreen]);
+
+  // Keep editor value in sync with the JSON payload
+  useEffect(() => {
+    setEditorValue(jsonPayload);
+  }, [jsonPayload]);
+
+  // Handle JSON editor change
+  const handleJsonChange = (value: string) => {
+    setEditorValue(value);
+    try {
+      JSON.parse(value);
+      setEditorError('');
+    } catch (error) {
+      if (error instanceof Error) {
+        setEditorError(error.message);
+      } else {
+        setEditorError('Invalid JSON');
+      }
+    }
+  };
+
+  // Save edited JSON back to Redux
+  const handleSaveJson = () => {
+    if (editorError) return;
+
+    try {
+      const parsed = JSON.parse(editorValue);
+
+      if (!parsed.screen || !parsed.data) {
+        setEditorError('JSON must contain screen and data properties');
+        return;
+      }
+
+      // Clear existing variables for this screen
+      const screenName = parsed.screen;
+      const currentScreenVariables = dynamicVariables.filter((v: DynamicVariable) => v.screen === screenName);
+
+      currentScreenVariables.forEach((variable: DynamicVariable) => {
+        dispatch(removeDynamicVariable({ 
+          name: variable.name, 
+          screen: variable.screen || 'WELCOME',
+          type: variable.type 
+        }));
+      });
+
+      // Add variables from the JSON
+      const data = parsed.data;
+      Object.keys(data).forEach(key => {
+        const value = data[key];
+        let variable: DynamicVariable;
+
+        if (typeof value === 'string') {
+          variable = {
+            name: key,
+            type: 'String',
+            screen: screenName,
+            sample: value,
+            value: value.length > 20 ? `${value.substring(0, 20)}...` : value
+          };
+        } else if (typeof value === 'boolean') {
+          variable = {
+            name: key,
+            type: 'Boolean',
+            screen: screenName,
+            booleanValue: value,
+            value: value.toString()
+          };
+        } else if (typeof value === 'number') {
+          variable = {
+            name: key,
+            type: 'Number',
+            screen: screenName,
+            numberValue: value,
+            value: value.toString()
+          };
+        } else if (Array.isArray(value)) {
+          variable = {
+            name: key,
+            type: 'Array',
+            screen: screenName,
+            arraySamples: value,
+            value: value.length > 0 ? 
+              `[{"id":"${value[0].id || ''}","ti...` : 
+              '[]'
+          };
+        } else {
+          return; // Skip unknown types
+        }
+
+        dispatch(addDynamicVariable(variable));
+      });
+
+      // Show success notification
+      alert('JSON successfully saved to variables');
+    } catch (error) {
+      setEditorError('Error processing JSON');
+    }
+  };
 
   const handleTabChange = (_: React.SyntheticEvent, newIndex: number) => {
     setTabIndex(newIndex);
@@ -74,10 +193,11 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
 
   const handleSaveVariable = (variable: DynamicVariable) => {
     dispatch(addDynamicVariable(variable));
+    // The JSON will be updated automatically via the useEffect
   };
 
-  const handleDeleteVariable = (variableName: string) => {
-    dispatch(removeDynamicVariable(variableName));
+  const handleDeleteVariable = (name: string, screen: string, type: string) => {
+    dispatch(removeDynamicVariable({ name, screen, type }));
   };
 
   // Format value based on type
@@ -125,9 +245,16 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
     return [...new Set(screens)];
   };
 
-  // Handle opening the JSON viewer
-  const handleOpenJsonViewer = (screenName: string) => {
+  // Handle click on a screen
+  const handleScreenClick = (screenName: string) => {
+    setActiveScreen(screenName);
+    // The JSON will be updated automatically via the useEffect
+  };
+
+  // Open the JSON modal
+  const handleOpenJsonModal = (screenName: string = activeScreen) => {
     setSelectedScreen(screenName);
+    // Get fresh JSON payload to ensure it's up to date
     const json = convertDynamicVariablesToJson(screenName, dynamicVariables);
     setJsonPayload(json);
     setJsonDialogOpen(true);
@@ -209,7 +336,121 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
           {/* Tab panels */}
           <Box sx={{ p: 3, minHeight: 'calc(78vh - 120px)' }}>
             {tabIndex === 0 && (
-              <Typography>No Screens Found.</Typography>
+              <Box sx={{ display: 'flex', height: 'calc(78vh - 120px)' }}>
+                {/* Left sidebar - Screen list */}
+                <Box sx={{ 
+                  width: '250px', 
+                  borderRight: '1px solid #eee', 
+                  pr: 2 
+                }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
+                    Screens
+                  </Typography>
+                  <List>
+                    {SCREENS.map((screen, index) => (
+                      <ListItemButton 
+                        key={index}
+                        selected={activeScreen === screen}
+                        onClick={() => handleScreenClick(screen)}
+                        sx={{ 
+                          borderRadius: 1,
+                          mb: 0.5,
+                          '&.Mui-selected': {
+                            backgroundColor: 'primary.light',
+                            color: 'primary.main',
+                          }
+                        }}
+                      >
+                        <ListItemText 
+                          primary={screen}
+                          primaryTypographyProps={{
+                            fontSize: '0.9rem',
+                            fontWeight: activeScreen === screen ? 'bold' : 'normal'
+                          }}
+                        />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Box>
+                
+                {/* Right side - JSON code display */}
+                <Box sx={{ flex: 1, pl: 2, display: 'flex', flexDirection: 'column' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6" component="div" sx={{ fontWeight: 500 }}>
+                      {activeScreen} JSON
+                    </Typography>
+                    <Box>
+                      <Button
+                        variant="text"
+                        size="small"
+                        startIcon={<SaveIcon />}
+                        onClick={handleSaveJson}
+                        disabled={!!editorError}
+                        sx={{
+                          borderRadius: 1,
+                          textTransform: 'none',
+                          mr: 1
+                        }}
+                      >
+                        Save Changes
+                      </Button>
+                      <Button
+                        variant="text"
+                        size="small"
+                        startIcon={<ContentCopyIcon />}
+                        onClick={() => handleOpenJsonModal()}
+                        sx={{
+                          borderRadius: 1,
+                          textTransform: 'none',
+                        }}
+                      >
+                        Copy Payload
+                      </Button>
+                    </Box>
+                  </Box>
+                  
+                  {editorError && (
+                    <Typography 
+                      color="error" 
+                      variant="caption" 
+                      sx={{ mb: 1, display: 'block' }}
+                    >
+                      Error: {editorError}
+                    </Typography>
+                  )}
+                  
+                  <Box sx={{ 
+                    flexGrow: 1, 
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 1,
+                    overflow: 'hidden',
+                    '& .ace_gutter': {
+                      background: '#f8f8f8'
+                    }
+                  }}>
+                    <AceEditor
+                      mode="json"
+                      theme="github"
+                      name="json-editor"
+                      value={editorValue}
+                      onChange={handleJsonChange}
+                      fontSize={14}
+                      width="100%"
+                      height="calc(78vh - 180px)"
+                      showPrintMargin={false}
+                      showGutter={true}
+                      highlightActiveLine={true}
+                      setOptions={{
+                        enableBasicAutocompletion: true,
+                        enableLiveAutocompletion: true,
+                        enableSnippets: false,
+                        showLineNumbers: true,
+                        tabSize: 2,
+                      }}
+                    />
+                  </Box>
+                </Box>
+              </Box>
             )}
 
             {tabIndex === 1 && (
@@ -226,35 +467,29 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
                   <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
                     Dynamic Variables
                   </Typography>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      startIcon={<CodeIcon />}
-                      onClick={() => handleOpenJsonViewer('WELCOME')}
-                      sx={{
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        boxShadow: 'none',
-                      }}
-                    >
-                      View JSON
-                    </Button>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      startIcon={<AddIcon />}
-                      onClick={handleOpenAddVariableDialog}
-                      sx={{
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        boxShadow: 'none',
-                      }}
-                    >
-                      Create Variables
-                    </Button>
-                  </Box>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<AddIcon />}
+                    onClick={handleOpenAddVariableDialog}
+                    sx={{
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      boxShadow: 'none',
+                    }}
+                  >
+                    Create Variables
+                  </Button>
                 </Box>
+
+                {/* Search bar */}
+                <TextField 
+                  placeholder="Search variables..."
+                  size="small"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  sx={{ mb: 2 }}
+                />
 
                 {/* Screen Selector (if multiple screens exist) */}
                 {getUniqueScreens().length > 1 && (
@@ -278,7 +513,7 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
                           />
                           <IconButton
                             size="small"
-                            onClick={() => handleOpenJsonViewer(screen)}
+                            onClick={() => handleOpenJsonModal(screen)}
                             sx={{ color: 'primary.main' }}
                           >
                             <ContentCopyIcon fontSize="small" />
@@ -323,7 +558,18 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {dynamicVariables.map((variable, index) => {
+                          {dynamicVariables
+                            .filter((v: DynamicVariable) => {
+                              // If on tab 0 (Screen Variable), only show variables from the active screen
+                              if (tabIndex === 0) {
+                                return v.screen === activeScreen;
+                              }
+                              
+                              // Otherwise filter by search term if any
+                              return !searchTerm || 
+                                v.name.toLowerCase().includes(searchTerm.toLowerCase());
+                            })
+                            .map((variable: DynamicVariable, index: number) => {
                             const formattedValue = formatValue(variable);
                             const truncatedValue = truncateValue(formattedValue);
                             const needsPopover = isLongValue(formattedValue);
@@ -355,10 +601,10 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
                                   <IconButton 
                                     size="small" 
                                     sx={{ 
-                                      color: '#f44336',
+                                      color: 'error.main',
                                       padding: 0
                                     }}
-                                    onClick={() => handleDeleteVariable(variable.name)}
+                                    onClick={() => handleDeleteVariable(variable.name, variable.screen || 'WELCOME', variable.type)}
                                   >
                                     <DeleteIcon fontSize="small" />
                                   </IconButton>
@@ -418,31 +664,23 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
         PaperProps={{
           sx: {
             borderRadius: 2,
-            height: '80vh'
+            maxHeight: '80vh'
           }
         }}
       >
         <DialogTitle>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="h6">{selectedScreen} JSON Payload</Typography>
-            <Box>
-              <IconButton
-                onClick={handleCopyJson}
-                sx={{ mr: 1 }}
-                title="Copy JSON"
-              >
-                <ContentCopyIcon />
-              </IconButton>
-              <IconButton
-                onClick={() => setJsonDialogOpen(false)}
-                title="Close"
-              >
-                <CloseIcon />
-              </IconButton>
-            </Box>
+            <IconButton
+              onClick={() => setJsonDialogOpen(false)}
+              aria-label="close"
+              sx={{ p: 0.5 }}
+            >
+              <CloseIcon />
+            </IconButton>
           </Box>
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent dividers sx={{ p: 0 }}>
           <TextField
             value={jsonPayload}
             multiline
@@ -454,13 +692,21 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
                 fontFamily: 'monospace',
                 fontSize: '0.9rem',
                 whiteSpace: 'pre',
-                height: '100%',
+                padding: 2,
+                border: 'none'
               }
             }}
-            sx={{ height: '90%' }}
+            sx={{ 
+              '& .MuiOutlinedInput-root': {
+                border: 'none',
+                '& fieldset': {
+                  border: 'none'
+                }
+              }
+            }}
           />
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ justifyContent: 'space-between', py: 1.5, px: 2 }}>
           <Button 
             onClick={() => setJsonDialogOpen(false)}
             variant="outlined"
