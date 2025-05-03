@@ -54,6 +54,7 @@ export const SidebarComponents: SidebarComponents = {
     { id: 'if-else', name: 'If‑Else', icon: VscSymbolClass },
     { id: 'switch', name: 'Switch', icon: RiSwitchLine },
     { id: 'date-picker', name: 'Date Picker', icon: AiOutlineCalendar },
+    { id: 'calendar-picker', name: 'Calendar Picker', icon: AiOutlineCalendar },
     // { id: 'user-details', name: 'User Details', icon: RiUserLine },
   ],
 };
