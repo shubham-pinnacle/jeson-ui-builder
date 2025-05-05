@@ -1,6 +1,6 @@
-  import React, { useState, useEffect } from "react";
-import { Stack, FormControl, InputLabel, Select, MenuItem, Button, Box, IconButton, Typography } from "@mui/material";
+import React, { useState, useEffect } from "react";
 import LimitedTextField from './LimitedTextField';
+import { Stack, TextField, FormControl, InputLabel, Select, MenuItem, Button, Box, IconButton, Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { FieldRendererProps } from "./FieldRendererProps";
 
@@ -121,10 +121,6 @@ export default function TextBodyPropertyForm({
       }
     }
   }, [isMarkdown, component.properties?.fontWeight, component.properties?.strikethrough, component.properties?.text]);
-  const handleChange = (prop: string, value: any) => h(prop, value);
-  const text = component.properties?.text || "";
-  const maxChars = 4096;
-  const isOverLimit = text.length > maxChars;
 
   return (
     <Stack spacing={2}>
@@ -183,16 +179,6 @@ export default function TextBodyPropertyForm({
           </Button>
         </>
       )}
-      <LimitedTextField
-        field="text"
-        label="Text Body"
-        required
-        fullWidth
-        value={component.properties?.text || ""}
-        onFieldChange={handleChange}
-        size="small"
-        maxChars={4096}
-      />
 
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>

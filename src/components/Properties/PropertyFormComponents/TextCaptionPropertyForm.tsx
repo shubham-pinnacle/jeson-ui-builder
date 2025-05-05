@@ -1,4 +1,3 @@
-import { Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import LimitedTextField from './LimitedTextField';
 import React, { useState } from "react";
 import { Stack, TextField, FormControl, InputLabel, Select, MenuItem, Button, Box, IconButton, Typography } from "@mui/material";
@@ -123,16 +122,6 @@ export default function TextCaptionPropertyForm({
   
   return (
     <Stack spacing={2}>
-      <LimitedTextField
-        field="text"
-        label="Text Caption"
-        required
-        fullWidth
-        value={component.properties?.text || ""}
-        onFieldChange={handleChange}
-        size="small"
-        maxChars={409}
-      />
       {!isMarkdown ? (
         // Standard text field for non-markdown mode
         <TextField
