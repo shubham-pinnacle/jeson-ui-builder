@@ -83,8 +83,8 @@ const AddDynamicVariableDialog: React.FC<AddDynamicVariableDialogProps> = ({
   const [numberError, setNumberError] = useState('');
   const [arrayItemErrors, setArrayItemErrors] = useState<{id?: string, title?: string, description?: string, metadata?: string}>({});
 
-  // Use active screen from props if available, otherwise use default WELCOME
-  const [screen] = useState(activeScreenId || 'WELCOME');
+  // Use active screen directly from props - no useState to prevent stale values
+  // This ensures we always use the current active screen, not the one from when the dialog opened
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -218,7 +218,7 @@ const AddDynamicVariableDialog: React.FC<AddDynamicVariableDialogProps> = ({
     const variable: DynamicVariable = {
       name: variableName,
       type: variableType as VariableType,
-      screen: screen,
+      screen: activeScreenId || 'WELCOME', // Always use current activeScreenId from props
     };
     
     // Add type-specific properties

@@ -661,7 +661,7 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
             )}
 
             {tabIndex === 2 && (
-              <Box sx={{ maxWidth: '800px' }}>
+              <Box sx={{ maxWidth: '100%' }}>
                 <Typography variant="h6" component="h2" sx={{ mb: 3 }}>
                   API Configuration
                 </Typography>
@@ -678,6 +678,12 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
                     error={!!apiUrlError}
                     helperText={apiUrlError}
                     placeholder="https://process-automation.1spoc.ai/process/pf2/execute?org_id=XXX&process_id=XXX&version=XXX"
+                    sx={{
+                      width: '100%',
+                      maxWidth: '1350px',
+                      margin: '0 auto' // optional, to center it
+                    }}
+                    
                     InputProps={{
                       sx: {
                         borderColor: apiUrlError ? 'error.main' : undefined,
