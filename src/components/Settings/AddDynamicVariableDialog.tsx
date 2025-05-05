@@ -32,6 +32,7 @@ interface AddDynamicVariableDialogProps {
   open: boolean;
   onClose: () => void;
   onAddVariable: (variable: any) => void;
+  activeScreenId?: string;
 }
 
 // Interface for property options in Array type
@@ -63,6 +64,7 @@ const AddDynamicVariableDialog: React.FC<AddDynamicVariableDialogProps> = ({
   open,
   onClose,
   onAddVariable,
+  activeScreenId,
 }) => {
   const { showToast } = useToast();
   const [variableName, setVariableName] = useState('');
@@ -81,8 +83,8 @@ const AddDynamicVariableDialog: React.FC<AddDynamicVariableDialogProps> = ({
   const [numberError, setNumberError] = useState('');
   const [arrayItemErrors, setArrayItemErrors] = useState<{id?: string, title?: string, description?: string, metadata?: string}>({});
 
-  // Default screen set to WELCOME
-  const [screen] = useState('WELCOME');
+  // Use active screen from props if available, otherwise use default WELCOME
+  const [screen] = useState(activeScreenId || 'WELCOME');
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -251,6 +253,11 @@ const AddDynamicVariableDialog: React.FC<AddDynamicVariableDialogProps> = ({
     setNameError('');
     setSampleError('');
     setNumberError('');
+    setSelectedProperties([]);
+    setPropertySelectionDisabled(false);
+    setArraySamples([]);
+    setCurrentArrayItem({ id: '', title: '', description: '', metadata: '' });
+    setArrayItemErrors({});
   };
 
   const handleClose = () => {
@@ -328,8 +335,16 @@ const AddDynamicVariableDialog: React.FC<AddDynamicVariableDialogProps> = ({
     // Add item to array samples
     setArraySamples(prev => [...prev, currentArrayItem]);
     
-    // Reset current item
-    setCurrentArrayItem({ id: '', title: '' });
+    // Reset current item - make sure to clear ALL fields including description and metadata
+    setCurrentArrayItem({ 
+      id: '', 
+      title: '',
+      description: '',
+      metadata: ''
+    });
+    
+    // Clear any errors
+    setArrayItemErrors({});
     
     // Disable property selection after adding first item
     setPropertySelectionDisabled(true);
@@ -388,7 +403,7 @@ const AddDynamicVariableDialog: React.FC<AddDynamicVariableDialogProps> = ({
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <Box sx={{ mt: 2 }}>
             <TextField
-              label="Variable Name *"
+              label="Variable Name"
               value={variableName}
               onChange={handleNameChange}
               fullWidth
@@ -485,7 +500,7 @@ const AddDynamicVariableDialog: React.FC<AddDynamicVariableDialogProps> = ({
           {variableType === 'String' && (
             <Box>
               <TextField
-                label="Add Sample *"
+                label="Add Sample"
                 value={sampleValue}
                 onChange={handleSampleChange}
                 fullWidth

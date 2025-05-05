@@ -5,53 +5,8 @@ interface DynamicVariableState {
   variables: DynamicVariable[];
 }
 
-// Sample data to match the reference images
-const initialSampleData: DynamicVariable[] = [
-  {
-    name: 'nameq',
-    type: 'String',
-    screen: 'WELCOME',
-    sample: 'sdasdasd asdasdasd asdasd asdasd',
-    value: 'sdasdasd asdasdasd a...'
-  },
-  {
-    name: 'asdasd',
-    type: 'Boolean',
-    screen: 'WELCOME',
-    booleanValue: true,
-    value: 'true'
-  },
-  {
-    name: 'asdasd',
-    type: 'Number',
-    screen: 'WELCOME',
-    numberValue: 1,
-    value: '1'
-  },
-  {
-    name: 'asdasd',
-    type: 'Array',
-    screen: 'WELCOME',
-    arraySamples: [
-      {
-        id: '1',
-        title: 't1',
-        description: 'des1',
-        metadata: 'm2'
-      },
-      {
-        id: 'id2',
-        title: 't2',
-        description: 'd2',
-        metadata: 'meta2'
-      }
-    ],
-    value: '[{"id":"asdasd","ti...'
-  }
-];
-
 const initialState: DynamicVariableState = {
-  variables: initialSampleData
+  variables: []
 };
 
 export const dynamicVariableSlice = createSlice({

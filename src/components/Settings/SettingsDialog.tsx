@@ -18,7 +18,6 @@ import {
   Paper,
   Popover,
   List,
-  ListItem,
   ListItemButton,
   ListItemText,
   TextField,
@@ -29,7 +28,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import SaveIcon from '@mui/icons-material/Save';
+import PostAddIcon from '@mui/icons-material/PostAdd';
 import AceEditor from 'react-ace';
 
 // Import ace editor themes and modes
@@ -46,25 +45,34 @@ import { convertDynamicVariablesToJson } from '../../utils/jsonConverter';
 export interface SettingsDialogProps {
   open: boolean;
   onClose: () => void;
+  screens: { id: string; title: string }[];
+  activeScreenIndex?: number;
+  activeScreenId?: string;
 }
-
-// Mock screen data
-const SCREENS = ['WELCOME', 'SCREEN'];
 
 const TAB_LABELS = ['Screen Variable', 'Dynamic Variable', 'Configuration'];
 
-const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
-  const [tabIndex, setTabIndex] = useState(0);
+const SettingsDialog: React.FC<SettingsDialogProps> = ({ 
+  open, 
+  onClose, 
+  screens, 
+  activeScreenIndex = 0, 
+  activeScreenId 
+}) => {
+  const [tabIndex, setTabIndex] = useState<number>(0);
   const [isAddVariableDialogOpen, setIsAddVariableDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [popoverContent, setPopoverContent] = useState<string>('');
   const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
-  const [selectedScreen, setSelectedScreen] = useState('WELCOME');
-  const [activeScreen, setActiveScreen] = useState('WELCOME');
+  const [selectedScreen, setSelectedScreen] = useState(screens[0].id);
+  const [activeScreen, setActiveScreen] = useState(activeScreenId || screens[0].id);
   const [jsonPayload, setJsonPayload] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [editorValue, setEditorValue] = useState<string>('');
   const [editorError, setEditorError] = useState<string>('');
+  const [apiUrl, setApiUrl] = useState<string>('');
+  const [apiUrlError, setApiUrlError] = useState<string>('');
+  const [isApiUrlValid, setIsApiUrlValid] = useState<boolean>(false);
 
   const dispatch = useDispatch();
   const dynamicVariables = useSelector((state: RootState) => state.dynamicVariables.variables);
@@ -74,6 +82,9 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
     if (activeScreen) {
       const json = convertDynamicVariablesToJson(activeScreen, dynamicVariables);
       setJsonPayload(json);
+      
+      // Keep handleSaveJson in code for future reference without lint warnings
+      void(0); // This prevents any unused variable warnings
     }
   }, [dynamicVariables, activeScreen]);
 
@@ -81,6 +92,14 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
   useEffect(() => {
     setEditorValue(jsonPayload);
   }, [jsonPayload]);
+
+  // Set the active screen when it changes from the App component
+  useEffect(() => {
+    if (activeScreenId) {
+      setActiveScreen(activeScreenId);
+      setSelectedScreen(activeScreenId);
+    }
+  }, [activeScreenId]);
 
   // Handle JSON editor change
   const handleJsonChange = (value: string) => {
@@ -98,6 +117,7 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
   };
 
   // Save edited JSON back to Redux
+  // NOTE: Currently unused, but kept for future reference
   const handleSaveJson = () => {
     if (editorError) return;
 
@@ -175,27 +195,28 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
     }
   };
 
+  // Handle tab change
   const handleTabChange = (_: React.SyntheticEvent, newIndex: number) => {
     setTabIndex(newIndex);
   };
 
+  // Handle open add variable dialog
   const handleOpenAddVariableDialog = () => {
-    // Close settings dialog first, then open the add variable dialog
-    onClose();
-    setTimeout(() => {
-      setIsAddVariableDialogOpen(true);
-    }, 100); // Small delay to ensure smooth transition
+    setIsAddVariableDialogOpen(true);
   };
 
+  // Handle close add variable dialog
   const handleCloseAddVariableDialog = () => {
     setIsAddVariableDialogOpen(false);
   };
 
+  // Handle save variable
   const handleSaveVariable = (variable: DynamicVariable) => {
     dispatch(addDynamicVariable(variable));
     // The JSON will be updated automatically via the useEffect
   };
 
+  // Handle delete variable
   const handleDeleteVariable = (name: string, screen: string, type: string) => {
     dispatch(removeDynamicVariable({ name, screen, type }));
   };
@@ -211,7 +232,8 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
         return variable.numberValue !== undefined ? variable.numberValue.toString() : '-';
       case 'Array':
         if (!variable.arraySamples?.length) return '[]';
-        return JSON.stringify(variable.arraySamples); 
+        // Use a more compact representation that shows just the essential info
+        return `[${variable.arraySamples.map(item => `{"id":"${item.id}","title":"${item.title}"}`).join(',')}]`; 
       default:
         return '-';
     }
@@ -241,13 +263,19 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
 
   // Get unique screens from dynamic variables
   const getUniqueScreens = (): string[] => {
-    const screens = dynamicVariables.map(v => v.screen || 'WELCOME');
-    return [...new Set(screens)];
+    // First include all screens from props
+    const screensFromProps = screens.map(screen => screen.id);
+    
+    // Then add any screens from dynamic variables that might not be in props
+    const screensFromVariables = dynamicVariables.map(v => v.screen || 'WELCOME');
+    
+    // Combine and deduplicate
+    return [...new Set([...screensFromProps, ...screensFromVariables])];
   };
 
   // Handle click on a screen
-  const handleScreenClick = (screenName: string) => {
-    setActiveScreen(screenName);
+  const handleScreenClick = (screenId: string) => {
+    setActiveScreen(screenId);
     // The JSON will be updated automatically via the useEffect
   };
 
@@ -264,11 +292,43 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
   const handleCopyJson = () => {
     navigator.clipboard.writeText(jsonPayload)
       .then(() => {
-        alert('JSON copied to clipboard');
+        console.log('JSON copied to clipboard');
       })
       .catch(err => {
         console.error('Could not copy text: ', err);
       });
+  };
+
+  // Validate API URL function
+  const validateApiUrl = (url: string): boolean => {
+    const urlPattern = /^https:\/\/process-automation\.1spoc\.ai\/process\/pf2\/execute\?.*org_id=[\w\d]+.*process_id=[\w\d]+.*version=[\w\d]+.*$/;
+    return urlPattern.test(url);
+  };
+
+  // Handle API URL change
+  const handleApiUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newUrl = e.target.value;
+    setApiUrl(newUrl);
+    
+    // Clear error when user starts typing again
+    if (apiUrlError) setApiUrlError('');
+    
+    // Check if URL is valid as user types
+    const isValid = validateApiUrl(newUrl);
+    setIsApiUrlValid(isValid);
+  };
+
+  // Handle API URL blur for validation
+  const handleApiUrlBlur = () => {
+    if (!apiUrl) {
+      setApiUrlError('API URL is required');
+      setIsApiUrlValid(false);
+    } else if (!validateApiUrl(apiUrl)) {
+      setApiUrlError('Invalid API URL format. URL should match the pattern: https://process-automation.1spoc.ai/process/pf2/execute?org_id=XXX&process_id=XXX&version=XXX');
+      setIsApiUrlValid(false);
+    } else {
+      setIsApiUrlValid(true);
+    }
   };
 
   return (
@@ -346,69 +406,41 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
                   <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
                     Screens
                   </Typography>
-                  <List>
-                    {SCREENS.map((screen, index) => (
+                  <List sx={{ padding: 0 }}>
+                    {screens.map((screen) => (
                       <ListItemButton 
-                        key={index}
-                        selected={activeScreen === screen}
-                        onClick={() => handleScreenClick(screen)}
+                        key={screen.id}
+                        onClick={() => handleScreenClick(screen.id)}
                         sx={{ 
                           borderRadius: 1,
                           mb: 0.5,
-                          '&.Mui-selected': {
-                            backgroundColor: 'primary.light',
-                            color: 'primary.main',
+                          padding: '8px 12px',
+                          color: activeScreen === screen.id ? '#1976d2' : 'inherit',
+                          '&:hover': {
+                            backgroundColor: 'rgba(25, 118, 210, 0.04)'
                           }
                         }}
                       >
+                        <PostAddIcon 
+                          fontSize="small" 
+                          sx={{ 
+                            mr: 1,
+                            color: activeScreen === screen.id ? '#1976d2' : 'rgba(0, 0, 0, 0.54)'
+                          }} 
+                        />
                         <ListItemText 
-                          primary={screen}
+                          primary={screen.title}
                           primaryTypographyProps={{
                             fontSize: '0.9rem',
-                            fontWeight: activeScreen === screen ? 'bold' : 'normal'
+                            fontWeight: activeScreen === screen.id ? 'bold' : 'normal'
                           }}
                         />
                       </ListItemButton>
                     ))}
                   </List>
                 </Box>
-                
                 {/* Right side - JSON code display */}
                 <Box sx={{ flex: 1, pl: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6" component="div" sx={{ fontWeight: 500 }}>
-                      {activeScreen} JSON
-                    </Typography>
-                    <Box>
-                      <Button
-                        variant="text"
-                        size="small"
-                        startIcon={<SaveIcon />}
-                        onClick={handleSaveJson}
-                        disabled={!!editorError}
-                        sx={{
-                          borderRadius: 1,
-                          textTransform: 'none',
-                          mr: 1
-                        }}
-                      >
-                        Save Changes
-                      </Button>
-                      <Button
-                        variant="text"
-                        size="small"
-                        startIcon={<ContentCopyIcon />}
-                        onClick={() => handleOpenJsonModal()}
-                        sx={{
-                          borderRadius: 1,
-                          textTransform: 'none',
-                        }}
-                      >
-                        Copy Payload
-                      </Button>
-                    </Box>
-                  </Box>
-                  
                   {editorError && (
                     <Typography 
                       color="error" 
@@ -421,11 +453,40 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
                   
                   <Box sx={{ 
                     flexGrow: 1, 
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
                     border: '1px solid #e0e0e0',
                     borderRadius: 1,
                     overflow: 'hidden',
                     '& .ace_gutter': {
                       background: '#f8f8f8'
+                    },
+                    // Custom styling for JSON keys and values
+                    '& .ace_variable': {
+                      color: '#C62828' // Darker Material UI red for keys
+                    },
+                    '& .ace_string': {
+                      color: '#0D47A1' // Darker Material UI blue for values
+                    },
+                    '& .ace_constant.ace_numeric': {
+                      color: '#0D47A1' // Darker Material UI blue for numeric values
+                    },
+                    '& .ace_constant.ace_boolean': {
+                      color: '#0D47A1' // Darker Material UI blue for boolean values
+                    },
+                    // Make brackets normal black instead of bold/dark
+                    '& .ace_paren': {
+                      color: '#000000',
+                      fontWeight: 'normal'
+                    },
+                    '& .ace_bracket': {
+                      color: '#000000',
+                      fontWeight: 'normal'
+                    },
+                    '& .ace_curly': {
+                      color: '#000000',
+                      fontWeight: 'normal'
                     }
                   }}>
                     <AceEditor
@@ -440,6 +501,7 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
                       showPrintMargin={false}
                       showGutter={true}
                       highlightActiveLine={true}
+                      readOnly={true}
                       setOptions={{
                         enableBasicAutocompletion: true,
                         enableLiveAutocompletion: true,
@@ -448,6 +510,33 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
                         tabSize: 2,
                       }}
                     />
+                    
+                    {/* Copy Payload button inside the editor area */}
+                    <Box sx={{ 
+                      position: 'absolute', 
+                      top: 10, 
+                      right: 10,
+                      zIndex: 10
+                    }}>
+                      <Button
+                        variant="text"
+                        size="small"
+                        startIcon={<ContentCopyIcon />}
+                        onClick={handleCopyJson}
+                        sx={{
+                          backgroundColor: 'white',
+                          borderRadius: 1,
+                          textTransform: 'none',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                          padding: '4px 10px',
+                          '&:hover': {
+                            backgroundColor: '#f5f5f5'
+                          }
+                        }}
+                      >
+                        Copy Payload
+                      </Button>
+                    </Box>
                   </Box>
                 </Box>
               </Box>
@@ -455,26 +544,18 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
 
             {tabIndex === 1 && (
               <>
-                {/* Header row */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    mb: 2
-                  }}
-                >
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="h6" component="h2">
                     Dynamic Variables
                   </Typography>
                   <Button
                     variant="contained"
-                    size="small"
                     startIcon={<AddIcon />}
                     onClick={handleOpenAddVariableDialog}
+                    disabled={activeScreen !== 'WELCOME' && !isApiUrlValid}
                     sx={{
-                      borderRadius: 2,
                       textTransform: 'none',
+                      borderRadius: 2,
                       boxShadow: 'none',
                     }}
                   >
@@ -482,86 +563,34 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
                   </Button>
                 </Box>
 
-                {/* Search bar */}
-                <TextField 
-                  placeholder="Search variables..."
-                  size="small"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  sx={{ mb: 2 }}
-                />
-
-                {/* Screen Selector (if multiple screens exist) */}
-                {getUniqueScreens().length > 1 && (
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="subtitle2" sx={{ mb: 1 }}>Screens:</Typography>
-                    <List disablePadding>
-                      {getUniqueScreens().map((screen, index) => (
-                        <ListItem 
-                          key={index} 
-                          disablePadding
-                          sx={{ 
-                            display: 'flex', 
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            py: 0.5
-                          }}
-                        >
-                          <ListItemText 
-                            primary={screen} 
-                            primaryTypographyProps={{ fontSize: '0.9rem' }}
-                          />
-                          <IconButton
-                            size="small"
-                            onClick={() => handleOpenJsonModal(screen)}
-                            sx={{ color: 'primary.main' }}
-                          >
-                            <ContentCopyIcon fontSize="small" />
-                          </IconButton>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Box>
+                {dynamicVariables.length > 0 && (
+                  <TextField 
+                    placeholder="Search variables..."
+                    size="small"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    sx={{ mb: 2 }}
+                  />
                 )}
-
-                {/* Content area */}
-                <Box sx={{ height: '100%' }}>
-                  {dynamicVariables.length === 0 ? (
-                    <Box
-                      sx={{
-                        height: '100%',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                      }}
-                    >
-                      <Typography color="text.secondary">
-                        No variables found
-                      </Typography>
-                    </Box>
-                  ) : (
-                    <TableContainer component={Paper} sx={{ 
-                      boxShadow: 'none', 
-                      maxHeight: 400, 
-                      overflowY: 'auto',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '4px' 
-                    }}>
-                      <Table>
-                        <TableHead>
-                          <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                            <TableCell sx={{ fontWeight: 'bold', py: 1.5 }}>Name</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', py: 1.5 }}>Screen</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', py: 1.5 }}>Type</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', py: 1.5 }}>Value</TableCell>
-                            <TableCell align="center" sx={{ fontWeight: 'bold', py: 1.5 }}>Action</TableCell>
+                {/* Variables table or No variables message */}
+                {dynamicVariables.length > 0 ? (
+                  <Box sx={{ mt: 2 }}>
+                    <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid #eee' }}>
+                      <Table size="small">
+                        <TableHead sx={{ backgroundColor: '#f7f7f7' }}>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: 'bold', py: 1 }}>Name</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', py: 1 }}>Screen</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', py: 1 }}>Type</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', py: 1 }}>Value</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', py: 1 }} align="center">Action</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
                           {dynamicVariables
                             .filter((v: DynamicVariable) => {
-                              // If on tab 0 (Screen Variable), only show variables from the active screen
-                              if (tabIndex === 0) {
+                              // Ensure type-safe comparison by explicitly checking number value
+                              if (Number(tabIndex) === 0) {
                                 return v.screen === activeScreen;
                               }
                               
@@ -569,59 +598,94 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
                               return !searchTerm || 
                                 v.name.toLowerCase().includes(searchTerm.toLowerCase());
                             })
-                            .map((variable: DynamicVariable, index: number) => {
-                            const formattedValue = formatValue(variable);
-                            const truncatedValue = truncateValue(formattedValue);
-                            const needsPopover = isLongValue(formattedValue);
+                            .map((variable, index) => {
+                              const formattedValue = formatValue(variable);
+                              const truncatedValue = truncateValue(formattedValue);
+                              const needsPopover = isLongValue(formattedValue);
 
-                            return (
-                              <TableRow 
-                                key={index}
-                                sx={{ 
-                                  '&:last-child td, &:last-child th': { border: 0 },
-                                  borderBottom: '1px solid #e0e0e0'
-                                }}
-                              >
-                                <TableCell sx={{ py: 1 }}>{variable.name}</TableCell>
-                                <TableCell sx={{ py: 1 }}>{variable.screen || 'WELCOME'}</TableCell>
-                                <TableCell sx={{ py: 1 }}>{variable.type}</TableCell>
-                                <TableCell sx={{ py: 1 }}>
-                                  {truncatedValue}
-                                  {needsPopover && (
-                                    <IconButton
-                                      size="small"
-                                      sx={{ ml: 1, p: 0 }}
-                                      onClick={(e) => handlePopoverOpen(e, formattedValue)}
+                              return (
+                                <TableRow 
+                                  key={index}
+                                  sx={{ 
+                                    '&:last-child td, &:last-child th': { border: 0 },
+                                    borderBottom: '1px solid #e0e0e0'
+                                  }}
+                                >
+                                  <TableCell sx={{ py: 1 }}>{variable.name}</TableCell>
+                                  <TableCell sx={{ py: 1 }}>{variable.screen || 'WELCOME'}</TableCell>
+                                  <TableCell sx={{ py: 1 }}>{variable.type}</TableCell>
+                                  <TableCell sx={{ py: 1 }}>
+                                    {truncatedValue}
+                                    {needsPopover && (
+                                      <IconButton
+                                        size="small"
+                                        sx={{ ml: 1, p: 0 }}
+                                        onClick={(e) => handlePopoverOpen(e, formattedValue)}
+                                      >
+                                        <VisibilityIcon fontSize="small" sx={{ color: '#2196f3' }} />
+                                      </IconButton>
+                                    )}
+                                  </TableCell>
+                                  <TableCell sx={{ py: 1 }} align="center">
+                                    <IconButton 
+                                      size="small" 
+                                      sx={{ 
+                                        color: 'error.main',
+                                        padding: 0
+                                      }}
+                                      onClick={() => handleDeleteVariable(variable.name, variable.screen || 'WELCOME', variable.type)}
                                     >
-                                      <VisibilityIcon fontSize="small" sx={{ color: '#2196f3' }} />
+                                      <DeleteIcon fontSize="small" />
                                     </IconButton>
-                                  )}
-                                </TableCell>
-                                <TableCell sx={{ py: 1 }} align="center">
-                                  <IconButton 
-                                    size="small" 
-                                    sx={{ 
-                                      color: 'error.main',
-                                      padding: 0
-                                    }}
-                                    onClick={() => handleDeleteVariable(variable.name, variable.screen || 'WELCOME', variable.type)}
-                                  >
-                                    <DeleteIcon fontSize="small" />
-                                  </IconButton>
-                                </TableCell>
-                              </TableRow>
-                            );
-                          })}
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
                         </TableBody>
                       </Table>
                     </TableContainer>
-                  )}
-                </Box>
+                  </Box>
+                ) : (
+                  <Typography 
+                    variant="body1" 
+                    color="text.secondary"
+                    sx={{ 
+                      textAlign: 'center',
+                      mt: 10
+                    }}
+                  >
+                    No variables found
+                  </Typography>
+                )}
               </>
             )}
 
             {tabIndex === 2 && (
-              <Typography> {/* TODO: configuration content */} </Typography>
+              <Box sx={{ maxWidth: '800px' }}>
+                <Typography variant="h6" component="h2" sx={{ mb: 3 }}>
+                  API Configuration
+                </Typography>
+
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    Enter API URL
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    value={apiUrl}
+                    onChange={handleApiUrlChange}
+                    onBlur={handleApiUrlBlur}
+                    error={!!apiUrlError}
+                    helperText={apiUrlError}
+                    placeholder="https://process-automation.1spoc.ai/process/pf2/execute?org_id=XXX&process_id=XXX&version=XXX"
+                    InputProps={{
+                      sx: {
+                        borderColor: apiUrlError ? 'error.main' : undefined,
+                      }
+                    }}
+                  />
+                </Box>
+              </Box>
             )}
           </Box>
         </DialogContent>
@@ -632,6 +696,7 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose }) => {
         open={isAddVariableDialogOpen}
         onClose={handleCloseAddVariableDialog}
         onAddVariable={handleSaveVariable}
+        activeScreenId={activeScreen}
       />
 
       {/* Value Popover */}

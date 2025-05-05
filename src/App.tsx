@@ -641,7 +641,7 @@ function App() {
         };
         break;
       case "PhotoPicker":
-        newComponent.properties = {
+        newComponent.properties = { 
           label: "",
           description: "",
           outputVariable: "",
@@ -978,10 +978,25 @@ function App() {
                     ...(child['input-type'] !== undefined && { inputType: child['input-type'] }),
                     ...(child['init-value'] !== undefined && { initValue: child['init-value'] }),
                     ...(child['helper-text'] !== undefined && {  helperText: child['helper-text'] }),
-                    ...(child.visible !== undefined && { visible: child.visible }),
-                    ...(child['min-chars'] !== undefined && { minChars: Number(child['min-chars']) }),
-                    ...(child['max-chars'] !== undefined && { maxChars: Number(child['max-chars']) }),
+                    visible: child.visible ?? true,
+                    // "min-chars":
+                    //   child['min-chars'] !== undefined
+                    //     ? Number(child['min-chars'])
+                    //     : null,
+                    ...(child['min-chars'] !== undefined
+                      ? {
+                        "min-chars":
+                          child['min-chars'] !== undefined
+                            ? Number(child['min-chars'])
+                            : null
+                      }
+                      : {}),
+                    "max-chars":
+                      child['max-chars'] !== undefined
+                        ? Number(child['max-chars'])
+                        : 80,
                   };
+
                   return {
                     id: prevComponent?.id || componentId,
                     type,
@@ -997,11 +1012,19 @@ function App() {
                     ...(child.label !== undefined && { label: child.label }),
                     ...(child.name !== undefined && { outputVariable: child.name }),
                     ...(child.required !== undefined && { required: child.required }),
-                    ...(child['init-value'] !== undefined && {  initValue: child['init-value'] }),
-                    ...(child['helper-text'] !== undefined && {  helperText: child['helper-text'] }),
-                    ...(child.visible !== undefined && { visible: child.visible }),
-                    ...(child['max-length'] !== undefined && { maxLength: Number(child['max-length']) }),
-                    ...(child.enabled !== undefined && { enabled: child.enabled }),
+                    ...(child['init-value'] !== undefined
+                      ? { "init-value": child['init-value'] }
+                      : {}),
+                    ...(child['helper-text'] !== undefined
+                      ? { "helper-text": child['helper-text'] }
+                      : {}),
+                    visible: child.visible ?? true,
+                    ...(child['max-length'] !== undefined
+                      ? { "max-length": Number(child['max-length']) }
+                      : {}),
+                    ...(child.enabled !== undefined
+                      ? { enabled: child.enabled }
+                      : {}),
                   };
                   return {
                     id: prevComponent?.id || componentId,
@@ -1019,7 +1042,7 @@ function App() {
                     ...(child.description !== undefined && { description: child.description }),
                     ...(child.name !== undefined && { outputVariable: child.name, name: child.name }),
                     ...(options !== undefined && { options: options }),
-                    ...(child.visible !== undefined && { visible: child.visible }),
+                    visible: child.visible ?? true,
                     ...(child.required !== undefined && { required: child.required }),
                     ...(child.enabled !== undefined && { enabled: child.enabled }),
                     "min-selected-items":
@@ -1048,7 +1071,7 @@ function App() {
                         ...(child.name !== undefined && { outputVariable: child.name, name: child.name }),
                         ...(child.enabled !== undefined && { enabled: child.enabled }),
                         ...(child.required !== undefined && { required: child.required }),
-                        ...(child.visible !== undefined && { visible: child.visible }),
+                        visible: child.visible ?? true,
                         ...(child["init-value"] !== undefined && { initValue: child["init-value"] }),
                         ...(options !== undefined && { options: options }),
                 };
@@ -1071,7 +1094,7 @@ function App() {
                     ...(child.name !== undefined && { name: child.name, outputVariable: child.name }),
                     ...(dropdownOptions !== undefined && { options: dropdownOptions }),
                     ...(child.enabled !== undefined && { enabled: child.enabled }),
-                    ...(child.visible !== undefined && { visible: child.visible }),
+                    visible: child.visible ?? true,
                     ...(child.required !== undefined && { required: child.required }),
                     ...(child.placeholder !== undefined && { placeholder: child.placeholder }),
                 };
@@ -1108,7 +1131,7 @@ function App() {
                 properties = {
                     ...prevComponent?.properties,
                     ...(child.text !== undefined && { text: child.text }),
-                    ...(child.visible !== undefined && { visible: child.visible }),
+                    visible: child.visible ?? true,
                     ...(child["on-click-action"]?.name !== undefined && { onClickAction: child["on-click-action"]?.name }),
                     ...(child["on-click-action"]?.next?.name !== undefined && { screenName: child["on-click-action"]?.next?.name }),
                     ...(child["url"]?.url !== undefined && { url: child["url"]?.url })
@@ -2059,7 +2082,13 @@ function App() {
             />
           </JsonEditorContainer>
 
-          <SettingsDialog open={settingsOpen} onClose={closeSettings} />
+          <SettingsDialog 
+            open={settingsOpen} 
+            onClose={closeSettings}
+            screens={screens} 
+            activeScreenIndex={activeScreenIndex}
+            activeScreenId={screens[activeScreenIndex].id}
+          />
           <PreviewContainer isVisible={showPreview}>
             <Simulator
               components={screens[activeScreenIndex].components}
