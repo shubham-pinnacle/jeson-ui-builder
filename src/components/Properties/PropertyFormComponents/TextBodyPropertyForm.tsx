@@ -1,4 +1,4 @@
-  import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Stack, TextField, FormControl, InputLabel, Select, MenuItem, Button, Box, IconButton, Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { FieldRendererProps } from "./FieldRendererProps";
@@ -12,7 +12,7 @@ export default function TextBodyPropertyForm({
   
   // Handle component property changes
   const handleChange = (prop: string, value: any) => {
-    // If markdown is being set to true, convert text to array format and set fontWeight to normal and strikethrough to false
+    // If markdown is being set to true, convert text to array format and set fontWeight to "" and strikethrough to undefined
     if (prop === "markdown" && value === "true") {
       // Get current values to update
       const currentText = component.properties?.text || "";
@@ -29,8 +29,8 @@ export default function TextBodyPropertyForm({
       }
       
       // Update all properties at once for immediate JSON update
-      h("fontWeight", "normal");
-      h("strikethrough", "false");
+      h("fontWeight", "");
+      h("strikethrough",undefined);
       h("text", textArray);
       h(prop, value);
       
@@ -44,10 +44,10 @@ export default function TextBodyPropertyForm({
         // Join with newlines
         const stringText = currentText.join("\n");
         h("text", stringText);
+        h("strikethrough", component.properties?.strikethrough);
       } else {
         h("text", currentText); // Keep existing text
       }
-      
       h(prop, value);
     } else {
       // Handle property change normally
@@ -93,12 +93,12 @@ export default function TextBodyPropertyForm({
   // Synchronize component text with local state when component changes or markdown is toggled
   useEffect(() => {
     if (isMarkdown) {
-      // Only update if the values aren't already set correctly
-      if (component.properties?.fontWeight !== "normal") {
-        h("fontWeight", "normal");
+      // Only update if the values aren't already set correctly in the json editor
+      if (component.properties?.fontWeight !== "") {
+        h("fontWeight", "");
       }
-      if (component.properties?.strikethrough !== "false") {
-        h("strikethrough", "false");
+      if (component.properties?.strikethrough !== undefined) {
+        h("strikethrough", undefined);
       }
       
       // Initialize text items from component properties
@@ -124,6 +124,7 @@ export default function TextBodyPropertyForm({
   return (
     <Stack spacing={2}>
       {!isMarkdown ? (
+        // Standard text field for non-markdown mode
         <TextField
           label="Text Body"
           required
@@ -194,7 +195,7 @@ export default function TextBodyPropertyForm({
       <FormControl fullWidth size="small" disabled={isMarkdown}>
         <InputLabel>Font Weight (Optional)</InputLabel>
         <Select
-          value={isMarkdown ? "normal" : (component.properties?.fontWeight ?? "")}
+          value={isMarkdown ? "" : (component.properties?.fontWeight ?? "")}
           onChange={(e) => handleChange("fontWeight", e.target.value)}
           label="Font Weight (Optional)"
         >
@@ -208,7 +209,11 @@ export default function TextBodyPropertyForm({
       <FormControl fullWidth size="small" disabled={isMarkdown}>
         <InputLabel>Strike Through (Optional)</InputLabel>
         <Select
-          value={isMarkdown ? "false" : (component.properties?.strikethrough ?? "false")}
+          value={
+            isMarkdown
+              ? "" 
+              : component.properties?.strikethrough ?? ""
+          }
           onChange={(e) => handleChange("strikethrough", e.target.value)}
           label="Strike Through (Optional)"
         >
@@ -216,6 +221,7 @@ export default function TextBodyPropertyForm({
           <MenuItem value="false">False</MenuItem>
         </Select>
       </FormControl>
+
 
       <FormControl fullWidth size="small">
         <InputLabel>Markdown (Optional)</InputLabel>

@@ -29,8 +29,8 @@ export default function TextCaptionPropertyForm({
       }
       
       // Update all properties at once for immediate JSON update
-      h("fontWeight", "normal");
-      h("strikethrough", "false");
+      h("fontWeight", "");
+      h("strikethrough", undefined);
       h("text", textArray);
       h(prop, value);
       
@@ -44,6 +44,7 @@ export default function TextCaptionPropertyForm({
         // Join with newlines
         const stringText = currentText.join("\n");
         h("text", stringText);
+        h("strikethrough", component.properties?.strikethrough);
       } else {
         h("text", currentText); // Keep existing text
       }
@@ -91,12 +92,12 @@ export default function TextCaptionPropertyForm({
   // Synchronize component text with local state when component changes or markdown is toggled
   React.useEffect(() => {
     if (isMarkdown) {
-      // Only update if the values aren't already set correctly
-      if (component.properties?.fontWeight !== "normal") {
-        h("fontWeight", "normal");
+      // Only update if the values aren't already set correctly in the json editor
+      if (component.properties?.fontWeight !== "") {
+        h("fontWeight", "");
       }
-      if (component.properties?.strikethrough !== "false") {
-        h("strikethrough", "false");
+      if (component.properties?.strikethrough !== undefined) {
+        h("strikethrough", undefined);
       }
       
       // Initialize text items from component properties
@@ -117,7 +118,7 @@ export default function TextCaptionPropertyForm({
         h("text", stringText);
       }
     }
-  }, [isMarkdown, component.properties?.fontWeight, component.properties?.text]);
+  }, [isMarkdown, component.properties?.fontWeight, component.properties?.strikethrough, component.properties?.text]);
   
   return (
     <Stack spacing={2}>
@@ -181,7 +182,7 @@ export default function TextCaptionPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>
         <Select
-          value={component.properties?.visible ?? true}
+          value={component.properties?.visible?.toString() ?? "true"}
           onChange={(e) => handleChange("visible", e.target.value)}
           label="Visible (Optional)"
         >
@@ -193,7 +194,7 @@ export default function TextCaptionPropertyForm({
       <FormControl fullWidth size="small" disabled={isMarkdown}>
         <InputLabel>Font Weight (Optional)</InputLabel>
         <Select
-          value={isMarkdown ? "normal" : (component.properties?.fontWeight ?? "")}
+          value={isMarkdown ? "" : (component.properties?.fontWeight ?? "")}
           onChange={(e) => handleChange("fontWeight", e.target.value)}
           label="Font Weight (Optional)"
         >
@@ -207,7 +208,7 @@ export default function TextCaptionPropertyForm({
       <FormControl fullWidth size="small" disabled={isMarkdown}>
         <InputLabel>Strike Through (Optional)</InputLabel>
         <Select
-          value={isMarkdown ? "false" : (component.properties?.strikethrough || null)}
+          value={isMarkdown ? "" : (component.properties?.strikethrough ?? "")}
           onChange={(e) => handleChange("strikethrough", e.target.value)}
           label="Strike Through (Optional)"
         >
@@ -219,7 +220,7 @@ export default function TextCaptionPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Markdown (Optional)</InputLabel>
         <Select
-          value={component.properties?.markdown ?? "false"}
+          value={component.properties?.markdown?.toString() ?? "false"}
           onChange={(e) => handleChange("markdown", e.target.value)}
           label="Markdown (Optional)"
         >
