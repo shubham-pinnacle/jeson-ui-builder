@@ -306,6 +306,8 @@ const Builder: React.FC<BuilderProps> = ({
         
       case 'date-picker':
           return <ComponentContent>{component.properties?.label || component.properties?.text || 'No Content'}</ComponentContent>;
+      case 'calendar-picker':
+          return <ComponentContent>{component.properties?.label || component.properties?.text || 'No Content'}</ComponentContent>;
       default:
         return null;
     }

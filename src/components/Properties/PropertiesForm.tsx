@@ -31,6 +31,7 @@ import PhotoPropertyForm from "./PropertyFormComponents/PhotoPropertyForm";
 import DocumentPropertyForm from "./PropertyFormComponents/DocumentPropertyForm";
 import ImagePropertyForm from "./PropertyFormComponents/ImagePropertyForm";
 import DatePickerPropertyForm from "./PropertyFormComponents/DatePickerPropertyForm";
+import CalendarPickerPropertyForm from "./PropertyFormComponents/CalendarPickerPropertyForm";
 import IfElseFields           from "./PropertyFormComponents/IfElseFields";
 import SwitchFields           from "./PropertyFormComponents/SwitchFields";
 import UserDetailsFields      from "./PropertyFormComponents/UserDetailsFields";
@@ -61,6 +62,7 @@ const fieldComponentMap: Record<string, React.FC<any>> = {
   DocumentPicker:  DocumentPropertyForm,
   image:           ImagePropertyForm,
   "date-picker":   DatePickerPropertyForm,
+  "calendar-picker": CalendarPickerPropertyForm,
   "if-else":       IfElseFields,
   switch:          SwitchFields,
   "user-details":  UserDetailsFields,

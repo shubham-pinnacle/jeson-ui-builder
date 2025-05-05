@@ -693,6 +693,27 @@ function App() {
             helperText: "",
         };
         break;
+      case "calendar-picker":
+          newComponent.properties = { 
+            label: "",
+            title: "",
+            description: "",
+            outputVariable: "",
+            mode: "single",
+            initValue: null,
+            visible: true,
+            enabled: true,
+            required: "false",
+            minDate: null,
+            maxDate: null,
+            unavailableDates: [],
+            includeDays: "",
+            minDays: "",
+            maxDays: "",
+            helperText: "",
+            errorMessage: "",
+        };
+        break;
 
 
     }
@@ -1769,6 +1790,71 @@ function App() {
                       "unavailable-dates": component.properties.unavailableDates || [],
                       "helper-text": component.properties["helper-text"] || component.properties.helperText || "",
                     };
+                  case "calendar-picker":
+                    const calendarPickerJson: any = {
+                      type: "CalendarPicker",
+                      label: component.properties.label || "",
+                      name: component.properties.outputVariable || "",
+                      visible,
+                      enabled,
+                      mode: component.properties.mode || "single",
+                      ...(component.properties?.required !== undefined
+                        ? { required }
+                        : {}),
+                      ...(component.properties?.title
+                        ? { "title": component.properties.title }
+                        : {}),
+                      ...(component.properties?.description
+                        ? { "description": component.properties.description }
+                        : {}),
+                      ...(component.properties?.minDate
+                        ? { "min-date": component.properties.minDate }
+                        : {}),
+                      ...(component.properties?.maxDate
+                        ? { "max-date": component.properties.maxDate }
+                        : {}),
+                      "unavailable-dates": component.properties.unavailableDates || [],
+                      "helper-text": component.properties["helper-text"] || component.properties.helperText || "",
+                      ...(component.properties?.errorMessage
+                        ? { "error-message": component.properties.errorMessage }
+                        : {}),
+                    };
+                    
+                    // Add range-specific properties if mode is range
+                    if (component.properties.mode === "range") {
+                      if (component.properties?.includeDays) {
+                        calendarPickerJson["include-days"] = component.properties.includeDays;
+                      }
+                      if (component.properties?.minDays) {
+                        calendarPickerJson["min-days"] = parseInt(component.properties.minDays) || 0;
+                      }
+                      if (component.properties?.maxDays) {
+                        calendarPickerJson["max-days"] = parseInt(component.properties.maxDays) || 0;
+                      }
+                    }
+                    
+                    // Handle init-value based on mode
+                    if (component.properties?.initValue) {
+                      if (component.properties.mode === "single") {
+                        calendarPickerJson["init-value"] = component.properties.initValue;
+                      } else {
+                        // For range mode, the initValue is already a JSON string
+                        try {
+                          const rangeValue = JSON.parse(component.properties.initValue);
+                          calendarPickerJson["init-value"] = rangeValue;
+                        } catch (e) {
+                          // If parsing fails, don't add init-value
+                        }
+                      }
+                    }
+                    
+                    // Add on-select-action for data_exchange
+                    calendarPickerJson["on-select-action"] = {
+                      name: "data_exchange",
+                      payload: {}
+                    };
+                    
+                    return calendarPickerJson;
 
                   case "user-details":
                     return {

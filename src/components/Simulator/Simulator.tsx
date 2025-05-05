@@ -27,6 +27,7 @@ import SimulatorFilePicker        from './SimulatorComponents/SimulatorFilePicke
 import SimulatorImage             from './SimulatorComponents/SimulatorImage';
 import SimulatorEmbeddedLink      from './SimulatorComponents/SimulatorEmbeddedLink';
 import SimulatorDatePicker        from './SimulatorComponents/SimulatorDatePicker';
+import SimulatorCalendarPicker    from './SimulatorComponents/SimulatorCalendarPicker';
 
 interface SimulatorProps {
   components: Component[];
@@ -49,6 +50,7 @@ const componentMap: { [key: string]: React.FC<{ component: Component }> } = {
   image:             SimulatorImage,
   'embedded-link':   SimulatorEmbeddedLink,
   'date-picker':     SimulatorDatePicker,
+  'calendar-picker':  SimulatorCalendarPicker,
 };
 
 const Simulator: React.FC<SimulatorProps> = ({ components, screenTitle }) => {
@@ -62,7 +64,7 @@ const Simulator: React.FC<SimulatorProps> = ({ components, screenTitle }) => {
     if (!Renderer) return null;
     
     // Wrap input components with floating labels
-    const inputComponents = ['text-input', 'text-area', 'drop-down', 'date-picker'];
+    const inputComponents = ['text-input', 'text-area', 'drop-down', 'date-picker', 'calendar-picker'];
     if (inputComponents.includes(component.type) && component.properties?.label) {
       return (
         <FloatingLabelContainer key={component.id}>
