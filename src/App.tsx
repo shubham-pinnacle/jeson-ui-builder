@@ -298,7 +298,7 @@ function App() {
           newComponent.properties = {
             text: "",
             visible: true,
-            strikethrough: null,
+            strikethrough: undefined,
             fontWeight: "",
             markdown: false,
           };
@@ -307,7 +307,7 @@ function App() {
           newComponent.properties = {
             text: "",
             visible: true,
-            strikethrough: null,
+            strikethrough: undefined,
             fontWeight: "",
             markdown: false,
           };
@@ -528,7 +528,7 @@ function App() {
         newComponent.properties = {
           text: "",
           visible: true,
-          strikethrough: null,
+          strikethrough: undefined,
           fontWeight: "",
           markdown: false,
         };
@@ -537,7 +537,7 @@ function App() {
         newComponent.properties = {
           text: "",
           visible: true,
-          strikethrough: null,
+          strikethrough: undefined,
           fontWeight: "",
           markdown: false,
         };
@@ -938,7 +938,7 @@ function App() {
                     ...prevComponent?.properties,
                     ...(child.text !== undefined && { text: child.text }),
                     ...(child.visible !== undefined && { visible: child.visible }),
-                    ...(child.fontWeight !== undefined && { fontWeight: child.fontWeight }),
+                    ...(child["font-weight"]!== undefined && { fontWeight: child["font-weight"] }),
                     ...(child.strikethrough !== undefined && { strikethrough: child.strikethrough }),
                     ...(child.markdown !== undefined && { markdown: child.markdown }),
                   };
@@ -956,7 +956,7 @@ function App() {
                     ...prevComponent?.properties,
                     ...(child.text !== undefined && { text: child.text }),
                     ...(child.visible !== undefined && { visible: child.visible }),
-                    ...(child.fontWeight !== undefined && { fontWeight: child.fontWeight }),
+                    ...(child["font-weight"] !== undefined && { fontWeight: child["font-weight"] }),
                     ...(child.strikethrough !== undefined && { strikethrough: child.strikethrough }),
                     ...(child.markdown !== undefined && { markdown: child.markdown }),
                   };
@@ -1386,13 +1386,19 @@ function App() {
                     : true;
 
                 const strikethrough =
-                  component.properties?.strikethrough === null ? null :
+                  component.properties?.strikethrough === undefined ? undefined :
                     component.properties?.strikethrough === false || component.properties?.strikethrough === "false"
                       ? false
                       : true;
 
+                // const markdown =
+                //   component.properties?.markdown === null ? null : component.properties?.markdown === "false" ||
+                //     component.properties?.markdown === false
+                //     ? false
+                //     : true;
+
                 const markdown =
-                  component.properties?.markdown === null ? null : component.properties?.markdown === "false" ||
+                   component.properties?.markdown === "false" ||
                     component.properties?.markdown === false
                     ? false
                     : true;
@@ -1427,12 +1433,12 @@ function App() {
                   case "text-body":
                     return {
                       type: "TextBody",
-                      text: component.properties.text || "",
+                      text: component.properties.text ?? "",
                       visible,
                       ...(component.properties?.fontWeight
                         ? { "font-weight": component.properties.fontWeight }
                         : {}),
-                      ...(component.properties?.strikethrough
+                      ...(component.properties?.strikethrough != undefined
                         ? { "strikethrough": strikethrough }
                         : {}),
                       markdown
@@ -1440,12 +1446,12 @@ function App() {
                   case "text-caption":
                     return {
                       type: "TextCaption",
-                      text: component.properties.text || "",
+                      text: component.properties.text ?? "",
                       visible,
                       ...(component.properties?.fontWeight
                         ? { "font-weight": component.properties.fontWeight }
                         : {}),
-                      ...(component.properties?.strikethrough
+                      ...(component.properties?.strikethrough != undefined
                         ? { "strikethrough": strikethrough }
                         : {}),
                       markdown,
