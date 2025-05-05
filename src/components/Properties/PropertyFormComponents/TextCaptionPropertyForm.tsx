@@ -1,4 +1,5 @@
-import { Stack, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import LimitedTextField from './LimitedTextField';
 import { FieldRendererProps } from "./FieldRendererProps";
 
 export default function TextCaptionPropertyForm({
@@ -12,21 +13,15 @@ export default function TextCaptionPropertyForm({
   const isOverLimit = text.length > maxLength;
   return (
     <Stack spacing={2}>
-      <TextField
-        label = "Text Caption" 
+      <LimitedTextField
+        field="text"
+        label="Text Caption"
         required
         fullWidth
         value={component.properties?.text || ""}
-        onChange={(e) => handleChange("text", e.target.value)}
+        onFieldChange={handleChange}
         size="small"
-        error={isOverLimit}
-        helperText={`${text.length}/${maxLength} characters`}
-        FormHelperTextProps={{
-          sx: {
-            color: isOverLimit ? 'red' : 'text.secondary',
-            fontWeight: isOverLimit ? 600 : 400,
-          },
-        }}
+        maxChars={409}
       />
 
       <FormControl fullWidth size="small">

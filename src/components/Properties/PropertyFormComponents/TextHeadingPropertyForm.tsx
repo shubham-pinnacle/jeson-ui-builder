@@ -1,4 +1,5 @@
-import { Stack, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import LimitedTextField from './LimitedTextField';
 import { FieldRendererProps } from "./FieldRendererProps";
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,7 +22,6 @@ export default function TextHeadingPropertyForm({
   const isEmpty = touched && trimmedText === "";
 
   const handleChange = (value: string) => {
-    setTouched(true);
     if (value.length <= maxChars) {
       dispatch(setText(value));       
       h("text", value);               
@@ -30,26 +30,14 @@ export default function TextHeadingPropertyForm({
 
   return (
     <Stack spacing={2}>
-      <TextField
+      <LimitedTextField
+        field="text"
         label="Text Heading"
         required
         fullWidth
         value={text}
-        onChange={(e) => handleChange(e.target.value)}
+        onFieldChange={(field, val) => { setTouched(true); handleChange(val); }}
         size="small"
-        error={isOverLimit || isEmpty}
-        helperText={
-          isEmpty
-            ? "Text Heading cannot be empty."
-            : `${text.length}/${maxChars} characters`
-        }
-        FormHelperTextProps={{
-          sx: {
-            color: isOverLimit || isEmpty ? "error.main" : "text.secondary",
-            fontWeight: isOverLimit || isEmpty ? 600 : 400,
-          },
-        }}
-        onBlur={() => setTouched(true)}
       />
       <FormControl fullWidth size="small">
         <InputLabel>Visible</InputLabel>

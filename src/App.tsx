@@ -641,7 +641,7 @@ function App() {
         };
         break;
       case "PhotoPicker":
-        newComponent.properties = {
+        newComponent.properties = { 
           label: "",
           description: "",
           outputVariable: "",
@@ -846,6 +846,21 @@ function App() {
           }
         });
       });
+
+      let hasSpace = false;
+      parsedJson.screens.forEach((screen: any) => {
+        screen.components.forEach((comp: any) => {
+          const ov = comp.properties?.outputVariable;
+          if (typeof ov === 'string' && ov.includes(' ')) {
+            hasSpace = true;
+          }
+        });
+      });
+
+      if (hasSpace) {
+        showToast({ message: 'Output Variable cannot contain spaces', type: 'error' });
+        return;
+      }
 
       const newScreens = parsedJson.screens.map((screen: any) => {
         const prevScreen = screens.find(s => s.id === screen.id);
@@ -1176,10 +1191,8 @@ function App() {
                     ...(child["allowed-mime-types"]
                       ? { "allowed-mime-types": child["allowed-mime-types"] }
                       : {}),
-                    "min-uploaded-documents":
-                      parseInt(child["min-uploaded-documents"]) || 0,
-                    "max-uploaded-documents":
-                      parseInt(child["max-uploaded-documents"]) || 30,
+                    "min-uploaded-documents": parseInt(child["min-uploaded-documents"]) || 0,
+                    "max-uploaded-documents": parseInt(child["max-uploaded-documents"]) || 30,
                     "max-file-size-kb":
                       parseInt(child["max-file-size-kb"]) || 10240,
                   };
@@ -1192,87 +1205,133 @@ function App() {
                     properties,
                   };
 
-                case "PhotoPicker":
-                  type = "PhotoPicker";
-                  properties = {
-                    label: child.label || "",
-                    description: child.description || "",
-                    outputVariable: child.name || "",
-                    photoSource: child["photo-source"] || "camera_gallery",
-                    minPhotos: child["min-uploaded-photos"] || "0",
-                    maxPhotos: child["max-uploaded-photos"] || "30",
-                    maxFileSize:
-                      child["max-file-size-kb"] || "10", // Convert back to MB
-                    visible: child.visible ?? true,
-                    enabled: child.enabled ?? true,
-                  };
-                  return {
-                    id: prevComponent?.id || componentId,
-                    type,
-                    name: type
-                      .replace(/-/g, " ")
-                      .replace(/\b\w/g, (l) => l.toUpperCase()),
-                    properties,
-                  };
 
-                case "DatePicker":
-                  type = "date-picker";
-                  properties = {
-                    label: child.label || "",
-                    outputVariable: child.name || "",
-                    initValue: child['init-value'] || null,
-                    visible: child.visible ?? true,
-                    enabled: child.enabled ?? true,
-                    minDate: child['min-date'] || null,
-                    maxDate: child['max-date'] || null,
-                    unavailableDates: child['unavailable-dates'] || [],
-                    helperText: child['helper-text'] || ""
-                  };
+
+                case "if-else":
                   return {
-                    id: prevComponent?.id || componentId,
-                    type,
-                    name: type
-                      .replace(/-/g, " ")
-                      .replace(/\b\w/g, (l) => l.toUpperCase()),
-                    properties,
-                  };
+                      type: "If-Else",
+                      "condition-name":
+                        component.properties.conditionName || "",
+                      condition: {
+                        compare: component.properties.compareToVariable || "",
+                        operator: component.properties.condition1 || "",
+                        value: component.properties.compareWithValue || "",
+                      },
+                      success: component.properties.success || true,
+                      failure: component.properties.failure || false,
+                    };
+                  case "switch":
+                    return {
+                      type: "Switch",
+                      "switch-on": component.properties.switchOn || "",
+                      "compare-to-variable":
+                        component.properties.compareToVariable || "",
+                      cases: component.properties.cases || ["default"],
+                    };
+                  case "opt-in":
+                    const optInJson = {
+                      type: "OptIn",
+                      name: component.properties.outputVariable || "",
+                      label: component.properties?.label || "",
+                      ...(component.properties?.required
+                        ? { "required": required }
+                        : {}),
+                      visible,
+                      ...(component.properties?.initValue
+                        ? { "init-value": intiValueOptIn }
+                        : {}),
+                      // "init-value": component.properties?.initValue === "true"
+                    };
+
+                    // Add on-click-action if it's not none
+                    if (component.properties?.onClick && component.properties.onClick !== "none") {
+                      if (component.properties.onClick === "navigate") {
+                        optInJson["on-click-action"] = {
+                          name: "navigate",
+                          next: {
+                            type: "screen",
+                            name: component.properties?.screenName || ""
+                          },
+                          payload: {}
+                        };
+                      } else if (component.properties.onClick === "open_url") {
+                        optInJson["on-click-action"] = {
+                          name: "open_url",
+                          url: component.properties?.url || "",
+                          payload: {}
+                        };
+                      } else if (component.properties.onClick === "data_exchange") {
+                        optInJson["on-click-action"] = {
+                          name: "data_exchange",
+                          payload: {}
+                        };
+                      }
+                    }
+
+                    // // Add select/unselect actions
+                    // optInJson["on-select-action"] = {
+                    //   name: "update_data",
+                    //   payload: {}
+                    // };
+                    // optInJson["on-unselect-action"] = {
+                    //   name: "update_data",
+                    //   payload: {}
+                    // };
+
+                    return optInJson;
+                  case "date-picker":
+                    return {
+                      type: "DatePicker",
+                      label: component.properties.label || "",
+                      name: component.properties.outputVariable || "",
+                      visible,
+                      enabled,
+                      ...(component.properties?.minDate
+                        ? { "min-date": component.properties.minDate }
+                        : {}),
+                      ...(component.properties?.initValue
+                        ? { "init-value": component.properties.initValue }
+                        : {}),
+                      ...(component.properties?.maxDate
+                        ? { "max-date": component.properties.maxDate }
+                        : {}),
+                      "unavailable-dates": component.properties.unavailableDates || [],
+                      "helper-text": component.properties["helper-text"] || component.properties.helperText || "",
+                    };
 
                   case "user-details":
-                    type = "user-details";
-                    properties = {
-                      name: child.name || "",
-                      email: child.email || "",
-                      address: child.address || "",
-                      dateOfBirth: child.dateOfBirth || "",
-                    };
                     return {
-                      id: prevComponent?.id || componentId,
-                      type,
-                      name: type
-                        .replace(/-/g, " ")
-                        .replace(/\b\w/g, (l) => l.toUpperCase()),
-                      properties,
+                      type: "UserDetails",
+                      fields: [
+                        {
+                          type: "TextInput",
+                          label: "Name",
+                          name: "name",
+                          required: true,
+                        },
+                        {
+                          type: "TextInput",
+                          label: "Email",
+                          name: "email",
+                          required: true,
+                        },
+                        {
+                          type: "TextArea",
+                          label: "Address",
+                          name: "address",
+                        },
+                        {
+                          type: "DatePicker",
+                          label: "Date Of Birth",
+                          name: "dateOfBirth",
+                        },
+                      ],
                     };
-                default:
-                  return null;
-              }
-
-
-            // Use the stable ID generated at the beginning or preserve original ID
-              return {
-                id:
-                  child.id ||
-                  `component_${Date.now()}_${Math.random()
-                    .toString(36)
-                    .substr(2, 9)}`,
-                type,
-                name: type
-                  .replace(/-/g, " ")
-                  .replace(/\b\w/g, (l) => l.toUpperCase()),
-                properties,
-              };
-            })
-            .filter((c): c is Component => c !== null),
+                  default:
+                    return null;
+                }
+              })
+              .filter((c): c is Component => c !== null),
           };
       });
 

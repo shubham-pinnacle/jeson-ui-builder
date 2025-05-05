@@ -1,4 +1,5 @@
 import { Stack, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import LimitedTextField from './LimitedTextField';
 import { FieldRendererProps } from "./FieldRendererProps";
 
 export default function PhotoPropertyForm({
@@ -15,43 +16,31 @@ export default function PhotoPropertyForm({
 
   return (
     <Stack spacing={2}>
-      <TextField
+      <LimitedTextField
+        field="label"
         label="Label"
         required
         fullWidth
         value={component.properties?.label || ""}
-        onChange={(e) => handleChange("label", e.target.value)}
+        onFieldChange={handleChange}
         size="small"
-        error={isOverLimit}
-        helperText={`${text.length}/${maxChars} characters`}
-        FormHelperTextProps={{
-          sx: {
-            color: isOverLimit ? 'red' : 'text.secondary',
-            fontWeight: isOverLimit ? 600 : 400,
-          },
-        }}
       />
-      <TextField
+      <LimitedTextField
+        field="description"
         label="Description (Optional)"
         fullWidth
         value={component.properties?.description || ""}
-        onChange={(e) => handleChange("description", e.target.value)}
+        onFieldChange={handleChange}
         size="small"
-        error={isDescriptionOverLimit}
-        helperText={`${descriptionText.length}/${descriptionMaxChars} characters`}
-        FormHelperTextProps={{
-          sx: {
-            color: isDescriptionOverLimit ? 'red' : 'text.secondary',
-            fontWeight: isDescriptionOverLimit ? 600 : 400,
-          },
-        }}
       />
-      <TextField
+      <LimitedTextField
+        field="outputVariable"
         label="Output Variable"
         required
         fullWidth
         value={component.properties?.outputVariable || ""}
-        onChange={(e) => handleChange("outputVariable", e.target.value)}
+        onFieldChange={handleChange}
+        forbidSpaces
         size="small"
       />
       <FormControl fullWidth size="small">

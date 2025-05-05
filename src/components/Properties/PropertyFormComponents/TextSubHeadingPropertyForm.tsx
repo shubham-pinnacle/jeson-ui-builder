@@ -1,4 +1,5 @@
-import { Stack, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import LimitedTextField from './LimitedTextField';
 import { FieldRendererProps } from "./FieldRendererProps";
 
 export default function TextSubHeadingFields({
@@ -11,24 +12,14 @@ export default function TextSubHeadingFields({
 
   return (
     <Stack spacing={2}>
-      <TextField
+      <LimitedTextField
+        field="text"
         label="Text SubHeading"
-        required fullWidth
+        required
+        fullWidth
         value={component.properties?.text || ""}
-        onChange={e => {
-          if (e.target.value.length <= maxChars) {
-            h("text", e.target.value);
-          }
-        }}
+        onFieldChange={(field, val) => h(field, val)}
         size="small"
-        error={isOverLimit}
-        helperText={`${text.length}/${maxChars} characters`}
-        FormHelperTextProps={{
-          sx: {
-            color: isOverLimit ? 'red' : 'text.secondary',
-            fontWeight: isOverLimit ? 600 : 400,
-          },
-        }}
       />
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>

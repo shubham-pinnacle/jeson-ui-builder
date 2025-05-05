@@ -1,5 +1,6 @@
 import React from "react";
-import { Stack, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import LimitedTextField from './LimitedTextField';
 import { FieldRendererProps } from "./FieldRendererProps";
 
 export default function TextBodyPropertyForm({
@@ -8,26 +9,20 @@ export default function TextBodyPropertyForm({
 }: Pick<FieldRendererProps, "component" | "onPropertyChange">) {
   const handleChange = (prop: string, value: any) => h(prop, value);
   const text = component.properties?.text || "";
-  const maxChars = 4603;
+  const maxChars = 4096;
   const isOverLimit = text.length > maxChars;
 
   return (
     <Stack spacing={2}>
-      <TextField
-        label = "Text Body" 
+      <LimitedTextField
+        field="text"
+        label="Text Body"
         required
         fullWidth
         value={component.properties?.text || ""}
-        onChange={(e) => handleChange("text", e.target.value)}
+        onFieldChange={handleChange}
         size="small"
-        error={isOverLimit}
-        helperText={`${text.length}/${maxChars} characters`}
-        FormHelperTextProps={{
-          sx: {
-            color: isOverLimit ? 'red' : 'text.secondary',
-            fontWeight: isOverLimit ? 600 : 400,
-          },
-        }}
+        maxChars={4096}
       />
 
       <FormControl fullWidth size="small">

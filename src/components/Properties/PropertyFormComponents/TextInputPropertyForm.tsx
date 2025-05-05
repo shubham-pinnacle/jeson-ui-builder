@@ -1,55 +1,56 @@
 import { Stack, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import LimitedTextField from './LimitedTextField';
 import { FieldRendererProps } from "./FieldRendererProps";
+import { useToast } from '../../ToastContext';
+import { useState } from 'react';
 
 export default function TextInputPropertyForm({
   component,
   onPropertyChange: h,
 }: Pick<FieldRendererProps, "component" | "onPropertyChange">) {
-  const handleChange = (prop: string, value: any) => h(prop, value);
-
-  const getHelperText = (field: string, limit: number) => {
-    const value = component.properties?.[field] || "";
-    return `${value.length}/${limit} characters`;
+  const { showToast } = useToast();
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const handleChange = (prop: string, value: any) => {
+    if (typeof value === 'string' && value.length > 80) {
+      const trimmed = value.slice(0, 80);
+      h(prop, trimmed);
+      setErrors(prev => ({ ...prev, [prop]: true }));
+      showToast({ message: `${prop} cannot exceed 80 characters`, type: 'error' });
+    } else {
+      h(prop, value);
+      setErrors(prev => ({ ...prev, [prop]: false }));
+    }
   };
 
-  const isOverLimit = (field: string, limit: number) => {
-    const value = component.properties?.[field] || "";
-    return value.length > limit;
-  };
-  
   return (
     <Stack spacing={2}>
-      <TextField
+      <LimitedTextField
+        field="label"
         label="Label"
         required
         fullWidth
         value={component.properties?.label || ""}
-        onChange={(e) => handleChange("label", e.target.value)}
+        onFieldChange={handleChange}
         size="small"
-        error={isOverLimit("label", 20)}
-        helperText={getHelperText("label", 20)}
-        FormHelperTextProps={{
-          sx: {
-            color: isOverLimit("label", 20) ? "red" : "text.secondary",
-            fontWeight: isOverLimit("label", 20) ? 600 : 400,
-          },
-        }}
       />
 
-      <TextField
+      <LimitedTextField
+        field="outputVariable"
         label="Output Variable"
         required
         fullWidth
         value={component.properties?.outputVariable || ""}
-        onChange={(e) => handleChange("outputVariable", e.target.value)}
+        onFieldChange={handleChange}
+        forbidSpaces
         size="small"
       />
 
-      <TextField
+      <LimitedTextField
+        field="initValue"
         label="Init Value (Optional)"
         fullWidth
         value={component.properties?.initValue || ""}
-        onChange={(e) => handleChange("initValue", e.target.value)}
+        onFieldChange={handleChange}
         size="small"
       />
 
@@ -65,7 +66,6 @@ export default function TextInputPropertyForm({
         </Select>
       </FormControl>
 
-      
       <FormControl fullWidth size="small">
         <InputLabel>Input Type (Optional)</InputLabel>
         <Select
@@ -81,7 +81,6 @@ export default function TextInputPropertyForm({
           <MenuItem value="phone">Phone</MenuItem>
         </Select>
       </FormControl>
-      
 
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>
@@ -95,40 +94,32 @@ export default function TextInputPropertyForm({
         </Select>
       </FormControl>
 
-      
-        <TextField
-          label="Min-Chars (Optional)"
-          type="number"
-          fullWidth
-          value={component.properties?.minChars === undefined ? "" : component.properties.minChars}
-          onChange={(e) => handleChange("minChars", Number(e.target.value))}
-          size="small"
-        />
-
-        <TextField
-          label="Max-Chars (Optional)"
-          type="number"
-          fullWidth
-          value={component.properties?.maxChars === undefined ? 80 : component.properties.maxChars}
-          onChange={(e) => handleChange("maxChars", Number(e.target.value))}
-          size="small"
-        />
-        
+      <TextField
+        label="Min-Chars (Optional)"
+        type="number"
+        fullWidth
+        value={component.properties?.minChars === undefined ? "" : component.properties.minChars}
+        onChange={(e) => handleChange("minChars", Number(e.target.value))}
+        size="small"
+      />
 
       <TextField
+        label="Max-Chars (Optional)"
+        type="number"
+        fullWidth
+        value={component.properties?.maxChars === undefined ? 80 : component.properties.maxChars}
+        onChange={(e) => handleChange("maxChars", Number(e.target.value))}
+        size="small"
+      />
+
+      <LimitedTextField
+        field="helperText"
         label="Helper Text (Optional)"
         fullWidth
         value={component.properties?.helperText || ""}
-        onChange={(e) => handleChange("helperText", e.target.value)}
+        onFieldChange={handleChange}
         size="small"
-        error={isOverLimit("helperText", 80)}
-        helperText={getHelperText("helperText", 80)}
-        FormHelperTextProps={{
-          sx: {
-            color: isOverLimit("helperText", 80) ? "red" : "text.secondary",
-            fontWeight: isOverLimit("helperText", 80) ? 600 : 400,
-          },
-        }}
+        maxChars={30}
       />
     </Stack>
   );
