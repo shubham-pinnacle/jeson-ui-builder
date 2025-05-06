@@ -1356,6 +1356,7 @@ function App() {
 
     return {
       version: "7.0",
+      data_api_version: "3.0",
       routing_model: routingModel,
       screens: screens.map((screen, index) => {
         const isLastScreen = index === screens.length - 1;
@@ -1791,68 +1792,140 @@ function App() {
                       "helper-text": component.properties["helper-text"] || component.properties.helperText || "",
                     };
                   case "calendar-picker":
+                    // Base properties for both modes
                     const calendarPickerJson: any = {
                       type: "CalendarPicker",
-                      label: component.properties.label || "",
                       name: component.properties.outputVariable || "",
                       visible,
                       enabled,
                       mode: component.properties.mode || "single",
-                      ...(component.properties?.required !== undefined
-                        ? { required }
-                        : {}),
-                      ...(component.properties?.title
-                        ? { "title": component.properties.title }
-                        : {}),
-                      ...(component.properties?.description
-                        ? { "description": component.properties.description }
-                        : {}),
-                      ...(component.properties?.minDate
-                        ? { "min-date": component.properties.minDate }
-                        : {}),
-                      ...(component.properties?.maxDate
-                        ? { "max-date": component.properties.maxDate }
-                        : {}),
-                      "unavailable-dates": component.properties.unavailableDates || [],
-                      "helper-text": component.properties["helper-text"] || component.properties.helperText || "",
-                      ...(component.properties?.errorMessage
-                        ? { "error-message": component.properties.errorMessage }
-                        : {}),
                     };
                     
-                    // Add range-specific properties if mode is range
-                    if (component.properties.mode === "range") {
-                      if (component.properties?.includeDays) {
-                        calendarPickerJson["include-days"] = component.properties.includeDays;
+                    // Handle mode-specific properties
+                    if (component.properties.mode === "single") {
+                      // Single mode properties
+                      calendarPickerJson.label = component.properties.label || "";
+                      
+                      if (component.properties?.helperText) {
+                        calendarPickerJson["helper-text"] = component.properties.helperText;
                       }
+                      
+                      if (component.properties?.required !== undefined) {
+                        calendarPickerJson.required = required;
+                      }
+                      
+                      if (component.properties?.minDate) {
+                        calendarPickerJson["min-date"] = component.properties.minDate;
+                      }
+                      
+                      if (component.properties?.maxDate) {
+                        calendarPickerJson["max-date"] = component.properties.maxDate;
+                      }
+                      
+                      if (component.properties?.unavailableDates && component.properties.unavailableDates.length > 0) {
+                        calendarPickerJson["unavailable-dates"] = component.properties.unavailableDates;
+                      }
+                      
+                      if (component.properties?.includeDays) {
+                        const includeDays = typeof component.properties.includeDays === 'string' 
+                          ? component.properties.includeDays.split(',').map(day => day.trim()) 
+                          : component.properties.includeDays;
+                        calendarPickerJson["include-days"] = includeDays;
+                      }
+                      
+                      if (component.properties?.initValue) {
+                        calendarPickerJson["init-value"] = component.properties.initValue;
+                      }
+                      
+                      // Add on-select-action for data_exchange
+                      calendarPickerJson["on-select-action"] = {
+                        name: "data_exchange",
+                        payload: {
+                          selected_date: "{{value}}"
+                        }
+                      };
+                    } else {
+                      // Range mode properties
+                      if (component.properties?.title) {
+                        calendarPickerJson.title = component.properties.title;
+                      }
+                      
+                      if (component.properties?.description) {
+                        calendarPickerJson.description = component.properties.description;
+                      }
+                      
+                      // Handle label as object for range mode
+                      calendarPickerJson.label = {
+                        "start-date": component.properties?.labelStartDate || "Start Date",
+                        "end-date": component.properties?.labelEndDate || "End Date"
+                      };
+                      
+                      // Handle helper-text as object for range mode
+                      if (component.properties?.helperTextStartDate || component.properties?.helperTextEndDate) {
+                        calendarPickerJson["helper-text"] = {
+                          "start-date": component.properties?.helperTextStartDate || "",
+                          "end-date": component.properties?.helperTextEndDate || ""
+                        };
+                      }
+                      
+                      // Handle required as object for range mode
+                      if (component.properties?.requiredStartDate !== undefined || component.properties?.requiredEndDate !== undefined) {
+                        calendarPickerJson.required = {
+                          "start-date": component.properties?.requiredStartDate === "true" || component.properties?.requiredStartDate === true,
+                          "end-date": component.properties?.requiredEndDate === "true" || component.properties?.requiredEndDate === true
+                        };
+                      }
+                      
+                      if (component.properties?.minDate) {
+                        calendarPickerJson["min-date"] = component.properties.minDate;
+                      }
+                      
+                      if (component.properties?.maxDate) {
+                        calendarPickerJson["max-date"] = component.properties.maxDate;
+                      }
+                      
+                      if (component.properties?.unavailableDates && component.properties.unavailableDates.length > 0) {
+                        calendarPickerJson["unavailable-dates"] = component.properties.unavailableDates;
+                      }
+                      
+                      if (component.properties?.includeDays) {
+                        const includeDays = typeof component.properties.includeDays === 'string' 
+                          ? component.properties.includeDays.split(',').map(day => day.trim()) 
+                          : component.properties.includeDays;
+                        calendarPickerJson["include-days"] = includeDays;
+                      }
+                      
                       if (component.properties?.minDays) {
                         calendarPickerJson["min-days"] = parseInt(component.properties.minDays) || 0;
                       }
+                      
                       if (component.properties?.maxDays) {
                         calendarPickerJson["max-days"] = parseInt(component.properties.maxDays) || 0;
                       }
-                    }
-                    
-                    // Handle init-value based on mode
-                    if (component.properties?.initValue) {
-                      if (component.properties.mode === "single") {
-                        calendarPickerJson["init-value"] = component.properties.initValue;
-                      } else {
-                        // For range mode, the initValue is already a JSON string
+                      
+                      // Handle init-value as object for range mode
+                      if (component.properties?.initValue) {
                         try {
                           const rangeValue = JSON.parse(component.properties.initValue);
-                          calendarPickerJson["init-value"] = rangeValue;
+                          calendarPickerJson["init-value"] = {
+                            "start-date": rangeValue["start-date"] || "",
+                            "end-date": rangeValue["end-date"] || ""
+                          };
                         } catch (e) {
                           // If parsing fails, don't add init-value
                         }
                       }
+                      
+                      // Add on-select-action for data_exchange with range-specific payload
+                      calendarPickerJson["on-select-action"] = {
+                        name: "data_exchange",
+                        payload: {
+                          start_date: "{{value.start_date}}",
+                          end_date: "{{value.end_date}}",
+                          days_count: "{{value.days_count}}"
+                        }
+                      };
                     }
-                    
-                    // Add on-select-action for data_exchange
-                    calendarPickerJson["on-select-action"] = {
-                      name: "data_exchange",
-                      payload: {}
-                    };
                     
                     return calendarPickerJson;
 
