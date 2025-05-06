@@ -976,8 +976,8 @@ function App() {
                     ...(child.name !== undefined && { outputVariable: child.name }),
                     ...(child.required !== undefined && { required: child.required }),
                     ...(child['input-type'] !== undefined && { inputType: child['input-type'] }),
-                    ...(child['init-value'] !== undefined && { initValue: child['init-value'] }),
-                    ...(child['helper-text'] !== undefined && {  helperText: child['helper-text'] }),
+                    ...(child['init-value'] !== undefined && { initValue: child["init-value"] }),
+                    ...(child["helper-text"] !== undefined && {  helperText: child["helper-text"] }),
                     visible: child.visible ?? true,
                     // "min-chars":
                     //   child['min-chars'] !== undefined
@@ -1467,8 +1467,14 @@ function App() {
                         ? { required }
                         : {}),
                       "input-type": component.properties.inputType || "text",
-                      "init-value": component.properties["init-value"] || component.properties.initValue || "",
-                      "helper-text": component.properties["helper-text"] || component.properties.helperText || "",
+                      // "init-value": component.properties["init-value"] || component.properties.initValue || "",
+                      ...(component.properties?.initValue
+                        ? { "init-value": component.properties["init-value"] || component.properties.initValue || "" }
+                        : {}),
+                      ...(component.properties?.helperText
+                        ? { "helper-text": component.properties["helper-text"] || component.properties.helperText || "" }
+                        : {}),
+                      // "helper-text": component.properties["helper-text"] || component.properties.helperText || "",
                       visible,
                       // "min-chars":
                       //   component.properties.minChars !== undefined
