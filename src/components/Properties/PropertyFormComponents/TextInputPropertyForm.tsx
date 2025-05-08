@@ -16,6 +16,10 @@ export default function TextInputPropertyForm({
     const value = component.properties?.[field] || "";
     return value.length > limit;
   };
+
+  // ensure we coerce anything (string|number) into a safe string for the input
+  const asString = (v: any, fallback = "") =>
+    v === undefined || v === null ? fallback : String(v);
   
   return (
     <Stack spacing={2}>
@@ -23,7 +27,7 @@ export default function TextInputPropertyForm({
         label="Label"
         required
         fullWidth
-        value={component.properties?.label || ""}
+        value={component.properties?.label ?? ""}
         onChange={(e) => handleChange("label", e.target.value)}
         size="small"
         error={isOverLimit("label", 20)}
@@ -96,23 +100,29 @@ export default function TextInputPropertyForm({
       </FormControl>
 
       
-        <TextField
-          label="Min-Chars (Optional)"
-          type="number"
-          fullWidth
-          value={component.properties?.minChars === undefined ? "" : component.properties.minChars}
-          onChange={(e) => handleChange("minChars", Number(e.target.value))}
-          size="small"
-        />
+      <TextField
+        label="Min‑Chars (Optional)"
+        type="number"
+        fullWidth
+        size="small"
+        // always render a string value
+        value={asString(component.properties?.minChars, "")}
+        // send a true number back into props
+        onChange={(e) =>
+          handleChange("minChars", e.target.value === "" ? undefined : Number(e.target.value))
+        }
+      />
 
-        <TextField
-          label="Max-Chars (Optional)"
-          type="number"
-          fullWidth
-          value={component.properties?.maxChars === undefined ? 80 : component.properties.maxChars}
-          onChange={(e) => handleChange("maxChars", Number(e.target.value))}
-          size="small"
-        />
+      <TextField
+        label="Max‑Chars (Optional)"
+        type="number"
+        fullWidth
+        size="small"
+        value={asString(component.properties?.maxChars, "")}
+        onChange={(e) =>
+          handleChange("maxChars", e.target.value === "" ? undefined : Number(e.target.value))
+        }
+      />
         
 
       <TextField
