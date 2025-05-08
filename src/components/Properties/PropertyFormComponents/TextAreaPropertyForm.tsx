@@ -20,13 +20,17 @@ export default function TextAreaPropertyForm({
   const maxLength = component.properties?.maxLength || 0;
   const isMaxLengthExceeded = maxLength > 600;
 
+  // ensure we coerce anything (string|number) into a safe string for the input
+  const asString = (v: any, fallback = "") =>
+    v === undefined || v === null ? fallback : String(v);
+
   return (
     <Stack spacing={2}>
       <TextField
         label="Label"
         required
         fullWidth
-        value={component.properties?.label || ""}
+        value={component.properties?.label ?? ""}
         onChange={(e) => handleChange("label", e.target.value)}
         size="small"
         error={isOverLimit("label", 20)}
@@ -75,7 +79,7 @@ export default function TextAreaPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>
         <Select
-          value={component.properties?.visible ?? "true"}
+          value={String(component.properties?.visible ?? "true")}
           onChange={(e) => handleChange("visible", e.target.value)}
           label="Visible (Optional)"
         >
@@ -103,8 +107,8 @@ export default function TextAreaPropertyForm({
         label="Max-Length (Optional)"
         type="number"
         fullWidth
-        value={component.properties?.maxLength === undefined ? 80 : component.properties.maxLength}
-        onChange={(e) => handleChange("maxLength", e.target.value)}
+        value={asString(component.properties?.maxLength, "" )}
+        onChange={(e) => handleChange("maxLength", e.target.value === "" ? undefined : Number(e.target.value))}
         size="small"
       />
       

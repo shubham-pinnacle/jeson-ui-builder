@@ -313,7 +313,7 @@ function App() {
           };
           break;
         case "text-input":
-          newComponent.properties = {
+          newComponent.properties = { 
             label: "",
             outputVariable: "",
             required: undefined,
@@ -321,12 +321,12 @@ function App() {
             initValue: "",
             helperText: "",
             visible: true,
-            minChars: null,
+            minChars: 0,
             maxChars: 80,
           };
           break;
         case "text-area":
-          newComponent.properties = {
+          newComponent.properties = { 
             label: "",
             outputVariable: "",
             required: undefined,
@@ -364,7 +364,7 @@ function App() {
           };
           break;
         case "drop-down":
-          newComponent.properties = {
+          newComponent.properties = { 
             label: "",
             description: "",
             name: `dropdown_field_${Date.now()}`,
@@ -543,7 +543,7 @@ function App() {
         };
         break;
       case "text-input":
-        newComponent.properties = {
+        newComponent.properties = { 
           label: "",
           outputVariable: "",
           required: undefined,
@@ -551,12 +551,12 @@ function App() {
           initValue: "",
           helperText: "",
           visible: true,
-          minChars: null,
+          minChars: 0,
           maxChars: 80,
         };
         break;
       case "text-area":
-        newComponent.properties = {
+        newComponent.properties = { 
           label: "",
           outputVariable: "",
           required: undefined,
@@ -568,7 +568,7 @@ function App() {
         };
         break;
       case "check-box":
-        newComponent.properties = {
+        newComponent.properties = { 
           label: "",
           description: "",
           outputVariable: "",
@@ -582,7 +582,7 @@ function App() {
         };
         break;
       case "radio-button":
-        newComponent.properties = {
+        newComponent.properties = { 
           label: "",
           description: "",
           outputVariable: "",
@@ -595,7 +595,7 @@ function App() {
         };
         break;
       case "drop-down":
-        newComponent.properties = {
+        newComponent.properties = { 
           label: "",
           description: "",
           name: `dropdown_field_${Date.now()}`,
@@ -763,7 +763,7 @@ function App() {
     });
 
     setScreens(updatedScreens);
-
+    
     // Update the selected component if it's the one being changed
     if (selectedComponent?.id === componentId) {
       const updatedSelectedComponent = updatedScreens[
@@ -773,7 +773,7 @@ function App() {
         setSelectedComponent(updatedSelectedComponent);
       }
     }
-
+    
     // Update the JSON editor with the new components
     const jsonString = JSON.stringify(generateJson(), null, 2);
     setEditValue(jsonString);
@@ -850,14 +850,14 @@ function App() {
       const newScreens = parsedJson.screens.map((screen: any) => {
         const prevScreen = screens.find(s => s.id === screen.id);
         const layoutChildren = screen.layout?.children || [];
-
+        
         return {
           id: screen.id,
           title: screen.title,
           components: layoutChildren
             .map((child: any) => {
               let type = "";
-              let properties: Record<string, any> = {};
+            let properties: Record<string, any> = {};
               
               // Generate a stable component ID at the beginning
               // Don't include name in ID to prevent breaking component identification when name changes
@@ -901,10 +901,10 @@ function App() {
                 }
               }
 
-              switch (child.type) {
+            switch (child.type) {
                 case "TextHeading":
                   type = "text-heading";
-                  properties = {
+                properties = {
                     ...prevComponent?.properties,
                     ...(child.text !== undefined && { text: child.text }),
                     ...(child.visible !== undefined && { visible: child.visible }),
@@ -919,7 +919,7 @@ function App() {
                   };
                 case "TextSubheading":
                   type = "sub-heading";
-                  properties = {
+                properties = {
                     ...prevComponent?.properties,
                     ...(child.text !== undefined && { text: child.text }),
                     ...(child.visible !== undefined && { visible: child.visible }),
@@ -934,7 +934,7 @@ function App() {
                   };
                 case "TextBody":
                   type = "text-body";
-                  properties = {
+                properties = {
                     ...prevComponent?.properties,
                     ...(child.text !== undefined && { text: child.text }),
                     ...(child.visible !== undefined && { visible: child.visible }),
@@ -952,7 +952,7 @@ function App() {
                   };
                 case "TextCaption":
                   type = "text-caption";
-                  properties = {
+                properties = {
                     ...prevComponent?.properties,
                     ...(child.text !== undefined && { text: child.text }),
                     ...(child.visible !== undefined && { visible: child.visible }),
@@ -970,7 +970,7 @@ function App() {
                   };
                 case "TextInput":
                   type = "text-input";
-                  properties = {
+                properties = {
                     ...prevComponent?.properties,
                     ...(child.label !== undefined && { label: child.label }),
                     ...(child.name !== undefined && { outputVariable: child.name }),
@@ -982,20 +982,62 @@ function App() {
                     // "min-chars":
                     //   child['min-chars'] !== undefined
                     //     ? Number(child['min-chars'])
-                    //     : null,
-                    ...(child['min-chars'] !== undefined
-                      ? {
-                        "min-chars":
-                          child['min-chars'] !== undefined
-                            ? Number(child['min-chars'])
-                            : null
-                      }
-                      : {}),
-                    "max-chars":
-                      child['max-chars'] !== undefined
-                        ? Number(child['max-chars'])
-                        : 80,
+                    //     : 0,
+                    // ...(child['min-chars'] !== undefined
+                    //   ? {
+                    //     "min-chars":
+                    //       child['min-chars'] !== undefined
+                    //         ? Number(child['min-chars'])
+                    //         : undefined
+                    //   }
+                    //   : {}),
+                    // "max-chars":
+                    //   child['max-chars'] !== undefined
+                    //     ? Number(child['max-chars'])
+                    //     : 80,
+
+
+                    // "max-chars":
+                    //   child['max-chars'] !== undefined
+                    //     && Number(child['max-chars']),
+
+                    // ...(child['max-chars'] !== undefined && { 'max-chars': Number(child['max-chars']) }),
+
+                    // map JSON "min-chars" → camelCase minChars
+                  ...(child["min-chars"] !== undefined && {
+                    minChars: Number(child["min-chars"]),
+                  }),
+                
+                  // map JSON "max-chars" → camelCase maxChars
+                  ...(child["max-chars"] !== undefined && {
+                    maxChars: Number(child["max-chars"]),
+                  }),
                   };
+
+                // properties = {
+                //   ...prevComponent?.properties,
+                
+                //   // map JSON "min-chars" → camelCase minChars
+                //   ...(child["min-chars"] !== undefined && {
+                //     minChars: Number(child["min-chars"]),
+                //   }),
+                
+                //   // map JSON "max-chars" → camelCase maxChars
+                //   ...(child["max-chars"] !== undefined && {
+                //     maxChars: Number(child["max-chars"]),
+                //   }),
+                
+                //   label: child.label ?? prevComponent?.properties?.label,
+                //   outputVariable: child.name ?? prevComponent?.properties?.outputVariable,
+                //   required:
+                //     child.required !== undefined
+                //       ? Boolean(child.required)
+                //       : prevComponent?.properties?.required,
+                //   inputType: child["input-type"] ?? prevComponent?.properties?.inputType,
+                //   initValue: child["init-value"] ?? prevComponent?.properties?.initValue,
+                //   helperText: child["helper-text"] ?? prevComponent?.properties?.helperText,
+                //   visible: child.visible ?? prevComponent?.properties?.visible ?? true,
+                // };
 
                   return {
                     id: prevComponent?.id || componentId,
@@ -1007,24 +1049,24 @@ function App() {
                   };
                 case "TextArea":
                   type = "text-area";
-                  properties = {
+                properties = {
                     ...prevComponent?.properties,
                     ...(child.label !== undefined && { label: child.label }),
                     ...(child.name !== undefined && { outputVariable: child.name }),
                     ...(child.required !== undefined && { required: child.required }),
-                    ...(child['init-value'] !== undefined
-                      ? { "init-value": child['init-value'] }
-                      : {}),
-                    ...(child['helper-text'] !== undefined
-                      ? { "helper-text": child['helper-text'] }
-                      : {}),
+                    ...(child["init-value"] !== undefined && { initValue: child["init-value"] }),
+                    ...(child["helper-text"] !== undefined && {  helperText: child["helper-text"] }),
                     visible: child.visible ?? true,
-                    ...(child['max-length'] !== undefined
-                      ? { "max-length": Number(child['max-length']) }
-                      : {}),
-                    ...(child.enabled !== undefined
-                      ? { enabled: child.enabled }
-                      : {}),
+                    // ...(child['max-length'] !== undefined
+                    //   ? { "max-length": Number(child['max-length']) }
+                    //   : {}),
+                    ...(child["max-length"] !== undefined && {
+                      maxLength: Number(child["max-length"]),
+                      }),
+                    // ...(child.enabled !== undefined
+                    //   ? { enabled: child.enabled }
+                    //   : {}),
+                    ...(child.enabled !== undefined && { enabled: child.enabled }),
                   };
                   return {
                     id: prevComponent?.id || componentId,
@@ -1282,13 +1324,13 @@ function App() {
 
 
             // Use the stable ID generated at the beginning or preserve original ID
-              return {
+            return {
                 id:
                   child.id ||
                   `component_${Date.now()}_${Math.random()
                     .toString(36)
                     .substr(2, 9)}`,
-                type,
+              type,
                 name: type
                   .replace(/-/g, " ")
                   .replace(/\b\w/g, (l) => l.toUpperCase()),
@@ -1296,7 +1338,7 @@ function App() {
               };
             })
             .filter((c): c is Component => c !== null),
-          };
+        };
       });
 
 
@@ -1335,7 +1377,7 @@ function App() {
       title: `Screen ${screens.length + 1}`,
       components: [],
     };
-
+    
     setScreens([...screens, newScreen]);
     setActiveScreenIndex(screens.length);
     setSelectedComponent(null);
@@ -1425,8 +1467,8 @@ function App() {
                       visible,
                     };
                   case "sub-heading":
-                    return {
-                      type: "TextSubheading",
+                  return {
+                    type: "TextSubheading",
                       text: component.properties.text || "",
                       visible
                     };
@@ -1444,8 +1486,8 @@ function App() {
                       markdown
                     };
                   case "text-caption":
-                    return {
-                      type: "TextCaption",
+                  return {
+                    type: "TextCaption",
                       text: component.properties.text ?? "",
                       visible,
                       ...(component.properties?.fontWeight
@@ -1479,19 +1521,28 @@ function App() {
                       // "min-chars":
                       //   component.properties.minChars !== undefined
                       //     ? Number(component.properties.minChars)
-                      //     : null,
-                      ...(component.properties?.minChars
-                        ? {
-                          "min-chars":
-                            component.properties.minChars !== undefined
-                              ? Number(component.properties.minChars)
-                              : null
-                        }
-                        : {}),
+                      //     : 0,
+                      // ...(component.properties?.minChars
+                      //   ? {
+                      //     "min-chars":
+                      //       component.properties.minChars !== undefined
+                      //         ? Number(component.properties.minChars)
+                      //         : undefined
+                      //   }
+                      // //   : {}),
+                      // "max-chars":
+                      //   component.properties.maxChars !== undefined
+                      //     ? Number(component.properties.maxChars)
+                      //     : 80,
+                      "min-chars":
+                        component.properties.minChars !== undefined
+                        ? Number(component.properties.minChars)
+                        : 0,
                       "max-chars":
                         component.properties.maxChars !== undefined
-                          ? Number(component.properties.maxChars)
-                          : 80,
+                        ? Number(component.properties.maxChars)
+                        : 80,
+
                     };
 
                   case "text-area":
@@ -1501,10 +1552,10 @@ function App() {
                       label: component.properties.label ?? "",
                       // "init-value": component.properties["init-value"] || component.properties.initValue || "",
 
-                      ...(component.properties?.initValue !== undefined
-                        ? { "init-value": component.properties["init-value"] || component.properties.initValue || "",}
+                      ...(component.properties?.initValue 
+                        ? { "init-value": component.properties["init-value"] || component.properties.initValue || ""}
                         : {}),
-                      ...(component.properties?.helperText !== undefined
+                      ...(component.properties?.helperText 
                         ? { "helper-text": component.properties["helper-text"] || component.properties.helperText || "",}
                         : {}),
                       visible,
@@ -1520,8 +1571,8 @@ function App() {
                         : {}),
                     };
                   case "check-box":
-                    return {
-                      type: "CheckboxGroup",
+                  return {
+                    type: "CheckboxGroup",
                       description: component.properties.description || "",
                       name: component.properties.outputVariable || "",
                       label: component.properties.label || "",
@@ -1555,8 +1606,8 @@ function App() {
                       }
                     };
                   case "radio-button":
-                    return {
-                      type: "RadioButtonsGroup",
+                  return {
+                    type: "RadioButtonsGroup",
                       label: component.properties.label || "",
                       description: component.properties.description || "",
                       name: component.properties.outputVariable || "",
@@ -1584,8 +1635,8 @@ function App() {
                       "data-source": component.properties["data-source"] || []
                     };
                   case "footer-button":
-                    return {
-                      type: "Footer",
+                  return {
+                    type: "Footer",
                       label: component.properties?.buttonText || "",
                       ...(component.properties?.leftCaption
                         ? { "left-caption": component.properties.leftCaption }
@@ -1606,8 +1657,8 @@ function App() {
                         component.properties?.onClickAction === "navigate"
                           ? {
                             name: "navigate",
-                            next: {
-                              type: "screen",
+                        next: {
+                          type: "screen",
                               name: component.properties?.screenName || "",
                             },
                           }
@@ -1883,7 +1934,7 @@ function App() {
     if (isNameValid && isIdValid) {
       const screenId =
         newScreenId || newScreenName.toUpperCase().replace(/\s+/g, "_");
-
+      
       if (screens.some((screen) => screen.id === screenId)) {
         setScreenIdError("Screen ID must be unique");
         return;
@@ -1894,7 +1945,7 @@ function App() {
         title: newScreenName,
         components: [],
       };
-
+      
       setScreens([...screens, newScreen]);
       setActiveScreenIndex(screens.length);
       setSelectedComponent(null);
@@ -1989,12 +2040,12 @@ function App() {
 
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <AppContainer>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <AppContainer>
         <SidebarContainer>
           <Sidebar onAddComponent={handleAddComponent} />
         </SidebarContainer>
-
+        
         <MainContent>
           <BuilderContainer isPreviewVisible={showPreview}>
             <ButtonGroupContainer>
@@ -2009,17 +2060,17 @@ function App() {
                 {showPreview ? "Hide Preview" : "Show Preview"}
               </StyledButton>
             </ButtonGroupContainer>
-
+            
             <ScreenTabsContainer>
-              <Tabs
-                value={activeScreenIndex}
+              <Tabs 
+                value={activeScreenIndex} 
                 onChange={handleScreenChange}
                 variant="scrollable"
                 scrollButtons="auto"
               >
                 {screens.map((screen, index) => (
-                  <ScreenTab
-                    key={screen.id}
+                  <ScreenTab 
+                    key={screen.id} 
                     label={
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         <ScreenTitle>{screen.title}</ScreenTitle>
@@ -2042,7 +2093,7 @@ function App() {
                 <AddIcon />
               </AddScreenButton>
             </ScreenTabsContainer>
-
+            
             <Builder
               components={screens[activeScreenIndex].components}
               selectedComponent={selectedComponent}
@@ -2103,7 +2154,7 @@ function App() {
           />
           <PreviewContainer isVisible={showPreview}>
             <Simulator
-              components={screens[activeScreenIndex].components}
+              components={screens[activeScreenIndex].components} 
               screenTitle={screens[activeScreenIndex].title}
             />
           </PreviewContainer>
@@ -2128,8 +2179,8 @@ function App() {
           initialData={selectedScreenForEdit || undefined}
           existingScreenIds={screens.map((screen) => screen.id)}
         />
-      </AppContainer>
-    </DragDropContext>
+          </AppContainer>
+        </DragDropContext>
   );
 }
 
