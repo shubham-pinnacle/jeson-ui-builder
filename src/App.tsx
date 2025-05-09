@@ -383,7 +383,7 @@ function App() {
             leftCaption: "",
             centerCaption: "",
             rightCaption: "",
-            enabled: null,
+            enabled: undefined,
             onClickAction: "",
             screenName: "",
           };
@@ -614,12 +614,12 @@ function App() {
           leftCaption: "",
           centerCaption: "",
           rightCaption: "",
-          enabled: null,
+          enabled: undefined,
           onClickAction: "",
           screenName: "",
         };
         break;
-      case "embedded-link":
+      case "embedded-link":null
         newComponent.properties = {
           text: "",
           visible: true,
@@ -1614,7 +1614,7 @@ function App() {
                       // enabled,
                       // required,
                       ...(component.properties?.required
-                        ? { required }
+                        ? { generateJsonrequired }
                         : {}),
                       visible,
                       "init-value": component.properties.initValue || "",
@@ -1637,28 +1637,31 @@ function App() {
                   case "footer-button":
                   return {
                     type: "Footer",
-                      label: component.properties?.buttonText || "",
+                      label: component.properties?.label ?? "",
                       ...(component.properties?.leftCaption
-                        ? { "left-caption": component.properties.leftCaption }
+                        ? { "left-caption": component.properties["left-caption"] || component.properties.leftCaption || "" }
                         : {}),
                       ...(component.properties?.centerCaption
                         ? {
-                          "center-caption":
-                            component.properties.centerCaption,
+                          "center-caption": 
+                          component.properties["center-caption"] ||
+                          component.properties.centerCaption || ""
                         }
                         : {}),
                       ...(component.properties?.rightCaption
-                        ? { "right-caption": component.properties.rightCaption }
+                        ? { "right-caption": 
+                          component.properties["right-caption"] ||
+                          component.properties.rightCaption || ""}
                         : {}),
-                      ...(component.properties?.enabled
+                      ...(component.properties?.enabled !== undefined
                         ? { "enabled": enabled }
                         : {}),
                       "on-click-action":
                         component.properties?.onClickAction === "navigate"
                           ? {
                             name: "navigate",
-                        next: {
-                          type: "screen",
+                            next: {
+                            type: "screen",
                               name: component.properties?.screenName || "",
                             },
                           }
