@@ -400,10 +400,10 @@ function App() {
         case "opt-in":
           newComponent.properties = {
             label: "",
-            required: null,
+            required: undefined,
             visible: true,
             outputVariable: "",
-            initValue: null,
+            initValue: undefined,
             onClickAction: "",
             screenName: "",
             url: ""
@@ -631,10 +631,10 @@ function App() {
       case "opt-in":
         newComponent.properties = {
           label: "",
-          required: null,
+          required: undefined,
           visible: true,
           outputVariable: "",
-          initValue: null,
+          initValue: undefined,
           onClickAction: "",
           screenName: "",
           url: ""
@@ -1193,14 +1193,24 @@ function App() {
                 case "OptIn":
                   type = "opt-in"
                   properties = {
-                    label: child.label || "",
-                    outputVariable: child.name || "",
-                    required: child.required || null,
+                    ...prevComponent?.properties,
+                    ...(child.label !== undefined && { label: child.label }),
+                    // label: child.label || "",
+                    ...(child.name !== undefined && { outputVariable: child.name }),
+                    // outputVariable: child.name || "",
+                    ...(child.required !== undefined && { required: child.required }),
+                    // required: child.required || null,
                     visible: child.visible ?? true,
-                    initValue: child.initValue || null,
-                    onClickAction: child["on-click-action"]?.name || "",
-                    screenName: child["on-click-action"]?.next?.name || "",
-                    url: child["url"]?.url || ""
+                    ...(child['init-value'] !== undefined && { initValue: child["init-value"] }),
+                    // initValue: child.initValue || null,
+                    ...(child["on-click-action"]?.name !== undefined && { onClickAction: child["on-click-action"]?.name }),
+                    ...(child["on-click-action"]?.next?.name !== undefined && { screenName: child["on-click-action"]?.next?.name }),
+
+                    ...(child["on-click-action"]?.url !== undefined && { url: child["on-click-action"]?.url }),
+
+                    // onClickAction: child["on-click-action"]?.name || "",
+                    // screenName: child["on-click-action"]?.next?.name || "",
+                    // url: child["url"]?.url || ""
                   };
                   return {
                     id: prevComponent?.id || componentId,
@@ -1456,9 +1466,9 @@ function App() {
                     : true;
 
                 const intiValueOptIn = 
-                component.properties?.initValue === null ? null :
+                component.properties?.initValue === undefined ? undefined :
                 component.properties?.initValue === "false" ||
-                component.properties?.enabled === false
+                component.properties?.initValue === false
                   ? false
                   : true;
 
@@ -1794,45 +1804,110 @@ function App() {
                       cases: component.properties.cases || ["default"],
                     };
                   case "opt-in":
-                    const optInJson = {
+                    // const optInJson = {
+                    //   type: "OptIn",
+                    //   name: component.properties.outputVariable || "",
+                    //   label: component.properties?.label || "",
+                    //   ...(component.properties?.required
+                    //     ? { "required": required }
+                    //     : {}),
+                    //   visible,
+                    //   ...(component.properties?.initValue
+                    //     ? { "init-value": intiValueOptIn }
+                    //     : {}),
+                    //   // "init-value": component.properties?.initValue === "true"
+                    // };
+
+                    // // Add on-click-action if it's not none
+                    // if (component.properties?.onClick && component.properties.onClick !== "none") {
+                    //   if (component.properties.onClick === "navigate") {
+                    //     optInJson["on-click-action"] = {
+                    //       name: "navigate",
+                    //       next: {
+                    //         type: "screen",
+                    //         name: component.properties?.screenName || ""
+                    //       },
+                    //       payload: {}
+                    //     };
+                    //   } else if (component.properties.onClick === "open_url") {
+                    //     optInJson["on-click-action"] = {
+                    //       name: "open_url",
+                    //       url: component.properties?.url || "",
+                    //       payload: {}
+                    //     };
+                    //   } else if (component.properties.onClick === "data_exchange") {
+                    //     optInJson["on-click-action"] = {
+                    //       name: "data_exchange",
+                    //       payload: {}
+                    //     };
+                    //   }
+                    // }
+
+                    // // // Add select/unselect actions
+                    // // optInJson["on-select-action"] = {
+                    // //   name: "update_data",
+                    // //   payload: {}
+                    // // };
+                    // // optInJson["on-unselect-action"] = {
+                    // //   name: "update_data",
+                    // //   payload: {}
+                    // // };
+
+                    // return optInJson;
+                    
+                    return {
                       type: "OptIn",
-                      name: component.properties.outputVariable || "",
-                      label: component.properties?.label || "",
-                      ...(component.properties?.required
-                        ? { "required": required }
+                      name: component.properties.outputVariable || component.properties.name || "",
+                      label: component.properties?.label ?? "",
+                      ...(component.properties?.required !== undefined
+                        ? { required }
                         : {}),
                       visible,
-                      ...(component.properties?.initValue
+                      ...(component.properties?.initValue !== undefined
                         ? { "init-value": intiValueOptIn }
                         : {}),
                       // "init-value": component.properties?.initValue === "true"
+                      "on-click-action": component.properties?.onClickAction === "navigate" ? {
+                        name: "navigate",
+                        next: {
+                          type: "screen",
+                          name: component.properties?.screenName || ""
+                        }
+                      } : component.properties?.onClickAction === "open_url" ? {
+                        name: component.properties?.onClickAction ||"open_url",
+                        url: component.properties?.url ??""
+                      } : component.properties?.onClickAction === "data_exchange" ? {
+                        name:
+                          component.properties?.onClickAction ||
+                          "data_exchange",
+                      } : "",
                     };
 
-                    // Add on-click-action if it's not none
-                    if (component.properties?.onClick && component.properties.onClick !== "none") {
-                      if (component.properties.onClick === "navigate") {
-                        optInJson["on-click-action"] = {
-                          name: "navigate",
-                          next: {
-                            type: "screen",
-                            name: component.properties?.screenName || ""
-                          },
-                          payload: {}
-                        };
-                      } else if (component.properties.onClick === "open_url") {
-                        optInJson["on-click-action"] = {
-                          name: "open_url",
-                          url: component.properties?.url || "",
-                          payload: {}
-                        };
-                      } else if (component.properties.onClick === "data_exchange") {
-                        optInJson["on-click-action"] = {
-                          name: "data_exchange",
-                          payload: {}
-                        };
-                      }
-                    }
-
+                    // // Add on-click-action if it's not none
+                    // if (component.properties?.onClick && component.properties.onClick !== "none") {
+                    //   if (component.properties.onClick === "navigate") {
+                    //     optInJson["on-click-action"] = {
+                    //       name: "navigate",
+                    //       next: {
+                    //         type: "screen",
+                    //         name: component.properties?.screenName || ""
+                    //       },
+                    //       payload: {}
+                    //     };
+                    //   } else if (component.properties.onClick === "open_url") {
+                    //     optInJson["on-click-action"] = {
+                    //       name: "open_url",
+                    //       url: component.properties?.url || "",
+                    //       payload: {}
+                    //     };
+                    //   } else if (component.properties.onClick === "data_exchange") {
+                    //     optInJson["on-click-action"] = {
+                    //       name: "data_exchange",
+                    //       payload: {}
+                    //     };
+                    //   }
+                    // }
+                      
                     // // Add select/unselect actions
                     // optInJson["on-select-action"] = {
                     //   name: "update_data",
@@ -1843,7 +1918,6 @@ function App() {
                     //   payload: {}
                     // };
 
-                    return optInJson;
                   case "date-picker":
                     return {
                       type: "DatePicker",
