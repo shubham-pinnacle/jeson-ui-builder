@@ -1,9 +1,8 @@
-import React from "react";
 import {
   Stack,
   TextField,
   FormControl,
-  InputLabel,
+  InputLabel, 
   Select,
   MenuItem,
 } from "@mui/material";
@@ -31,15 +30,15 @@ export default function FooterButtonPropertyForm({
         label="Label"
         required
         fullWidth
-        value={component.properties?.buttonText || ""}
-        onChange={(e) => handleChange("buttonText", e.target.value)}
+        value={component.properties?.label ?? ""}
+        onChange={(e) => handleChange("label", e.target.value)}
         size="small"
-        error={isOverLimit("buttonText", 35)}
-        helperText={getHelperText("buttonText", 35)}
+        error={isOverLimit("label", 35)}
+        helperText={getHelperText("label", 35)}
         FormHelperTextProps={{
           sx: {
-            color: isOverLimit("buttonText", 35) ? "red" : "text.secondary",
-            fontWeight: isOverLimit("buttonText", 35) ? 600 : 400,
+            color: isOverLimit("label", 35) ? "red" : "text.secondary",
+            fontWeight: isOverLimit("label", 35) ? 600 : 400,
           },
         }}
       />
@@ -47,8 +46,8 @@ export default function FooterButtonPropertyForm({
       <FormControl fullWidth size="small">
         <InputLabel>Enabled (Optional)</InputLabel>
         <Select
-          value={component.properties?.enabled || null}
-          onChange={(e) => handleChange("enabled", e.target.value)}
+          value={component.properties?.enabled === undefined ? "" : String(component.properties.enabled)}
+          onChange={(e) => handleChange("enabled", e.target.value === "true")}
           label="Enabled (Optional)"
         >
           <MenuItem value="true">True</MenuItem>
