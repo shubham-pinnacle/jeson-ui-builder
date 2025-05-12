@@ -43,9 +43,8 @@ export default function EmbeddedLinkFields({
         label="Text"
         required
         fullWidth
-        value={component.properties?.text || ""}
+        value={component.properties?.text ?? ""}
         onChange={handleTextChange}
-
         size="small"
         error={showError}
         helperText={
@@ -66,8 +65,8 @@ export default function EmbeddedLinkFields({
       <FormControl fullWidth size="small">
         <InputLabel>Visible (Optional)</InputLabel>
         <Select
-          value={component.properties?.visible ?? true}
-          onChange={(e) => handleChange("visible", e.target.value)}
+          value={String(component.properties?.visible ?? "true")}
+          onChange={(e) => handleChange("visible", e.target.value === "true")}
           label="Visible (Optional)"
         >
           <MenuItem value="true">True</MenuItem>
@@ -78,8 +77,8 @@ export default function EmbeddedLinkFields({
       <FormControl fullWidth size="small">
         <InputLabel>On Click Action * </InputLabel>
         <Select
-          value={component.properties?.onClick || ""}
-          onChange={(e) => handleChange("onClick", e.target.value)}
+          value={component.properties?.onClickAction || ""}
+          onChange={(e) => handleChange("onClickAction", e.target.value)}
           label="On Click Action"
         >
           <MenuItem value="open_url">Open URL</MenuItem>
@@ -88,18 +87,18 @@ export default function EmbeddedLinkFields({
         </Select>
       </FormControl>
 
-      {component.properties?.onClick === "open_url" && (
+      {component.properties?.onClickAction === "open_url" && (
         <TextField
           label="URL"
           required
           fullWidth
-          value={component.properties?.url || ""}
+          value={component.properties?.url ?? ""}
           onChange={(e) => handleChange("url", e.target.value)}
           size="small"
         />
       )}
 
-      {component.properties?.onClick === "navigate" && (
+      {component.properties?.onClickAction === "navigate" && (
         <FormControl fullWidth size="small">
           <InputLabel>Screen Name</InputLabel>
           <Select
@@ -115,6 +114,8 @@ export default function EmbeddedLinkFields({
           </Select>
         </FormControl>
       )}
+
+      
     </Stack>
   );
 }

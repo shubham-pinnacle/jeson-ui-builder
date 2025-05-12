@@ -400,7 +400,7 @@ function App() {
             leftCaption: "",
             centerCaption: "",
             rightCaption: "",
-            enabled: null,
+            enabled: undefined,
             onClickAction: "",
             screenName: "",
           };
@@ -631,7 +631,7 @@ function App() {
           leftCaption: "",
           centerCaption: "",
           rightCaption: "",
-          enabled: null,
+          enabled: undefined,
           onClickAction: "",
           screenName: "",
         };
@@ -1284,13 +1284,16 @@ function App() {
                 };
                 case "EmbeddedLink":
                   type = "embedded-link"
-                properties = {
+                  properties = {
                     ...prevComponent?.properties,
                     ...(child.text !== undefined && { text: child.text }),
                     visible: child.visible ?? true,
                     ...(child["on-click-action"]?.name !== undefined && { onClickAction: child["on-click-action"]?.name }),
                     ...(child["on-click-action"]?.next?.name !== undefined && { screenName: child["on-click-action"]?.next?.name }),
-                    ...(child["url"]?.url !== undefined && { url: child["url"]?.url })
+
+                    ...(child["on-click-action"]?.url !== undefined && { url: child["on-click-action"]?.url }),
+
+                    // ...(child.url !== undefined && { url: child.url })
                 };
                 return {
                   id: prevComponent?.id || componentId,
@@ -1706,20 +1709,22 @@ function App() {
                   case "embedded-link":
                     return {
                       type: "EmbeddedLink",
-                      text: component.properties?.text || "",
+                      text: component.properties?.text ?? "",
                       visible,
-                      "on-click-action": component.properties?.onClick === "navigate" ? {
+                      "on-click-action": component.properties?.onClickAction === "navigate" ? {
                         name: "navigate",
                         next: {
                           type: "screen",
                           name: component.properties?.screenName || ""
                         }
-                      } : component.properties?.onClick === "open_url" ? {
-                        name: "open_url",
-                        url: component.properties?.url || ""
-                      } : {
-                        name: component.properties?.onClick || ""
-                      }
+                      } : component.properties?.onClickAction === "open_url" ? {
+                        name: component.properties?.onClickAction ||"open_url",
+                        url: component.properties?.url ??""
+                      } : component.properties?.onClickAction === "data_exchange" ? {
+                        name:
+                          component.properties?.onClickAction ||
+                          "data_exchange",
+                      } : "",
                     };
                   case "radio-button":
                   return {
@@ -1753,28 +1758,31 @@ function App() {
                   case "footer-button":
                   return {
                     type: "Footer",
-                      label: component.properties?.buttonText || "",
+                      label: component.properties?.label ?? "",
                       ...(component.properties?.leftCaption
-                        ? { "left-caption": component.properties.leftCaption }
+                        ? { "left-caption": component.properties["left-caption"] || component.properties.leftCaption || "" }
                         : {}),
                       ...(component.properties?.centerCaption
                         ? {
-                          "center-caption":
-                            component.properties.centerCaption,
+                          "center-caption": 
+                          component.properties["center-caption"] ||
+                          component.properties.centerCaption || ""
                         }
                         : {}),
                       ...(component.properties?.rightCaption
-                        ? { "right-caption": component.properties.rightCaption }
+                        ? { "right-caption": 
+                          component.properties["right-caption"] ||
+                          component.properties.rightCaption || ""}
                         : {}),
-                      ...(component.properties?.enabled
+                      ...(component.properties?.enabled !== undefined
                         ? { "enabled": enabled }
                         : {}),
                       "on-click-action":
                         component.properties?.onClickAction === "navigate"
                           ? {
                             name: "navigate",
-                        next: {
-                          type: "screen",
+                            next: {
+                            type: "screen",
                               name: component.properties?.screenName || "",
                             },
                           }
