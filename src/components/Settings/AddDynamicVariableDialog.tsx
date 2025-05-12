@@ -375,12 +375,12 @@ const AddDynamicVariableDialog: React.FC<AddDynamicVariableDialogProps> = ({
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography variant="h6" sx={{ fontWeight: 'medium', fontSize: '0.95rem' }}>
+          <Typography variant="body1" sx={{ fontWeight: 'medium', fontSize: '0.95rem' }}>
             Add Dynamic Variable
           </Typography>
           {variableType && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="h6" sx={{ fontWeight: 'medium', fontSize: '0.95rem' ,backgroundColor: "#f57c00", padding:"2px 5px"  ,borderRadius:"5px"}}>
+              <Typography variant="body1" sx={{ fontWeight: 'medium', fontSize: '0.95rem' ,backgroundColor: "#f57c00", padding:"2px 5px"  ,borderRadius:"5px"}}>
                 {variableType}
               </Typography>
             </Box>

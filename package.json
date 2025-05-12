@@ -30,6 +30,7 @@
     "react-json-editor-ajrm": "^2.5.14",
     "react-redux": "^9.2.0",
     "react-syntax-highlighter": "^15.6.1",
+    "redux-persist": "^6.0.0",
     "styled-components": "^6.1.16",
     "uuid": "^11.1.0"
   },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent, useRef } from "react";
 import { styled } from "@mui/material/styles";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import {
@@ -11,26 +11,43 @@ import {
   Menu,
   MenuItem,
   TextField,
+  AppBar,
+  Toolbar,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import SettingsIcon from "@mui/icons-material/Settings";
+import SaveIcon from "@mui/icons-material/Save";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import AddIcon from "@mui/icons-material/Add";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import SettingsIcon from '@mui/icons-material/Settings';
-import SaveIcon from '@mui/icons-material/Save';
+import { useDispatch, useSelector } from "react-redux";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Builder from "./components/Builder/Builder";
 import Simulator from "./components/Simulator/Simulator";
-import MetaJsonGenerator from "./components/MetaJsonGenerator";
 import ScreenDialog from "./components/ScreenDialog";
 import { Component } from "./types";
-import Dialog from "@mui/material/Dialog";
-import { useSelector, useDispatch } from 'react-redux';
+// Screen interface is defined within this file
 import { RootState } from './store/index';
-import { useToast } from './components/ToastContext';;
+import { useToast } from './components/ToastContext';
 import SettingsDialog from "./components/Settings/SettingsDialog"
+import Dialog from "@mui/material/Dialog";
+import MetaJsonGenerator from "./components/MetaJsonGenerator";
+import { store } from "./store";
 
+const generateComponentId = (type: string, properties: any): string => {
+  const propertyString = JSON.stringify(properties || {});
+  const baseString = `${type}-${propertyString}`;
+  
+  let hash = 0;
+  for (let i = 0; i < baseString.length; i++) {
+    const char = baseString.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  
+  return `${type}-${Math.abs(hash).toString(16).substring(0, 8)}`;
+};
 
 const AppContainer = styled("div")({
   display: "flex",
@@ -809,7 +826,10 @@ function App() {
   };
 
   const handleJsonChange = (newJson: string) => {
+    // Store the current edit value to check if it actually changed
+    const prevEditValue = editValue;
     setEditValue(newJson);
+    
     try {
       const trimmedJson = newJson.trim();
       if (!trimmedJson) {
@@ -818,106 +838,200 @@ function App() {
 
       const parsedJson = JSON.parse(trimmedJson);
 
-      if (!parsedJson || typeof parsedJson !== "object") {
-        console.error("Invalid JSON: Expected an object");
+      if (!parsedJson) {
+        console.error('App.tsx - handleJsonChange: No parsed JSON data');
         return;
       }
 
-      if (!parsedJson.screens || !Array.isArray(parsedJson.screens)) {
-        console.error("Invalid JSON: Missing or invalid screens array");
+      const jsonScreens = parsedJson.screens;
+
+      if (!jsonScreens) {
+        console.error('App.tsx - handleJsonChange: No screens in JSON data');
         return;
       }
 
-      // Extract all data-source options from radio buttons and checkboxes
-      const allDataSources: any[] = [];
-      parsedJson.screens.forEach((screen: any) => {
-        const layoutChildren = screen.layout?.children || [];
-        layoutChildren.forEach((child: any) => {
-          if ((child.type === "RadioButtonsGroup" || child.type === "CheckboxGroup") &&
-            Array.isArray(child["data-source"])) {
-            // Add each option to the Redux store
-            child["data-source"].forEach((option: any) => {
-              if (option && option.id && option.title) {
-                // Dispatch to Redux store
-                dispatch({ type: 'UPDATE_OPTION', payload: option });
-                allDataSources.push(option);
-              }
-            });
-          }
-        });
-      });
+      // Get the current active screen from redux state
+      const currentScreens = screens;
+      const activeScreen = currentScreens[activeScreenIndex];
+      
+      if (!activeScreen) {
+        console.error('App.tsx - handleJsonChange: No active screen found');
+        return;
+      }
+      
+      let screenId = activeScreen.id;
+      const components: Component[] = [];
 
-      const newScreens = parsedJson.screens.map((screen: any) => {
-        const prevScreen = screens.find(s => s.id === screen.id);
-        const layoutChildren = screen.layout?.children || [];
-        
-        return {
+      // Track if we need to update Redux at all
+      let reduxUpdateNeeded = false;
+      
+      // Store the current layout's children for component matching
+      const layoutChildren = jsonScreens.find((s: any) => s.id === screenId)?.children || [];
+
+      // Create new screens array to store transformed screens
+      const newScreens = jsonScreens.map((screen: any) => {
+        // Start with the existing screen as a base
+        const newScreen = {
           id: screen.id,
-          title: screen.title,
-          components: layoutChildren
-            .map((child: any) => {
-              let type = "";
-            let properties: Record<string, any> = {};
-              
-              // Generate a stable component ID at the beginning
-              // Don't include name in ID to prevent breaking component identification when name changes
-              const componentId = child.id || 
-                `component_${child.type || ''}${child.label || ''}${child.text || ''}`;
-                
-              // PRIORITY 1: If child has explicit ID, use that to find component
-              let prevComponent = child.id ? 
-                prevScreen?.components.find((c: any) => c.id === child.id) : null;
-                
-              // Store original ID to ensure we maintain component identity
-              const originalId = child.id;
-              
-              // PRIORITY 2: If not found by ID, try finding by generated ID
-              if (!prevComponent) {
-                prevComponent = prevScreen?.components.find(
-                  (c: any) => c.id === componentId
-                );
+          title: screen.title || screen.id,
+          components: []
+        };
+        
+        // If this is the active screen, process its components
+        if (screen.id === screenId && Array.isArray(screen.children)) {
+          // Transform each child into a component
+          newScreen.components = screen.children.map((child: any) => {
+            let type = child.type || "";
+            let properties = {};
+            
+            // Function to process common properties
+            const processCommonProps = (c: any) => {
+              if (c.hasOwnProperty("visible")) {
+                return { ...properties, visible: c.visible };
               }
+              return properties;
+            };
+            
+            if (child.hasOwnProperty("properties")) {
+              const { "on-click-action": onClickAction, ...otherProps } = child.properties;
               
-              // PRIORITY 3: If not found and component has name, try finding by name
-              if (!prevComponent && child.name) {
-                prevComponent = prevScreen?.components.find((c: any) => 
-                  (c.properties.outputVariable === child.name || c.properties.name === child.name) &&
-                  c.type === child.type
-                );
-              }
-              
-              // PRIORITY 4: If still not found, try matching by position/index in the layout
-              // This helps maintain identities when the component is completely renamed
-              if (!prevComponent && prevScreen?.components && layoutChildren) {
-                const index = layoutChildren.indexOf(child);
-                if (index >= 0 && index < prevScreen.components.length) {
-                  const sameTypeAtIndex = prevScreen.components.filter(c => c.type === child.type);
-                  if (sameTypeAtIndex.length > 0) {
-                    const indexInType = layoutChildren.filter(c => c.type === child.type).indexOf(child);
-                    if (indexInType >= 0 && indexInType < sameTypeAtIndex.length) {
-                      prevComponent = sameTypeAtIndex[indexInType];
+              if (onClickAction) {
+                if (onClickAction.type === "next-screen") {
+                  properties = {
+                    ...otherProps,
+                    "on-click-action": {
+                      type: onClickAction.type,
+                      screenId: onClickAction.screenId || ""
                     }
+                  };
+                } else if (onClickAction.type === "close-screen") {
+                  properties = {
+                    ...otherProps,
+                    "on-click-action": {
+                      type: onClickAction.type
+                    }
+                  };
+                } else if (onClickAction.type === "submit-form") {
+                  properties = {
+                    ...otherProps,
+                    "on-click-action": {
+                      type: onClickAction.type
+                    }
+                  };
+                }
+              } else {
+                properties = { ...otherProps };
+              }
+            }
+            
+            // PRIORITY 1: If child has explicit ID, use that to find component
+            let prevComponent = child.id ? 
+              activeScreen.components.find((c: any) => c.id === child.id) : null;
+                
+            // Store original ID to ensure we maintain component identity
+            const originalId = child.id || "";
+              
+            // Generate a consistent component ID based on type and properties
+            const componentId = generateComponentId(child.type, child.properties);
+              
+            // PRIORITY 2: If not found by ID, try finding by generated ID
+            if (!prevComponent) {
+              prevComponent = activeScreen.components.find(
+                (c: any) => c.id === componentId
+              );
+            }
+              
+            // PRIORITY 3: If not found and component has name, try finding by name
+            if (!prevComponent && child.name) {
+              prevComponent = activeScreen.components.find((c: any) => 
+                (c.properties.outputVariable === child.name || c.properties.name === child.name) &&
+                c.type === child.type
+              );
+            }
+              
+            // PRIORITY 4: If still not found, try matching by position/index in the layout
+            // This helps maintain identities when the component is completely renamed
+            if (!prevComponent && activeScreen.components && layoutChildren) {
+              const index = layoutChildren.indexOf(child);
+              if (index >= 0 && index < activeScreen.components.length) {
+                const sameTypeAtIndex = activeScreen.components.filter((c: any) => c.type === child.type);
+                if (sameTypeAtIndex.length > 0) {
+                  const indexInType = layoutChildren.filter((c: any) => c.type === child.type).indexOf(child);
+                  if (indexInType >= 0 && indexInType < sameTypeAtIndex.length) {
+                    prevComponent = sameTypeAtIndex[indexInType];
                   }
                 }
               }
-
-            switch (child.type) {
-                case "TextHeading":
-                  type = "text-heading";
+            }
+              switch (child.type) {
+              case "TextHeading":
+                type = "text-heading";
+                
+                // If text is updated from JSON editor, update Redux store
+                if (child.text !== undefined) {
+                  console.log('App.tsx - TextHeading text from JSON:', child.text);
+                  console.log('App.tsx - Component ID:', child.id);
+                  
+                  // Get the variable name from the new text
+                  const variableMatch = child.text.match(/\${data\.(.*?)}/g);
+                  console.log('App.tsx - Variable matches found:', variableMatch);
+                  
+                  // If variable exists in the text
+                  if (variableMatch) {
+                    // Extract variable name for debugging
+                    const varName = variableMatch[0].replace(/\${data\.(.*?)}/, '$1');
+                    console.log('App.tsx - Variable name extracted:', varName);
+                    
+                    // Convert from JSON format to UI format
+                    const uiText = child.text.replace(/\${data\.(.*?)}/g, '{{$1}}');
+                    console.log('App.tsx - Converted to UI format:', uiText);
+                    
+                    // Update Redux store with the new text and component ID
+                    dispatch({ 
+                      type: 'SET_TEXT', 
+                      payload: { 
+                        text: uiText, 
+                        componentId: child.id 
+                      }
+                    });
+                    console.log('App.tsx - Updated Redux with variable text:', uiText, 'for component:', child.id);
+                  } else if (child.text === '') {
+                    // Handle empty text case
+                    console.log('App.tsx - Empty text detected for component:', child.id);
+                    dispatch({ 
+                      type: 'SET_TEXT', 
+                      payload: { 
+                        text: '', 
+                        componentId: child.id 
+                      }
+                    });
+                  } else {
+                    // Handle regular text without variables
+                    console.log('App.tsx - Regular text without variables:', child.text, 'for component:', child.id);
+                    dispatch({ 
+                      type: 'SET_TEXT', 
+                      payload: { 
+                        text: child.text, 
+                        componentId: child.id 
+                      }
+                    });
+                  }
+                }
+                break;
+                
                 properties = {
-                    ...prevComponent?.properties,
-                    ...(child.text !== undefined && { text: child.text }),
-                    ...(child.visible !== undefined && { visible: child.visible }),
-                  };
-                  return {
-                    id: prevComponent?.id || componentId,
-                    type,
-                    name: type
-                      .replace(/-/g, " ")
-                      .replace(/\b\w/g, (l) => l.toUpperCase()),
-                    properties,
-                  };
-                case "TextSubheading":
+                  ...prevComponent?.properties,
+                  ...(child.text !== undefined && { text: child.text }),
+                  ...(child.visible !== undefined && { visible: child.visible }),
+                };
+                return {
+                  id: prevComponent?.id || componentId,
+                  type,
+                  name: type.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+                  properties,
+                };
+                
+              case "TextSubheading":
                   type = "sub-heading";
                 properties = {
                     ...prevComponent?.properties,
@@ -1324,21 +1438,23 @@ function App() {
 
 
             // Use the stable ID generated at the beginning or preserve original ID
+            // Create a component with preserved ID or generated one
             return {
-                id:
+                id: prevComponent?.id || 
                   child.id ||
                   `component_${Date.now()}_${Math.random()
                     .toString(36)
                     .substr(2, 9)}`,
-              type,
+                type,
                 name: type
                   .replace(/-/g, " ")
-                  .replace(/\b\w/g, (l) => l.toUpperCase()),
+                  .replace(/\b\w/g, (l: any) => l.toUpperCase()),
                 properties,
               };
-            })
-            .filter((c): c is Component => c !== null),
-        };
+            }).filter((c): c is Component => c !== null);
+        }
+        // Return the processed screen
+        return newScreen;
       });
 
 
